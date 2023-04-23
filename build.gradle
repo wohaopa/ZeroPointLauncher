@@ -1,0 +1,76 @@
+plugins {
+    id 'java'
+    id 'com.diffplug.spotless' version '6.7.2'
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
+}
+
+group 'com.github.wohaopa'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+spotless {
+    java {
+        googleJavaFormat()
+    }
+}
+
+dependencies {
+
+    implementation 'cn.hutool:hutool-all:5.8.17'
+    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+    implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
+
+    implementation 'org.apache.commons:commons-compress:1.21'
+    implementation 'org.tukaani:xz:1.9'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+def allJars = (configurations.runtimeClasspath)
+        .findAll{it.isFile()}
+        .collect { 'lib/' + it.name }
+        .join(' ')
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.github.wohaopa.zeropointwrapper.Main',
+                'Class-Path': allJars + " ."
+        )
+    }
+}
+
+spotless {
+    encoding 'UTF-8'
+
+    format 'misc', {
+        target '.gitignore'
+
+        trimTrailingWhitespace()
+        indentWithSpaces(4)
+        endWithNewline()
+    }
+    java {
+        target 'src/*/java/**/*.java', 'src/*/scala/**/*.java'
+
+        toggleOffOn()
+        importOrderFile('spotless.importorder')
+        removeUnusedImports()
+        eclipse('4.19.0').configFile('spotless.eclipseformat.xml')
+    }
+}
+
+
+tasks.register('copyDependencies', Copy) {
+    from configurations.runtimeClasspath
+    into "$buildDir/libs/lib"
+    from "$rootDir/启动.bat"
+    into "$buildDir/libs"
+}
