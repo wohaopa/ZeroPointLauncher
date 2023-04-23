@@ -1,3 +1,4 @@
+
 plugins {
     id 'java'
     id 'com.diffplug.spotless' version '6.7.2'
@@ -57,14 +58,18 @@ spotless {
         indentWithSpaces(4)
         endWithNewline()
     }
+
+
     java {
         target 'src/*/java/**/*.java', 'src/*/scala/**/*.java'
-
+//
         toggleOffOn()
         importOrderFile('spotless.importorder')
         removeUnusedImports()
+        licenseHeaderFile("licenseHeader")
         eclipse('4.19.0').configFile('spotless.eclipseformat.xml')
     }
+
 }
 
 

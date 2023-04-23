@@ -1,4 +1,4 @@
 # 默认忽略的文件
 /.gradle/
 /.idea/
-/lib/
+/build/
