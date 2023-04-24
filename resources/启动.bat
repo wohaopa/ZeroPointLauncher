@@ -16,7 +16,7 @@ exit /B
 chcp 65001>nul
 echo 本程序需要使用管理员权限来完成文件链接的创建。本程序完全开源，不存在其他操作行为。
 cd /d %cwd%
-java -Dfile.encoding=utf8 -jar ZeroPointServerWrapper-1.0-SNAPSHOT.jar
+java -Dfile.encoding=utf8 -jar ZeroPointLaunch-1.0-SNAPSHOT.jar
 
 echo 按任意键退出
 pause>nul
