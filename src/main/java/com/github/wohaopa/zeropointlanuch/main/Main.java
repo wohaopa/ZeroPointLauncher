@@ -18,40 +18,37 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointwrapper;
+package com.github.wohaopa.zeropointlanuch.main;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.http.HttpUtil;
+import com.github.wohaopa.zeropointlanuch.core.DirTools;
+import com.github.wohaopa.zeropointlanuch.core.Log;
 
 public class Main {
 
     public static String launcherVersion = "内部测试版本";
-    public static boolean DEBUG = false;
+    public static boolean DEBUG = true;
 
     public static Map<String, ICommand> cmds = new HashMap<>();
 
     public static void main(String[] args) {
 
         if (DEBUG) {
-            test();
+            // DownLoadUtil.downloadFile(
+            // "http://127.0.0.1/ZPL/standard/GT_New_Horizons_2.3.0_Client.zip",
+            // new File("D:\\test\\file"));
             return;
         }
 
-        if (!Boolean.getBoolean(System.getProperty("zp.skipLib"))) {
-            librariesCheckAndDown();
-        }
-
-        Log.LOGGER.info("ZeroPoint启动器核心启动");
-
-        DirTools.init(new File("D:\\ZeroPointServer\\Launcher\\Test"));
+        long a = System.currentTimeMillis();
+        Log.LOGGER.debug("ZeroPoint启动器核心正在启动...");
         Main.init();
+        long b = System.currentTimeMillis();
+        Log.LOGGER.debug("ZeroPoint启动器核心启动成功，用时：{}ms", b - a);
 
         if (args.length == 0) {
             appProcess();
@@ -60,22 +57,33 @@ public class Main {
         }
 
         Log.LOGGER.info("ZeroPoint启动器核心关闭");
-    }
-
-    private static void librariesCheckAndDown() {}
-
-    public static void test() {
-
-        // 当无法识别页面编码的时候，可以自定义请求页面的编码
-        String result2 = HttpUtil.get("http://127.0.0.1", CharsetUtil.CHARSET_UTF_8);
-        System.out.println(result2);
+        System.exit(0); // 关闭用于下载的线程池
     }
 
     private static void init() {
+
+        String rootDirStr = System.getProperty("zpl.rootdir");
+
+        if (rootDirStr == null) {
+            rootDirStr = System.getProperty("user.dir");
+        }
+        rootDirStr = "D:\\ZeroPointServer\\Launcher\\Test";
+
+        DirTools.init(new File(rootDirStr));
+
         Class<Command> clazz = Command.class;
         Field[] fields = clazz.getFields();
         try {
             for (Field field : fields) {
+                cmds.put(field.getName(), (ICommand) field.get(null));
+            }
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        Class<GenCommand> clazz1 = GenCommand.class;
+        Field[] fields1 = clazz1.getFields();
+        try {
+            for (Field field : fields1) {
                 cmds.put(field.getName(), (ICommand) field.get(null));
             }
         } catch (IllegalAccessException e) {
@@ -106,12 +114,10 @@ public class Main {
             // 增量更新版本，将会自动下载所需文件。本启动器独有的更新方式，支持版本有限，敬请期待后续更新。\n"
             // "update <实例名> <版本号> - 升级一个实例\n"
             // "translate <实例名> - 汉化一个实例 \n"
-            // "genRunDir <实例名/all> - 生成一个实例的.minecraft目录，其可被hmcl/pcl等启动器启动\n"
             // "genLwjgl3ify <实例名> - 生成Java17版本\n"
             // "launch <实例名> - 启动一个实例\n"
             // "login <offline> <用户名> - 登录账户\n"
 
-            // translation 2.3.2 "D:\ZeroPointServer\Launcher\Test\汉化\2.3.0_complete.zip"
             String cmdStrLine = sc.nextLine(); // IDEA中的终端支持中文，cmd不支持，我吐了！！！
 
             String[] args = cmdStrLine.split(" ");

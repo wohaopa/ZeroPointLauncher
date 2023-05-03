@@ -18,36 +18,37 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointwrapper;
+package com.github.wohaopa.zeropointlanuch.core.download;
 
-import java.util.*;
+public class DownloadProvider {
 
-public class Differ {
+    private static final DownloadProvider defaultProvider = new DownloadProvider();
 
-    public static List<Map<String, Long>> diff(Map<String, Long> checksum1, Map<String, Long> checksum2) {
-        List<Map<String, Long>> list = new ArrayList<>();
+    private static DownloadProvider provider;
+    String assetsBase;
 
-        Map<String, Long> inst1have = new HashMap<>();
-        Map<String, Long> inst2have = new HashMap<>();
-        list.add(inst1have);
-        list.add(inst2have);
+    String assetsIndexJsonUrl;
+    String librariesIndexJsonUrl;
 
-        for (Map.Entry<String, Long> entry : checksum1.entrySet()) {
-            if (checksum2.containsKey(entry.getKey())
-                && Objects.equals(checksum2.get(entry.getKey()), entry.getValue())) {
-                continue;
-            }
-            inst1have.put(entry.getKey(), entry.getValue());
-        }
+    public DownloadProvider() {
+        this.assetsBase = "https://resources.download.minecraft.net/";
+        this.assetsIndexJsonUrl = "https://launchermeta.mojang.com/v1/packages/1863782e33ce7b584fc45b037325a1964e095d3e/1.7.10.json";
+        this.librariesIndexJsonUrl = "https://libraries.minecraft.net/";
+    }
 
-        for (Map.Entry<String, Long> entry : checksum2.entrySet()) {
-            if (checksum1.containsKey(entry.getKey())
-                && Objects.equals(checksum1.get(entry.getKey()), entry.getValue())) {
-                continue;
-            }
-            inst2have.put(entry.getKey(), entry.getValue());
-        }
+    public static DownloadProvider getProvider() {
+        return defaultProvider;
+    }
 
-        return list;
+    public String getLibrariesBaseUrl() {
+        return librariesIndexJsonUrl;
+    }
+
+    public String getAssetsIndexJsonUrl() {
+        return assetsIndexJsonUrl;
+    }
+
+    public String getAssetsObjUrl(String hash) {
+        return assetsBase + hash.substring(0, 2) + "/" + hash;
     }
 }

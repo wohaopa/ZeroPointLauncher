@@ -18,11 +18,15 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointwrapper;
+package com.github.wohaopa.zeropointlanuch.main;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
+import java.util.List;
+
+import com.github.wohaopa.zeropointlanuch.api.Function;
+import com.github.wohaopa.zeropointlanuch.core.DirTools;
+import com.github.wohaopa.zeropointlanuch.core.Instance;
 
 @SuppressWarnings("unused") // 内部所有字段都会被反射注册
 public class Command {
@@ -38,7 +42,7 @@ public class Command {
             }
 
             String name = args[1];
-            if (Instance.instances.containsKey(name)) {
+            if (Instance.containsKey(name)) {
                 System.out.println("错误：实例名重复:" + name + "\n");
                 return false;
             }
@@ -57,8 +61,8 @@ public class Command {
                 return false;
             }
             // 校验完成
+            Function.installStandard(zipFile, instDir, name, ver); // 执行
 
-            Instance.installStandard(zipFile, instDir, name, ver); // 执行
             return true; // 执行成功
         }
 
@@ -71,8 +75,11 @@ public class Command {
 
         @Override
         public boolean execute(String[] args) {
-            System.out.println("共有：" + Instance.instances.size() + "个GTNH实例被识别");
-            for (Instance instance : Instance.instances.values())
+
+            List<Instance> list = Function.listInst();
+
+            System.out.println("共有：" + list.size() + "个GTNH实例被识别");
+            for (Instance instance : list)
                 System.out.println("实例名：" + instance.information.name + " 版本：" + instance.information.version);
             System.out.println();
             return true;
@@ -113,38 +120,7 @@ public class Command {
         @Override
         public boolean execute(String[] args) {
 
-            Log.LOGGER.debug("[文件初始化]实例搜寻：开始");
-            Instance.instances.clear();
-
-            for (File file : Objects.requireNonNull(DirTools.instancesDir.listFiles())) {
-                if (file.isDirectory()) {
-                    File version = new File(file, "version.json");
-                    if (version.exists()) {
-                        Log.LOGGER.debug("[文件初始化]实例搜寻：发现实例" + file.getName());
-                        Instance.addInst(version);
-                    }
-                }
-            }
-            Log.LOGGER.debug("[文件初始化]实例搜寻：结束");
-
-            Log.LOGGER.debug("[文件初始化]安装包搜寻：开始");
-            for (File file : Objects.requireNonNull(DirTools.zipDir.listFiles())) {
-                if (file.isFile() && file.getName()
-                    .endsWith(".zip")) {
-                    String name = file.getName();
-                    name = name.replace("GT_New_Horizons_", "");
-                    name = name.replace("_Client.zip", "");
-                    if (!Instance.instances.containsKey(name)) {
-                        Log.LOGGER.debug("[文件初始化]实例搜寻：发现安装包 {}，名为 {}", file.getName(), name);
-                        try {
-                            Instance.installStandard(file, new File(DirTools.instancesDir, name), name, name);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-            }
-            Log.LOGGER.debug("[文件初始化]安装包搜寻：结束");
+            Function.lookup();
             return true;
         }
 
@@ -162,14 +138,12 @@ public class Command {
                 return false;
             }
 
-            if (!Instance.instances.containsKey(args[1])) {
+            if (!Instance.containsKey(args[1])) {
                 System.out.println("错误：已安装的实例中不包含：\"" + args[1] + "\" 可以使用list指令查看已安装实例");
                 return false;
             }
 
-            Instance inst = Instance.instances.get(args[1]);
-            inst.genRuntimeDir();
-            System.out.println("dir=" + inst.information.runDir);
+            System.out.println("dir=" + Function.genRuntimeDir(args[1]));
 
             return true;
         }
@@ -189,13 +163,13 @@ public class Command {
             }
 
             String depInst = args[1];
-            if (!Instance.instances.containsKey(depInst)) {
+            if (!Instance.containsKey(depInst)) {
                 System.out.println("错误：已安装的实例中不包含：\"" + depInst + "\" 可以使用list指令查看已安装实例");
                 return false;
             }
 
             String name = depInst + "-translation";
-            if (Instance.instances.containsKey(name)) {
+            if (Instance.containsKey(name)) {
                 System.out.println("错误：已存在:" + name + "\n");
                 return false;
             }
@@ -213,15 +187,39 @@ public class Command {
                 return false;
             }
 
-            String version = Instance.instances.get(depInst).information.version;
+            Function.installTranslation(zipFile, instDir, name, depInst);
 
-            Instance.installTranslation(zipFile, instDir, name, version, depInst);
             return true;
         }
 
         @Override
         public String usage() {
             return "translation <实例名> <汉化包路径> - 汉化实例";
+        }
+    };
+
+    public static ICommand genHMCLDir = new ICommand() {
+
+        @Override
+        public boolean execute(String[] args) throws IOException {
+            if (args.length < 2) {
+                System.out.println("用法" + usage());
+                return false;
+            }
+
+            if (!Instance.containsKey(args[1])) {
+                System.out.println("错误：已安装的实例中不包含：\"" + args[1] + "\" 可以使用list指令查看已安装实例");
+                return false;
+            }
+
+            System.out.println("dir=" + Function.genHMCLDir(args[1]));
+
+            return true;
+        }
+
+        @Override
+        public String usage() {
+            return "genHMCLDir <实例名> - 生成hmcl支持的.miencraft文件夹";
         }
     };
 }

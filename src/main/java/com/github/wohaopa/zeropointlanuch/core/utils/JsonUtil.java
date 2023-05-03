@@ -18,8 +18,12 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointwrapper.utils;
+package com.github.wohaopa.zeropointlanuch.core.utils;
 
+import java.io.File;
+import java.nio.charset.Charset;
+
+import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
 
 public class JsonUtil {
@@ -33,5 +37,9 @@ public class JsonUtil {
     /** 将JSON转为POJO */
     public static <T> T fromJson(String json, Class<T> type) {
         return JSONUtil.toBean(json, type);
+    }
+
+    public static JSON fromJson(File jsonFile) {
+        return JSONUtil.readJSON(jsonFile, Charset.defaultCharset());
     }
 }

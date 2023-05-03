@@ -18,13 +18,30 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointwrapper;
+package com.github.wohaopa.zeropointlanuch.core;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.File;
 import java.io.IOException;
 
-public interface ICommand {
+import org.junit.jupiter.api.Test;
 
-    boolean execute(String[] args) throws IOException;
+class InstanceInstallerTest {
 
-    String usage();
+    @Test
+    void installStandard() throws IOException {
+        DirTools.init(new File("D:\\ZeroPointServer\\Launcher\\.GTNH"));
+
+        InstanceInstaller.addInst(new File("D:\\ZeroPointServer\\Launcher\\.GTNH\\instances\\2.3.0\\version.json"));
+
+        // InstanceInstaller.installStandard(
+        // new
+        // File("D:\\ZeroPointServer\\Launcher\\.GTNH\\zip\\GT_New_Horizons_2.3.0_Client.zip"),
+        // new File("D:\\ZeroPointServer\\Launcher\\.GTNH\\instances\\2.3.0"),
+        // "2.3.0",
+        // "2.3.0");
+        Instance.get("2.3.0")
+            .genRuntimeDir();
+    }
 }

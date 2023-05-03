@@ -73,9 +73,13 @@ spotless {
 }
 
 
-tasks.register('copyDependencies', Copy) {
-    from configurations.runtimeClasspath
+tasks.register('copyLib', Copy) {
+    dependsOn 'copyCmd'
+    from configurations.compileClasspath
     into "$buildDir/libs/lib"
-    from "$rootDir/启动.bat"
+}
+
+tasks.register('copyCmd', Copy) {
+    from 'resources/启动.bat'
     into "$buildDir/libs"
 }

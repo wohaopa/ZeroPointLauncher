@@ -18,19 +18,14 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointwrapper;
+package com.github.wohaopa.zeropointlanuch.core.utils;
 
-import java.io.File;
+import org.junit.jupiter.api.Test;
 
-public class Sharer {
+class OSUtilTest {
 
-    public static final String[] specialDir = { "mods", "config", "scripts", "saves" };
-    public static final String[] excludeDir = { "assets", "libraries", "versions" };
-    public File rootDir;
-
-    public Sharer(File rootDir) {
-        this.rootDir = rootDir;
+    @Test
+    void getOS() {
+        System.out.println(OSUtil.getOS());
     }
-
-    public static void copyFileAsLink(File runDir) {}
 }

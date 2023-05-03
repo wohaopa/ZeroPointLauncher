@@ -18,7 +18,7 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointwrapper;
+package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
 import java.io.IOException;

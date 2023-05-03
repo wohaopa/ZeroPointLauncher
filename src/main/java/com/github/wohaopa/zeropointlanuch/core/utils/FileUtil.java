@@ -18,7 +18,7 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointwrapper.utils;
+package com.github.wohaopa.zeropointlanuch.core.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,15 +29,16 @@ import java.util.zip.Checksum;
 
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
+import cn.hutool.crypto.digest.DigestUtil;
 
-import com.github.wohaopa.zeropointwrapper.Log;
+import com.github.wohaopa.zeropointlanuch.core.Log;
 
 public class FileUtil {
 
     public static File initAndMkDir(File parent, String child) {
         File file = new File(parent, child);
         if (file.isFile()) if (!file.delete()) throw new RuntimeException("无法删除文件：" + file);
-        if (!file.exists()) if (!file.mkdir()) throw new RuntimeException("无法新建文件夹：" + file);
+        if (!file.exists()) if (!file.mkdirs()) throw new RuntimeException("无法新建文件夹：" + file);
         return file;
     }
 
@@ -65,34 +66,36 @@ public class FileUtil {
     }
 
     public static Map<String, Long> genChecksum(File dir) {
-        String parent = dir.toString();
+        String parent = dir.toString() + "\\";
         Map<String, Long> res = new HashMap<>();
         List<File> fileList = FileUtil.fileList(dir);
-        for (File file : fileList) {
-            res.put(
+        fileList.forEach(
+            file -> res.put(
                 file.toString()
                     .replace(parent, ""),
                 FileUtil.getChecksum(file)
-                    .getValue());
-        }
+                    .getValue()));
+
         return res;
     }
 
-    private static Checksum getChecksum(File file) {
+    public static Checksum getChecksum(File file) {
         return cn.hutool.core.io.FileUtil.checksum(file, null);
     }
 
     public static boolean adminFlag = false;
 
-    public static void genLink(Path link, Path target) {
+    public static void genLink(File link, File target) {
         if (adminFlag) return;
 
         try {
-            if (Files.exists(link)) {
+            if (link.exists()) {
                 Log.LOGGER.info("跳过文件：{} 文件已存在", link);
                 return;
             }
-            Files.createSymbolicLink(link, target);
+            link.getParentFile()
+                .mkdirs();
+            Files.createSymbolicLink(link.toPath(), target.toPath());
         } catch (IOException e) {
             adminFlag = true;
             Log.LOGGER.info("无法创建文件链接，可能是没有管理员权限，文件：{} 目标：{}", link, target);
@@ -106,16 +109,21 @@ public class FileUtil {
             if (!target.getParentFile()
                 .exists())
                 if (!target.getParentFile()
-                    .mkdir()) throw new RuntimeException("无法创建文件夹：" + target.getParentFile());
+                    .mkdirs()) throw new RuntimeException("无法创建文件夹：" + target.getParentFile());
             return src.renameTo(target);
         }
         return false;
     }
 
+    public static void moveFile(File file, File file1, boolean cover) {
+        if (cover && file1.exists()) delete(file1);
+        moveFile(file, file1);
+    }
+
     public static void delLink(File file) {
         Path path = file.toPath();
         try {
-            if (!path.equals(path.toRealPath())) file.delete();
+            if (!path.equals(path.toRealPath())) delete(file);
         } catch (IOException e) {
             Log.LOGGER.error("无法判断文件链接：{} 错误：{}", file.getPath(), e);
         }
@@ -127,5 +135,11 @@ public class FileUtil {
 
     public static void copyDir(File src, File target) {
         cn.hutool.core.io.FileUtil.copy(src, target, false);
+    }
+
+    public static boolean checkSha1OfFile(File file, String hash) {
+        if (!file.exists()) return false;
+        if (hash == null || hash.isEmpty()) return true;
+        return Objects.equals(DigestUtil.sha1Hex(file), hash);
     }
 }

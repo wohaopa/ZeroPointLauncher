@@ -18,19 +18,12 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointwrapper.update;
+package com.github.wohaopa.zeropointlanuch.core;
 
-import java.util.Map;
+import java.io.File;
 
-public interface Updater {
+public class Lwjgl3ifyPatcher {
 
-    String getVersion();
-
-    String getTargetVersion();
-
-    Map<String, String> getDownloads();
-
-    void preExecute();
-
-    void postExecute();
+    private static File versionJava17JsonFile = new File(DirTools.versionsDir, "GTNHJava17.json");
+    private static File defaultConfig = new File(DirTools.versionsDir, "defaultConfig.json");
 }

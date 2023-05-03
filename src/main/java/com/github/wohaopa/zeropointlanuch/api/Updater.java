@@ -18,20 +18,19 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointwrapper.utils;
+package com.github.wohaopa.zeropointlanuch.api;
 
-import java.io.File;
+import java.util.Map;
 
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.extra.compress.CompressUtil;
-import cn.hutool.extra.compress.extractor.Extractor;
+public interface Updater {
 
-/** 解压zip文件 */
-public final class ZipUtil {
+    String getVersion();
 
-    public static void unCompress(File zip, File savePath) {
+    String getTargetVersion();
 
-        Extractor extractor = CompressUtil.createExtractor(CharsetUtil.CHARSET_UTF_8, zip);
-        extractor.extract(savePath);
-    }
+    Map<String, String> getDownloads();
+
+    void preExecute();
+
+    void postExecute();
 }

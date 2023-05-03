@@ -18,12 +18,12 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointwrapper;
+package com.github.wohaopa.zeropointlanuch.core.download;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+public class BMCLAPIDownloadProvider extends DownloadProvider {
 
-public class Log {
-
-    public static final Logger LOGGER = LogManager.getLogger("ZPW");
+    public BMCLAPIDownloadProvider() {
+        this.assetsBase = "https://resources.download.minecraft.net/";
+        this.assetsIndexJsonUrl = "https://launchermeta.mojang.com/v1/packages/1863782e33ce7b584fc45b037325a1964e095d3e/1.7.10.json";
+    }
 }

@@ -18,13 +18,15 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointwrapper;
+package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
 
-import com.github.wohaopa.zeropointwrapper.utils.FileUtil;
+import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class DirTools {
+
+    // private static boolean initialized = false;
 
     public static File workDir;
     public static File instancesDir;
@@ -33,6 +35,8 @@ public class DirTools {
     public static File modsDir;
     public static File zipDir;
     public static File shareDir;
+    public static File tmpDir;
+    public static File versionsDir;
 
     public static void init(File workDir) {
         Log.LOGGER.info("目录管理初始化开始");
@@ -43,6 +47,8 @@ public class DirTools {
         DirTools.modsDir = FileUtil.initAndMkDir(workDir, "mods");
         DirTools.zipDir = FileUtil.initAndMkDir(workDir, "zip");
         DirTools.shareDir = FileUtil.initAndMkDir(workDir, "share");
+        DirTools.tmpDir = FileUtil.initAndMkDir(workDir, "tmpDir");
+        DirTools.versionsDir = FileUtil.initAndMkDir(workDir, "versions");
         Log.LOGGER.info("目录管理初始化结束");
     }
 }
