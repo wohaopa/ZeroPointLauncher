@@ -29,6 +29,7 @@ import cn.hutool.json.JSONObject;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
+/** 用于目录映射的核心类，execute()不会递归执行映射，需要在实例方法中调用 */
 public class Mapper {
 
     private final Map<String, List<String>> exclude = new HashMap<>();
@@ -54,6 +55,7 @@ public class Mapper {
         return targetDir;
     }
 
+    /** 用于解析json文件 */
     private void analyticConfig() {
         JSONObject json = (JSONObject) JsonUtil.fromJson(config);
         List<_Config> exclude1 = json.getBeanList("exclude", _Config.class);
@@ -71,6 +73,12 @@ public class Mapper {
         });
     }
 
+    /**
+     * 执行映射用
+     *
+     * @param name 提供image的实例名
+     * @param dir  image目录
+     */
     public void execute(String name, File dir) {
         for (File file : Objects.requireNonNull(dir.listFiles())) {
             if (file.isDirectory()) {

@@ -28,17 +28,36 @@ import cn.hutool.json.JSONUtil;
 
 public class JsonUtil {
 
-    /** 将POJO转换为JSON */
+    /**
+     * 对象->字符串
+     *
+     * @param obj 对象
+     * @return json字符串
+     * @param <T> json对象类型
+     */
     public static <T> String toJson(T obj) {
         return JSONUtil.parse(obj)
             .toJSONString(4);
     }
 
-    /** 将JSON转为POJO */
+    /**
+     * 字符串->对象
+     *
+     * @param json json字符串
+     * @param type 类型
+     * @return json对象
+     * @param <T> json对象的类型
+     */
     public static <T> T fromJson(String json, Class<T> type) {
         return JSONUtil.toBean(json, type);
     }
 
+    /**
+     * 加载json文件
+     *
+     * @param jsonFile json文件
+     * @return JSON抽象对象
+     */
     public static JSON fromJson(File jsonFile) {
         return JSONUtil.readJSON(jsonFile, Charset.defaultCharset());
     }

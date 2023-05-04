@@ -116,22 +116,22 @@ public class LibrariesDownloader {
     }
 }
 
-class DownloadObj{
+class DownloadObj {
+
     String name;
     String url;
     String path;
     String sha1;
-
-
 }
-class DownloadObjRuler extends DownloadObj{
+
+class DownloadObjRuler extends DownloadObj {
+
     boolean allowWindows;
     boolean allowLinux;
     boolean allowOSX;
 }
 
-class DownloadObjExtract extends DownloadObjRuler{
-
+class DownloadObjExtract extends DownloadObjRuler {
 }
 
 class _LibObj {
@@ -172,6 +172,4 @@ class _LibObj {
     public void setSize(int size) {
         this.size = size;
     }
-
-
 }

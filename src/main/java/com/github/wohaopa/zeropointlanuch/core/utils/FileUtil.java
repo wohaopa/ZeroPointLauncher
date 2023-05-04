@@ -35,6 +35,13 @@ import com.github.wohaopa.zeropointlanuch.core.Log;
 
 public class FileUtil {
 
+    /**
+     * 获得并初始化目录
+     *
+     * @param parent 父文件夹对象
+     * @param child  字文件夹路径
+     * @return 文件夹对象
+     */
     public static File initAndMkDir(File parent, String child) {
         File file = new File(parent, child);
         if (file.isFile()) if (!file.delete()) throw new RuntimeException("无法删除文件：" + file);
@@ -42,6 +49,12 @@ public class FileUtil {
         return file;
     }
 
+    /**
+     * 获得所有子文件夹的文件对象
+     *
+     * @param file 目标文件夹
+     * @return 子文件
+     */
     public static List<File> fileList(File file) {
         List<File> res = new ArrayList<>();
         if (file.isFile()) {
@@ -55,16 +68,34 @@ public class FileUtil {
         return res;
     }
 
+    /**
+     * 读取文件
+     *
+     * @param file 文件对象
+     * @return 文件内容
+     */
     public static String fileRead(File file) {
         FileReader fr = new FileReader(file);
         return fr.readString();
     }
 
+    /**
+     * 写入文件（覆盖原内容）
+     *
+     * @param file    文件对象
+     * @param content 写入内容
+     */
     public static void fileWrite(File file, String content) {
         FileWriter fw = new FileWriter(file);
         fw.write(content);
     }
 
+    /**
+     * 获得文件夹及其子文件的所有校验
+     *
+     * @param dir 文件夹
+     * @return 校验
+     */
     public static Map<String, Long> genChecksum(File dir) {
         String parent = dir.toString() + "\\";
         Map<String, Long> res = new HashMap<>();
@@ -79,12 +110,24 @@ public class FileUtil {
         return res;
     }
 
+    /**
+     * 获得校验
+     *
+     * @param file 文件对象
+     * @return 校验
+     */
     public static Checksum getChecksum(File file) {
         return cn.hutool.core.io.FileUtil.checksum(file, null);
     }
 
-    public static boolean adminFlag = false;
+    private static boolean adminFlag = false;
 
+    /**
+     * 创建symlink
+     *
+     * @param link   link文件
+     * @param target 源文件
+     */
     public static void genLink(File link, File target) {
         if (adminFlag) return;
 
@@ -103,6 +146,13 @@ public class FileUtil {
         }
     }
 
+    /**
+     * 将src->target
+     *
+     * @param src
+     * @param target
+     * @return 是否移动
+     */
     public static boolean moveFile(File src, File target) {
         if (src.isFile()) {
             if (target.exists()) return false;
@@ -115,11 +165,23 @@ public class FileUtil {
         return false;
     }
 
+    /**
+     * 将src->target
+     *
+     * @param file
+     * @param file1
+     * @param cover 覆盖
+     */
     public static void moveFile(File file, File file1, boolean cover) {
         if (cover && file1.exists()) delete(file1);
         moveFile(file, file1);
     }
 
+    /**
+     * 删除链接文件
+     *
+     * @param file 目标文件
+     */
     public static void delLink(File file) {
         Path path = file.toPath();
         try {
@@ -129,14 +191,21 @@ public class FileUtil {
         }
     }
 
-    public static boolean delete(File file) {
-        return cn.hutool.core.io.FileUtil.del(file);
+    public static void delete(File file) {
+        cn.hutool.core.io.FileUtil.del(file);
     }
 
     public static void copyDir(File src, File target) {
         cn.hutool.core.io.FileUtil.copy(src, target, false);
     }
 
+    /**
+     * 检测文件sha1，hash不存在则为true，文件不存在则为false
+     *
+     * @param file 文件
+     * @param hash sha1
+     * @return
+     */
     public static boolean checkSha1OfFile(File file, String hash) {
         if (!file.exists()) return false;
         if (hash == null || hash.isEmpty()) return true;

@@ -30,19 +30,6 @@ public class Instance {
 
     private static final Map<String, Instance> instances = new HashMap<>();
 
-    public File versionFile;
-    public File insDir;
-    public File imageDir;
-    public File runDir;
-    public Information information;
-
-    private Instance() {}
-
-    /**
-     * 外部调用，仅创建与加载实例时使用
-     *
-     * @return 新实例
-     */
     public static Instance newInstance() {
         return new Instance();
     }
@@ -78,6 +65,14 @@ public class Instance {
     public static Collection<Instance> list() {
         return instances.values();
     }
+
+    public File versionFile;
+    public File insDir;
+    public File imageDir;
+    public File runDir;
+    public Information information;
+
+    private Instance() {}
 
     /** 加载实例信息，仅在初始化阶段使用本方法来加载持久化的实例 */
     public Information loadInformation() {

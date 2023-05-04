@@ -29,6 +29,12 @@ import cn.hutool.extra.compress.extractor.Extractor;
 /** 解压zip文件 */
 public final class ZipUtil {
 
+    /**
+     * 解压用
+     *
+     * @param zip      压缩包文件夹
+     * @param savePath 解压路径
+     */
     public static void unCompress(File zip, File savePath) {
 
         Extractor extractor = CompressUtil.createExtractor(CharsetUtil.CHARSET_UTF_8, zip);
