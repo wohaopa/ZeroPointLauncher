@@ -21,8 +21,16 @@
 package com.github.wohaopa.zeropointlanuch.api;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import com.github.wohaopa.zeropointlanuch.core.DirTools;
+import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.InstanceInstaller;
+import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
 
 public class Core {
 
@@ -34,47 +42,84 @@ public class Core {
         dirToolsInit = true;
     }
 
+    /**
+     * 安装标准实例
+     *
+     * @param zipFile zip文件
+     * @param dir     实例文件夹
+     * @param name    实例名
+     * @param version 实例版本
+     */
+    public static void installStandard(File zipFile, File dir, String name, String version) {
+        InstanceInstaller.installStandard(zipFile, dir, name, version);
+    }
+
+    /** 检查实例文件夹 */
+    public static void lookup() {
+        Log.LOGGER.debug("[文件初始化]实例搜寻：开始");
+        Instance.clear();
+        for (File file : Objects.requireNonNull(DirTools.instancesDir.listFiles())) {
+            if (file.isDirectory()) {
+                File version = new File(file, "version.json");
+                if (version.exists()) {
+                    Log.LOGGER.debug("[文件初始化]实例搜寻：发现实例" + file.getName());
+                    InstanceInstaller.addInst(version);
+                }
+            }
+        }
+        Log.LOGGER.debug("[文件初始化]实例搜寻：结束");
+        Log.LOGGER.debug("[文件初始化]安装包搜寻：开始");
+        for (File file : Objects.requireNonNull(DirTools.zipDir.listFiles())) {
+            if (file.isFile() && file.getName()
+                .endsWith(".zip")) {
+                String name = file.getName();
+                name = name.replace("GT_New_Horizons_", "");
+                name = name.replace("_Client.zip", "");
+                if (!Instance.containsKey(name)) {
+                    Log.LOGGER.debug("[文件初始化]实例搜寻：发现安装包 {}，名为 {}", file.getName(), name);
+                    InstanceInstaller.installStandard(file, new File(DirTools.instancesDir, name), name, name);
+                }
+            }
+        }
+        Log.LOGGER.debug("[文件初始化]安装包搜寻：结束");
+    }
+
+    /**
+     * 实例列表
+     *
+     * @return 实例列表
+     */
+    public static List<Instance> listInst() {
+        return new ArrayList<>(Instance.list());
+    }
+
+    /**
+     * 安装翻译
+     *
+     * @param translationFile
+     * @param dir
+     * @param name
+     * @param targetVersion
+     */
+    public static void installTranslation(File translationFile, File dir, String name, Instance targetVersion) {
+        String version = targetVersion.information.version;
+        InstanceInstaller.installTranslation(translationFile, dir, name, version, targetVersion);
+    }
+
+    public static void downloadFile(String url) {
+        DownloadUtil.submitDownloadTasks(url, DirTools.tmpDir);
+        try {
+            DownloadUtil.takeDownloadResult();
+        } catch (ExecutionException | InterruptedException e) {
+            Log.LOGGER.error("文件下载失败：{}", url);
+        }
+    }
+
+    public static String genRuntimeDir(Instance inst) {
+        inst.genRuntimeDir();
+        return inst.information.runDir;
+    }
     /*
-     * public static void installStandard(File zipFile, File dir, String name, String version) throws IOException {
-     * InstanceInstaller.installStandard(zipFile, dir, name, version);
-     * }
-     * public static void lookup() {
-     * Log.LOGGER.debug("[文件初始化]实例搜寻：开始");
-     * Instance.clear();
-     * for (File file : Objects.requireNonNull(DirTools.instancesDir.listFiles())) {
-     * if (file.isDirectory()) {
-     * File version = new File(file, "version.json");
-     * if (version.exists()) {
-     * Log.LOGGER.debug("[文件初始化]实例搜寻：发现实例" + file.getName());
-     * InstanceInstaller.addInst(version);
-     * }
-     * }
-     * }
-     * Log.LOGGER.debug("[文件初始化]实例搜寻：结束");
-     * Log.LOGGER.debug("[文件初始化]安装包搜寻：开始");
-     * for (File file : Objects.requireNonNull(DirTools.zipDir.listFiles())) {
-     * if (file.isFile() && file.getName()
-     * .endsWith(".zip")) {
-     * String name = file.getName();
-     * name = name.replace("GT_New_Horizons_", "");
-     * name = name.replace("_Client.zip", "");
-     * if (!Instance.containsKey(name)) {
-     * Log.LOGGER.debug("[文件初始化]实例搜寻：发现安装包 {}，名为 {}", file.getName(), name);
-     * try {
-     * InstanceInstaller.installStandard(file, new File(DirTools.instancesDir, name), name, name);
-     * } catch (IOException e) {
-     * throw new RuntimeException(e);
-     * }
-     * }
-     * }
-     * }
-     * Log.LOGGER.debug("[文件初始化]安装包搜寻：结束");
-     * }
-     * public static String genRuntimeDir(String name) {
-     * Instance inst = Instance.get(name);
-     * inst.genRuntimeDir();
-     * return inst.information.runDir;
-     * }
      * public static String genHMCLDir(String name) {
      * Instance inst = Instance.get(name);
      * inst.genRuntimeDir();
@@ -82,18 +127,6 @@ public class Core {
      * FileUtil.genLink(new File(inst.runDir, "libraries"), DirTools.librariesDir);
      * FileUtil.genLink(new File(inst.runDir, "versions"), DirTools.versionsDir);
      * return inst.information.runDir;
-     * }
-     * public static void installTranslation(File translationFile, File dir, String name, String target) {
-     * Instance targetVersion = Instance.get(target);
-     * if (targetVersion == null) {
-     * Log.LOGGER.error("无法找到前置版本：{}", target);
-     * throw new RuntimeException("无法找到前置版本：" + target);
-     * }
-     * String version = targetVersion.information.version;
-     * InstanceInstaller.installTranslation(translationFile, dir, name, version, targetVersion);
-     * }
-     * public static List<Instance> listInst() {
-     * return new ArrayList<>(Instance.list());
      * }
      */
 }

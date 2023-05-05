@@ -21,7 +21,6 @@
 package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -128,7 +127,7 @@ public class InstanceInstaller {
      * @param name    实例名（唯一识别码）
      * @param version 实例版本（不起作用）
      */
-    public static void installStandard(File zip, File dir, String name, String version) throws IOException {
+    public static void installStandard(File zip, File dir, String name, String version) {
         // 准备好目录
         File image = FileUtil.initAndMkDir(dir, "image");
 

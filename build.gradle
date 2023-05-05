@@ -42,7 +42,7 @@ def allJars = (configurations.runtimeClasspath)
 jar {
     manifest {
         attributes(
-                'Main-Class': 'com.github.wohaopa.zeropointwrapper.Main',
+                'Main-Class': 'com.github.wohaopa.zeropointlanuch.main.Main',
                 'Class-Path': allJars + " ."
         )
     }

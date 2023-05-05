@@ -20,8 +20,6 @@
 
 package com.github.wohaopa.zeropointlanuch.main;
 
-import java.util.*;
-
 public class GenCommand {
     /*
      * public static ICommand genDiff = new ICommand() {

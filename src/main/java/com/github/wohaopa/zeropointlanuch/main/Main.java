@@ -31,6 +31,7 @@ import com.github.wohaopa.zeropointlanuch.core.Log;
 public class Main {
 
     public static Map<String, ICommand> commands = new HashMap<>();
+    public static File workDir;
 
     public static void main(String[] args) {
 
@@ -54,10 +55,11 @@ public class Main {
 
         String rootDirStr = System.getProperty("zpl.rootdir");
         if (rootDirStr == null) {
-            rootDirStr = System.getProperty("user.dir");
+            rootDirStr = System.getProperty("user.dir") + "/.GTNH";
         }
+        workDir = new File(rootDirStr);
 
-        Core.initDirTools(new File(rootDirStr, ".GTNH")); // 目录工具初始化
+        Core.initDirTools(workDir); // 目录工具初始化
         Main.registerCommand(GenCommand.class); // 注册指令
         Main.registerCommand(Command.class);
     }
