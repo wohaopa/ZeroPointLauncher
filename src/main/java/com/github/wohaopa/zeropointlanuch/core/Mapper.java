@@ -34,19 +34,19 @@ public class Mapper {
 
     private final Map<String, List<String>> exclude = new HashMap<>();
     private final Map<String, List<String>> include = new HashMap<>();
-    // private List<String> all_include = new ArrayList<>();
+
     private final List<String> all_exclude;
 
     private final File targetDir;
-    private final File config;
+    private final File mainConfig;
 
     public Mapper(File config, File targetDir) {
         List<String> all = new ArrayList<>();
         all.add("zpl_margi_config.json");
         exclude.put("__zpl_all__", all);
         this.targetDir = targetDir;
-        this.config = config;
-        this.analyticConfig();
+        this.mainConfig = config;
+        this.analyticConfig(config);
         // this.all_include = include.getOrDefault("__zpl_all__", new ArrayList<>());
         this.all_exclude = exclude.get("__zpl_all__");
     }
@@ -56,8 +56,8 @@ public class Mapper {
     }
 
     /** 用于解析json文件 */
-    private void analyticConfig() {
-        JSONObject json = (JSONObject) JsonUtil.fromJson(config);
+    public void analyticConfig(File configFile) {
+        JSONObject json = (JSONObject) JsonUtil.fromJson(configFile);
         List<_Config> exclude1 = json.getBeanList("exclude", _Config.class);
         exclude1.forEach(config -> {
             if (config.name == null) config.name = "__zpl_all__";
@@ -73,23 +73,28 @@ public class Mapper {
         });
     }
 
+    public void execute(String name, File dir) {
+
+        File file = new File(dir, "zpl_margi_config.json");
+        List list = ((JSONObject) JsonUtil.fromJson(file)).get("shareDir", List.class);
+        execute0(name, dir, list);
+    }
+
     /**
      * 执行映射用
      *
      * @param name 提供image的实例名
      * @param dir  image目录
      */
-    public void execute(String name, File dir) {
+    private void execute0(String name, File dir, List<String> shareDir) {
         for (File file : Objects.requireNonNull(dir.listFiles())) {
-            if (file.isDirectory()) {
+            if (file.isDirectory() && !shareDir.contains(file.getName())) {
                 for (File file1 : Objects.requireNonNull(file.listFiles())) {
                     File tmp = new File(targetDir, file.getName() + "/" + file1.getName());
-                    // doLink("__zpl_all__", tmp, file1);
                     doLink(name, tmp, file1);
                 }
             } else {
                 File tmp = new File(targetDir, file.getName());;
-                // doLink("__zpl_all__", tmp, file);
                 doLink(name, tmp, file);
             }
         }
@@ -99,6 +104,7 @@ public class Mapper {
         JSONObject object = new JSONObject();
         object.putOpt("include", new JSONArray());
         object.putOpt("exclude", new JSONArray());
+        object.putOpt("shareDir", new ArrayList<>());
         return object;
     }
 

@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.github.wohaopa'
-version '1.0-SNAPSHOT'
+version 'Core'
 
 repositories {
     mavenCentral()
@@ -36,14 +36,14 @@ test {
 
 def allJars = (configurations.runtimeClasspath)
         .findAll{it.isFile()}
-        .collect { 'lib/' + it.name }
+        .collect {  it.name }
         .join(' ')
 
 jar {
     manifest {
         attributes(
                 'Main-Class': 'com.github.wohaopa.zeropointlanuch.main.Main',
-                'Class-Path': allJars + " ."
+                'Class-Path': allJars
         )
     }
 }
@@ -76,7 +76,7 @@ spotless {
 tasks.register('copyLib', Copy) {
     dependsOn 'copyCmd'
     from configurations.compileClasspath
-    into "$buildDir/libs/lib"
+    into "$buildDir/libs"
 }
 
 tasks.register('copyCmd', Copy) {

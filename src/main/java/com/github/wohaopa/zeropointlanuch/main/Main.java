@@ -53,7 +53,8 @@ public class Main {
 
     private static void init() {
 
-        String rootDirStr = System.getProperty("zpl.rootdir");
+        // String rootDirStr = System.getProperty("zpl.rootdir");
+        String rootDirStr = "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\Wrapper\\build\\libs\\.GTNH";
         if (rootDirStr == null) {
             rootDirStr = System.getProperty("user.dir") + "/.GTNH";
         }

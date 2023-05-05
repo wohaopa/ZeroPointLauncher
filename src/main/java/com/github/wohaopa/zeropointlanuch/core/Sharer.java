@@ -34,6 +34,7 @@ public class Sharer {
         inst.put("Common", new Sharer("Common", FileUtil.initAndMkDir(DirTools.shareDir, "Common"), null));
         inst.put("Java8", new Sharer("Java8", FileUtil.initAndMkDir(DirTools.shareDir, "Java8"), "Common"));
         inst.put("Java17", new Sharer("Java17", FileUtil.initAndMkDir(DirTools.shareDir, "Java17"), "Common"));
+        inst.put("HMCL", new Sharer("HMCL", FileUtil.initAndMkDir(DirTools.shareDir, "HMCL"), "Common"));
     }
 
     public static Sharer get(String name) {
@@ -43,6 +44,7 @@ public class Sharer {
     public File rootDir;
     public String name;
     public String parent;
+
 
     private Sharer(String name, File rootDir, String parent) {
         this.rootDir = rootDir;

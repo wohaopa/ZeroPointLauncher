@@ -27,6 +27,7 @@ import java.util.List;
 import com.github.wohaopa.zeropointlanuch.api.Core;
 import com.github.wohaopa.zeropointlanuch.core.DirTools;
 import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.Sharer;
 
 @SuppressWarnings("unused") // 内部所有字段都会被反射注册
 public class Command {
@@ -124,7 +125,7 @@ public class Command {
                 System.out.println("错误：目录重复:" + instDir.getPath() + "\n");
                 return false;
             }
-            String zip = args[2];
+            String zip = args[2].replace("\"", "");
             String ver = args[3];
             File zipFile = new File(zip);
             if (!zipFile.exists()) {
@@ -195,7 +196,15 @@ public class Command {
                 System.out.println("错误：已安装的实例中不包含：\"" + args[1] + "\" 可以使用list指令查看已安装实例");
                 return false;
             }
-            System.out.println("dir=" + Core.genRuntimeDir(inst));
+            Sharer sharer = null;
+            if (args.length == 3) {
+                sharer = Sharer.get(args[2]);
+                if (sharer == null) {
+                    System.out.println("错误：共享器不存在：" + args[2] + " 可以使用默认共享器：Java8、Java17、Common");
+                    return false;
+                }
+            }
+            System.out.println("dir=" + Core.genRuntimeDir(inst, sharer));
             return true;
         }
 

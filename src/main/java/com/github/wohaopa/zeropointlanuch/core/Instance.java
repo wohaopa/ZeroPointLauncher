@@ -87,7 +87,7 @@ public class Instance {
     }
 
     /** 生成实例的运行目录（.minecraft） 可被其他启动器直接启动 */
-    public void genRuntimeDir() {
+    public void genRuntimeDir(Sharer sharer) {
         // 删除目录中的系统链接文件
         for (File file : Objects.requireNonNull(this.runDir.listFiles())) {
             if (file.isDirectory()) for (File file1 : Objects.requireNonNull(file.listFiles())) FileUtil.delLink(file1);
@@ -95,7 +95,7 @@ public class Instance {
         }
         Mapper mapper = new Mapper(new File(this.imageDir, "zpl_margi_config.json"), this.runDir);
 
-        Sharer.execute(this.information.sharer, mapper); // 优先共享文件
+        Sharer.execute(sharer == null ? this.information.sharer : sharer.name, mapper); // 优先共享文件
 
         this.copyFileAsLink(mapper, this.information.excludeMods); // 本实例的共享文件
 

@@ -26,10 +26,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
-import com.github.wohaopa.zeropointlanuch.core.DirTools;
-import com.github.wohaopa.zeropointlanuch.core.Instance;
-import com.github.wohaopa.zeropointlanuch.core.InstanceInstaller;
-import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.*;
 import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
 
 public class Core {
@@ -115,8 +112,8 @@ public class Core {
         }
     }
 
-    public static String genRuntimeDir(Instance inst) {
-        inst.genRuntimeDir();
+    public static String genRuntimeDir(Instance inst, Sharer sharer) {
+        inst.genRuntimeDir(sharer);
         return inst.information.runDir;
     }
     /*

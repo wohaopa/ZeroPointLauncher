@@ -106,6 +106,7 @@ public class InstanceInstaller {
         inst.information.insDir = inst.insDir.toString();
         inst.information.imageDir = inst.imageDir.toString();
         inst.information.runDir = inst.runDir.toString();
+        inst.information.sharer = "Common"; // 使用默认共享器
 
         Log.LOGGER.debug("[实例安装]正在生成校验文件");
         inst.information.checksum = FileUtil.genChecksum(inst.imageDir); // 加载文件校验
