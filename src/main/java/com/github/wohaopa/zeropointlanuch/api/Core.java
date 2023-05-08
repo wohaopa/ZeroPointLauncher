@@ -32,7 +32,7 @@ import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class Core {
 
-    public static final String launcherVersion = "内部测试版本";
+    public static final String launcherVersion = "0.0.1";
     public static boolean dirToolsInit = false;
 
     public static void initDirTools(File rootDir) {

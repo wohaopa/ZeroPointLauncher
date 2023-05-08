@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -36,17 +37,17 @@ public class Main {
         libDir = new File(userDir, "lib");
         File configFile = new File(userDir + "/config.properties");
         if (!configFile.exists()) {
-            config.setProperty("download-url", "http://127.0.0.1/ZeroPointLaunch/Library/");
+            config.setProperty("download-url", "http://127.0.0.1/ZeroPointLaunch/");
             config.setProperty("check-libraries", "true");
             config.setProperty("check-update", "true");
             try {
-                config.store(new FileOutputStream(configFile), null);
+                config.store(Files.newOutputStream(configFile.toPath()), null);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         } else {
             try {
-                config.load(new FileInputStream(configFile));
+                config.load(Files.newInputStream(configFile.toPath()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -55,7 +56,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        zpLaunch=config.getProperty("download-url","http://127.0.0.1/ZeroPointLaunch/Library/");
+        zpLaunch = config.getProperty("download-url", "http://127.0.0.1/ZeroPointLaunch/") + "Library/";
 
         if (config.getProperty("check-update", "false").equals("true")) {
             File newCore = new File(libDir, "ZeroPointLaunch-Core-new.jar");
@@ -90,7 +91,7 @@ public class Main {
             method.setAccessible(true);
             method.invoke(null, (Object) args);
         } catch (ClassNotFoundException e) {
-            System.out.println("无法加载核心类：com.github.wohaopa.zeropointlanuch.main.Main，可能缺少ZeroPointLaunch-Core.jar");
+            System.out.println("无法加载核心类：com.github.wohaopa.zeropointlanuch.main.Main，请重新启动！或者可能缺少ZeroPointLaunch-Core.jar");
             throw new RuntimeException(e);
         } catch (NoSuchMethodException e) {
             System.out.println("无法加载main方法，请重新下载！");

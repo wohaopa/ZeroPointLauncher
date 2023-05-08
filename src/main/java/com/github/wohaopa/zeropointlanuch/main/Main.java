@@ -23,10 +23,15 @@ package com.github.wohaopa.zeropointlanuch.main;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import cn.hutool.json.JSONObject;
 
@@ -35,12 +40,9 @@ import com.github.wohaopa.zeropointlanuch.core.DirTools;
 import com.github.wohaopa.zeropointlanuch.core.Log;
 import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class Main {
 
-    private static final String DOWNLOAD_VERSION_URL = "http://127.0.0.1//ZeroPointLaunch//";
     public static Map<String, ICommand> commands = new HashMap<>();
     public static File workDir;
 
@@ -64,15 +66,18 @@ public class Main {
 
     private static void init() {
 
-        // String rootDirStr = System.getProperty("zpl.rootdir");
-        String rootDirStr = "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\Wrapper\\build\\libs\\.GTNH";
+        String rootDirStr = System.getProperty("zpl.rootdir");
+        // String rootDirStr =
+        // "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\Wrapper\\build\\libs\\.GTNH";
+
         if (rootDirStr == null) {
             rootDirStr = System.getProperty("user.dir") + "/.GTNH";
         }
         workDir = new File(rootDirStr);
         Core.initDirTools(workDir); // 目录工具初始化
 
-        if (!Core.launcherVersion.equals("内部测试版本")) {
+        if (!System.getProperty("zpl.skipUpdate")
+            .equals("true") && !Core.launcherVersion.equals("内部测试版本")) {
             check_update();
         }
 
@@ -81,6 +86,20 @@ public class Main {
     }
 
     private static void check_update() {
+
+        File configProperties = new File(workDir.getParentFile(), "config.properties");
+        if (!configProperties.exists()) return;
+        Properties properties = new Properties();
+
+        try {
+            properties.load(Files.newInputStream(configProperties.toPath()));
+        } catch (IOException e) {
+            Log.info("无法加载config.properties，跳过更新检查。");
+            return;
+        }
+
+        String DOWNLOAD_VERSION_URL = properties.getProperty("download-url");
+
         Logger updateLog = LogManager.getLogger("Update");
         Runnable runnable = () -> {
             File versionFile = new File(DirTools.tmpDir, "version.json");
