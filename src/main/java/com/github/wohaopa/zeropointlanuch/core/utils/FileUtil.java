@@ -133,7 +133,7 @@ public class FileUtil {
 
         try {
             if (link.exists()) {
-                Log.LOGGER.info("跳过文件：{} 文件已存在", link);
+                Log.info("跳过文件：{} 文件已存在", link);
                 return;
             }
             link.getParentFile()
@@ -141,7 +141,7 @@ public class FileUtil {
             Files.createSymbolicLink(link.toPath(), target.toPath());
         } catch (IOException e) {
             adminFlag = true;
-            Log.LOGGER.info("无法创建文件链接，可能是没有管理员权限，文件：{} 目标：{}", link, target);
+            Log.info("无法创建文件链接，可能是没有管理员权限，文件：{} 目标：{}", link, target);
             throw new RuntimeException("缺少管理员权限，无法创建系统链接");
         }
     }
@@ -187,7 +187,8 @@ public class FileUtil {
         try {
             if (!path.equals(path.toRealPath())) delete(file);
         } catch (IOException e) {
-            Log.LOGGER.error("无法判断文件链接：{} 错误：{}", file.getPath(), e);
+            delete(file); // 一般无法找到源文件，即源文件失效
+            Log.error("无法判断文件链接：{} 错误：{}", file.getPath(), e);
         }
     }
 

@@ -64,7 +64,7 @@ public class InstanceInstaller {
             throw new RuntimeException("版本加载错误：" + e);
         }
         if (!inst.information.insDir.equals(versionFile.getParent())) {
-            Log.LOGGER.info("实例文件被移动：{}", inst.information.insDir);
+            Log.info("实例文件被移动：{}", inst.information.insDir);
             inst.information.insDir = versionFile.getParent();
             inst.information.imageDir = inst.information.insDir + "\\image";
             inst.information.runDir = inst.information.insDir + "\\.minecraft";
@@ -108,7 +108,7 @@ public class InstanceInstaller {
         inst.information.runDir = inst.runDir.toString();
         inst.information.sharer = "Common"; // 使用默认共享器
 
-        Log.LOGGER.debug("[实例安装]正在生成校验文件");
+        Log.debug("正在生成校验文件");
         inst.information.checksum = FileUtil.genChecksum(inst.imageDir); // 加载文件校验
 
         inst.information.includeMods = genModList(new File(inst.imageDir, "mods")); // 加载mods信息
@@ -129,14 +129,16 @@ public class InstanceInstaller {
      * @param version 实例版本（不起作用）
      */
     public static void installStandard(File zip, File dir, String name, String version) {
+
+        Log.start("标准实例安装");
         // 准备好目录
         File image = FileUtil.initAndMkDir(dir, "image");
 
-        Log.LOGGER.debug("[实例安装]开始解压：{}", zip);
+        Log.debug("开始解压：{}", zip);
         long time1 = System.currentTimeMillis();
         ZipUtil.unCompress(zip, image); // 解压
         long time2 = System.currentTimeMillis();
-        Log.LOGGER.debug("[实例安装]解压完成！用时：{}s", (time2 - time1) / 1000);
+        Log.debug("解压完成！用时：{}s", (time2 - time1) / 1000);
 
         install(dir, name, version, "null"); // 创建实例
 
@@ -159,7 +161,8 @@ public class InstanceInstaller {
         File config = new File(image, "zpl_margi_config.json");
         FileUtil.fileWrite(config, JsonUtil.toJson(json));
 
-        Log.LOGGER.info("[实例安装]实例 {} 安装完成！", name);
+        Log.info("实例 {} 安装完成！", name);
+        Log.end();
     }
 
     /**
@@ -183,14 +186,15 @@ public class InstanceInstaller {
 
     public static void installTranslation(File translationFile, File dir, String name, String version,
         Instance targetVersion) {
+        Log.start("汉化实例安装");
 
         File image = FileUtil.initAndMkDir(dir, "image");
 
-        Log.LOGGER.debug("[实例安装]开始解压：{}", translationFile);
+        Log.debug("开始解压：{}", translationFile);
         long time1 = System.currentTimeMillis();
         ZipUtil.unCompress(translationFile, image); // 解压
         long time2 = System.currentTimeMillis();
-        Log.LOGGER.debug("[实例安装]解压完成！用时：{}s", (time2 - time1) / 1000);
+        Log.debug("解压完成！用时：{}s", (time2 - time1) / 1000);
 
         Instance inst = install(dir, name, version, targetVersion.information.name);
         File depImageDir = targetVersion.imageDir;
@@ -200,12 +204,13 @@ public class InstanceInstaller {
                 for (File file1 : Objects.requireNonNull(file.listFiles())) {
                     if (file.isDirectory()) {
                         File depFile = new File(depImageDir, file.getName() + "/" + file1.getName());
-                        Log.LOGGER.debug("[实例安装]复制目录：{} 到：{}", depFile, file1);
+                        Log.debug("复制目录：{} 到：{}", depFile, file1);
                         FileUtil.copyDir(depFile, file1.getParentFile());
                     }
                 }
             }
         }
+        Log.end();
     }
 
     private static List<String> genModList(File modsDir) {
@@ -224,8 +229,8 @@ public class InstanceInstaller {
                 String path = modRepo + "/" + modFileName;
                 mods.add(path);
                 if (!FileUtil.moveFile(mod, new File(DirTools.modsDir, path))) {
-                    Log.LOGGER.info("[实例安装]已在mod库中发现：{} 即将删除临时文件", modFileName);
-                    if (mod.delete()) Log.LOGGER.warn("[实例安装]文件：{} 删除失败，可能被占用，请手动删除", mod.getPath());
+                    Log.info("已在mod库中发现：{} 即将删除临时文件", modFileName);
+                    if (mod.delete()) Log.warn("文件：{} 删除失败，可能被占用，请手动删除", mod.getPath());
                 }
             }
         }

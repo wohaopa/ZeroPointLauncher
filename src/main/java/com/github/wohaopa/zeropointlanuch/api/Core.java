@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 
 import com.github.wohaopa.zeropointlanuch.core.*;
 import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
+import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class Core {
 
@@ -53,19 +54,19 @@ public class Core {
 
     /** 检查实例文件夹 */
     public static void lookup() {
-        Log.LOGGER.debug("[文件初始化]实例搜寻：开始");
+        Log.start("文件初始化");
         Instance.clear();
         for (File file : Objects.requireNonNull(DirTools.instancesDir.listFiles())) {
             if (file.isDirectory()) {
                 File version = new File(file, "version.json");
                 if (version.exists()) {
-                    Log.LOGGER.debug("[文件初始化]实例搜寻：发现实例" + file.getName());
+                    Log.debug("发现实例" + file.getName());
                     InstanceInstaller.addInst(version);
                 }
             }
         }
-        Log.LOGGER.debug("[文件初始化]实例搜寻：结束");
-        Log.LOGGER.debug("[文件初始化]安装包搜寻：开始");
+        Log.end();
+        Log.start("文件初始化");
         for (File file : Objects.requireNonNull(DirTools.zipDir.listFiles())) {
             if (file.isFile() && file.getName()
                 .endsWith(".zip")) {
@@ -73,12 +74,12 @@ public class Core {
                 name = name.replace("GT_New_Horizons_", "");
                 name = name.replace("_Client.zip", "");
                 if (!Instance.containsKey(name)) {
-                    Log.LOGGER.debug("[文件初始化]实例搜寻：发现安装包 {}，名为 {}", file.getName(), name);
+                    Log.debug("发现安装包 {}，名为 {}", file.getName(), name);
                     InstanceInstaller.installStandard(file, new File(DirTools.instancesDir, name), name, name);
                 }
             }
         }
-        Log.LOGGER.debug("[文件初始化]安装包搜寻：结束");
+        Log.end();
     }
 
     /**
@@ -108,7 +109,7 @@ public class Core {
         try {
             DownloadUtil.takeDownloadResult();
         } catch (ExecutionException | InterruptedException e) {
-            Log.LOGGER.error("文件下载失败：{}", url);
+            Log.error("文件下载失败：{}", url);
         }
     }
 
@@ -116,14 +117,38 @@ public class Core {
         inst.genRuntimeDir(sharer);
         return inst.information.runDir;
     }
-    /*
-     * public static String genHMCLDir(String name) {
-     * Instance inst = Instance.get(name);
-     * inst.genRuntimeDir();
-     * FileUtil.genLink(new File(inst.runDir, "assets"), DirTools.assetsDir);
-     * FileUtil.genLink(new File(inst.runDir, "libraries"), DirTools.librariesDir);
-     * FileUtil.genLink(new File(inst.runDir, "versions"), DirTools.versionsDir);
-     * return inst.information.runDir;
-     * }
-     */
+
+    public static void genTransferOld(Instance instance, File file) {
+
+        List<String> exclude = new ArrayList<>();
+        for (File file1 : Objects.requireNonNull(file.listFiles())) {
+            if (file1.getName()
+                .startsWith(".")) exclude.add(file1.getPath());
+        }
+        exclude.add(file.getPath() + "\\assets");
+        exclude.add(file.getPath() + "\\libraries");
+        exclude.add(file.getPath() + "\\logs");
+        exclude.add(file.getPath() + "\\versions");
+
+        long a = System.currentTimeMillis();
+        Identification identification = new Identification(instance.information.checksum);
+        Differ differ = Differ.diff(file, identification, exclude);
+        long b = System.currentTimeMillis();
+        Log.debug("对比用时：{}s", (b - a) / 1000.0);
+
+        File outDir = new File(instance.insDir, "private-outDir");
+        if (outDir.exists()) {
+            File oldOutDir = new File(instance.insDir, "private-outDir-old");
+            FileUtil.delete(oldOutDir);
+            if (!outDir.renameTo(oldOutDir)) FileUtil.delete(outDir);
+        } else {
+            outDir.mkdir();
+        }
+        differ.addition.forEach(s -> {
+            File f1 = new File(file, s);
+            File f2 = new File(outDir, s).getParentFile();
+            if (!f2.exists()) f2.mkdirs();
+            FileUtil.copyDir(f1, f2);
+        });
+    }
 }

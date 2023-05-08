@@ -28,12 +28,15 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.http.HttpUtil;
 
-import com.github.wohaopa.zeropointlanuch.core.Log;
-
 public class DownloadUtil {
+
+    private static final Logger downloadLog = LogManager.getLogger("Download");
 
     public static int tasksCount = 0;
 
@@ -74,32 +77,32 @@ public class DownloadUtil {
         int count = tasksCount;
 
         while (tasksCount-- != 0) {
-            Log.LOGGER.debug("正在下载：{} 剩余：{}", count - tasksCount, tasksCount);
+            downloadLog.debug("正在下载：{} 剩余：{}", count - tasksCount, tasksCount);
             result = cs.take();
             list.add(result.get());
         }
 
         return list;
     }
-}
 
-class DownloadTask implements Callable<File> {
+    static class DownloadTask implements Callable<File> {
 
-    String url;
-    File file;
+        String url;
+        File file;
 
-    public DownloadTask(String url, File file) {
-        this.url = url;
-        this.file = file;
-    }
-
-    @Override
-    public File call() throws Exception {
-        try {
-            return HttpUtil.downloadFileFromUrl(url, file);
-        } catch (Exception e) {
-            Log.LOGGER.error("[多线程下载器]无法下载链接：{}", url);
+        public DownloadTask(String url, File file) {
+            this.url = url;
+            this.file = file;
         }
-        return null;
+
+        @Override
+        public File call() throws Exception {
+            try {
+                return HttpUtil.downloadFileFromUrl(url, file);
+            } catch (Exception e) {
+                downloadLog.error("无法下载链接：{}", url);
+            }
+            return null;
+        }
     }
 }

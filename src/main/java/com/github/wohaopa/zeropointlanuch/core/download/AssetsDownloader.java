@@ -36,13 +36,13 @@ import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 public class AssetsDownloader {
 
     public static void verifyAssets(File assetsDir) throws ExecutionException, InterruptedException {
-        Log.LOGGER.debug("[assets文件夹校验]开始");
+        Log.start("assets文件夹校验");
         List<File> fail = new ArrayList<>();
         File mcAssetsFile = new File(assetsDir, "indexes/1.7.10.json");
         File objectsDir = FileUtil.initAndMkDir(assetsDir, "objects");
         File tmpDir = DirTools.tmpDir;
         if (!mcAssetsFile.exists()) {
-            Log.LOGGER.debug("[assets文件夹校验]正在下载indexes/1.7.10.json文件");
+            Log.debug("正在下载indexes/1.7.10.json文件");
             String mcAssetsFileUrl = DownloadProvider.getProvider()
                 .getAssetsIndexJsonUrl();
             DownloadUtil.submitDownloadTasks(mcAssetsFileUrl, tmpDir);
@@ -67,7 +67,7 @@ public class AssetsDownloader {
         for (File file : fail) {
             String name = file.getName();
             if (!FileUtil.checkSha1OfFile(new File(tmpDir, name), name)) {
-                Log.LOGGER.debug("[assets文件夹校验]正在将{}}文件加入下载队列", name);
+                Log.debug("正在将{}文件加入下载队列", name);
                 downloads.add(
                     DownloadProvider.getProvider()
                         .getAssetsObjUrl(name));
@@ -75,12 +75,12 @@ public class AssetsDownloader {
         }
 
         DownloadUtil.submitDownloadTasks(downloads, tmpDir);
-        Log.LOGGER.debug("[assets文件夹校验]正在补全缺失的{}个文件", downloads.size());
+        Log.debug("正在补全缺失的{}个文件", downloads.size());
         DownloadUtil.takeDownloadResult();
 
         for (File file : fail) {
             FileUtil.moveFile(new File(tmpDir, file.getName()), file, true);
         }
-        Log.LOGGER.debug("[assets文件夹校验]结束");
+        Log.end();
     }
 }

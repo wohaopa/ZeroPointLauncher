@@ -21,35 +21,54 @@
 package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.Checksum;
 
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class Differ {
 
-    public static Differ diff(File dir, Identification identification) {
+    public void setExclude(List<String> exclude) {
+        this.exclude = exclude;
+    }
 
-        Differ differ = new Differ(dir.getPath() + "\\");
+    public static Differ diff(File dir, Identification identification, List<String> exclude) {
+
+        Differ differ = new Differ(dir.getPath() + "\\", exclude);
         differ.search(dir, identification.item);
         return differ;
     }
 
     public final List<String> removed = new ArrayList<>();
     public final List<String> addition = new ArrayList<>();
-    private String rootStr;
+    private final String rootStr;
+    private List<String> exclude;
 
-    public Differ(String rootStr) {
+    public Differ(String rootStr, List<String> exclude) {
         this.rootStr = rootStr;
+        this.exclude = exclude;
     }
 
-    public void search(File dir, Identification.IdentificationDirectoryItem directoryItem) {
+    private void search(File dir, Identification.IdentificationDirectoryItem directoryItem) {
+
         File[] rootDir = dir.listFiles();
         if (rootDir == null || rootDir.length < 1) return;
         List<String> loaded = new ArrayList<>();
         for (File file : rootDir) {
             String fileName = file.getName();
-            if (fileName.equals("Quests")) continue; // 跳过任务书检测
+
+            if (exclude != null) {
+                boolean flag = false;
+                for (String s : exclude) if (file.getPath()
+                    .endsWith(s)) {
+                        flag = true;
+                        exclude.remove(s);
+                        break;
+                    }
+                if (flag) continue;
+            }
+
             if (directoryItem.contains(fileName)) { // 镜像内存在相应名字的文件或者目录
                 loaded.add(fileName);
                 Identification.IdentificationItem identificationItem = directoryItem.getFile(fileName);

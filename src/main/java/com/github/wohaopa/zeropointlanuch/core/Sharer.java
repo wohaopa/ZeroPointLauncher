@@ -45,7 +45,6 @@ public class Sharer {
     public String name;
     public String parent;
 
-
     private Sharer(String name, File rootDir, String parent) {
         this.rootDir = rootDir;
         this.name = name;
@@ -69,7 +68,7 @@ public class Sharer {
                 mapper.execute(sharerP.name, sharerP.rootDir);
             }
         } catch (Exception e) {
-            Log.LOGGER.error("未找到Sharer或其依赖：{}", name);
+            Log.error("未找到Sharer或其依赖：{}", name);
             throw new RuntimeException(e);
         }
     }

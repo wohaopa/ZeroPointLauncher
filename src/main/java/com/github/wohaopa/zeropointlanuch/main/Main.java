@@ -23,23 +23,34 @@ package com.github.wohaopa.zeropointlanuch.main;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
+
+import cn.hutool.json.JSONObject;
 
 import com.github.wohaopa.zeropointlanuch.api.Core;
+import com.github.wohaopa.zeropointlanuch.core.DirTools;
 import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
+import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Main {
 
+    private static final String DOWNLOAD_VERSION_URL = "http://127.0.0.1//ZeroPointLaunch//";
     public static Map<String, ICommand> commands = new HashMap<>();
     public static File workDir;
 
     public static void main(String[] args) {
 
         long a = System.currentTimeMillis();
-        Log.LOGGER.debug("ZeroPoint启动器核心正在启动...");
+        Log.info("ZeroPoint启动器核心正在启动...");
         Main.init();
         long b = System.currentTimeMillis();
-        Log.LOGGER.debug("ZeroPoint启动器核心启动成功，用时：{}ms", b - a);
+        Log.debug("ZeroPoint启动器核心启动成功，用时：{}ms", b - a);
 
         if (args.length == 0) {
             appProcess();
@@ -47,7 +58,7 @@ public class Main {
             commandProcess(args);
         }
 
-        Log.LOGGER.info("ZeroPoint启动器核心关闭");
+        Log.info("ZeroPoint启动器核心关闭");
         System.exit(0); // 关闭用于下载的线程池
     }
 
@@ -59,10 +70,52 @@ public class Main {
             rootDirStr = System.getProperty("user.dir") + "/.GTNH";
         }
         workDir = new File(rootDirStr);
-
         Core.initDirTools(workDir); // 目录工具初始化
+
+        if (!Core.launcherVersion.equals("内部测试版本")) {
+            check_update();
+        }
+
         Main.registerCommand(GenCommand.class); // 注册指令
         Main.registerCommand(Command.class);
+    }
+
+    private static void check_update() {
+        Logger updateLog = LogManager.getLogger("Update");
+        Runnable runnable = () -> {
+            File versionFile = new File(DirTools.tmpDir, "version.json");
+            updateLog.info("开始检查更新");
+            DownloadUtil.submitDownloadTasks(DOWNLOAD_VERSION_URL + "version.json", versionFile);
+            try {
+                DownloadUtil.takeDownloadResult();
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            JSONObject versionJson = (JSONObject) JsonUtil.fromJson(versionFile);
+            String latestVersion = (String) versionJson.get("latest");
+            boolean flag = false;
+            {
+                String[] a = Core.launcherVersion.split("\\.");
+                String[] b = latestVersion.split("\\.");
+                for (int i = 0; i < a.length; i++) {
+                    if (Integer.parseInt(b[i]) > Integer.parseInt(a[i])) {
+                        flag = true;
+                        break;
+                    }
+                }
+            }
+            if (flag) {
+                updateLog.info("发现更新，正在下载更新");
+                String downloadUrl = DOWNLOAD_VERSION_URL + versionJson.get("download-url");
+                DownloadUtil.submitDownloadTasks(
+                    downloadUrl,
+                    new File(workDir.getParentFile(), "lib\\ZeroPointLaunch-Core.jar"));
+            }
+            versionFile.delete();
+        };
+        Thread thread = new Thread(runnable);
+        thread.setName("update");
+        thread.start();
     }
 
     private static void registerCommand(Class<?> commandClass) {
@@ -72,7 +125,7 @@ public class Main {
                 commands.put(field.getName(), (ICommand) field.get(null));
             }
         } catch (IllegalAccessException e) {
-            Log.LOGGER.error("无法注册指令，错误：{}", e.getMessage());
+            Log.error("无法注册指令，错误：{}", e.getMessage());
             throw new RuntimeException(e);
         }
     }

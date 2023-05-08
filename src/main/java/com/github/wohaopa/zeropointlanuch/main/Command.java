@@ -67,7 +67,7 @@ public class Command {
 
         @Override
         public String usage() {
-            return "lookup - 安装zip文件夹压缩包并刷新实例文件夹";
+            return "lookup - 刷新实例文件夹并安装zip文件夹压缩包";
         }
     };
 
@@ -210,29 +210,38 @@ public class Command {
 
         @Override
         public String usage() {
-            return "genRunDir <实例名> - 生成指定版本的运行目录，在使用其他启动器时使用次命令";
+            return "genRunDir <实例名> [共享器] - 生成指定版本的运行目录，在使用其他启动器时使用此命令";
         }
     };
 
-    /*
-     * public static ICommand genHMCLDir = new ICommand() {
-     * @Override
-     * public boolean execute(String[] args) throws IOException {
-     * if (args.length < 2) {
-     * System.out.println("用法" + usage());
-     * return false;
-     * }
-     * if (!Instance.containsKey(args[1])) {
-     * System.out.println("错误：已安装的实例中不包含：\"" + args[1] + "\" 可以使用list指令查看已安装实例");
-     * return false;
-     * }
-     * System.out.println("dir=" + Function.genHMCLDir(args[1]));
-     * return true;
-     * }
-     * @Override
-     * public String usage() {
-     * return "genHMCLDir <实例名> - 生成hmcl支持的.miencraft文件夹";
-     * }
-     * };
-     */
+    public static ICommand genTransferOld = new ICommand() {
+
+        @Override
+        public boolean execute(String[] args) throws IOException {
+            if (args.length < 3) {
+                System.out.println("用法：" + usage());
+                return false;
+            }
+
+            Instance instance = Instance.get(args[1]);
+            if (instance == null) {
+                System.out.println("错误：已安装的实例中不包含：\"" + args[1] + "\" 可以使用list指令查看已安装实例");
+                return false;
+            }
+
+            File file = new File(args[2].replace("\"", ""));
+            if (!file.exists() || file.isFile()) {
+                System.out.println("错误：" + file + "不存在/不是目录。");
+                return false;
+            }
+
+            Core.genTransferOld(instance, file);
+            return true;
+        }
+
+        @Override
+        public String usage() {
+            return "genTransferOld <实例名> <.minecraft路径> - 将原来的GTNH迁移至ZPL对应版本的实例";
+        }
+    };
 }

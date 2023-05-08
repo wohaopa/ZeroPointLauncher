@@ -76,13 +76,13 @@ public class Instance {
 
     /** 加载实例信息，仅在初始化阶段使用本方法来加载持久化的实例 */
     public Information loadInformation() {
-        Log.LOGGER.debug("[实例加载]正在加载：{}", versionFile);
+        Log.debug("正在加载：{}", versionFile);
         return JsonUtil.fromJson(FileUtil.fileRead(versionFile), Information.class);
     }
 
     /** 保存实例信息 */
     public void savaInformation() {
-        Log.LOGGER.debug("[实例安装]正在保存：{}", versionFile);
+        Log.debug("正在保存：{}", versionFile);
         FileUtil.fileWrite(versionFile, JsonUtil.toJson(information));
     }
 
@@ -108,7 +108,7 @@ public class Instance {
 
                 depVersion = instance.information.depVersion;
             } else {
-                Log.LOGGER.error("未知版本：" + depVersion);
+                Log.error("未知版本：" + depVersion);
                 throw new RuntimeException("未知版本：" + depVersion);
             }
         }
@@ -127,7 +127,7 @@ public class Instance {
             if (excludeModsList.contains(mods)) continue; // 排除
             File modsFile = new File(modsDir, mods);
             if (!modsFile.exists()) {
-                Log.LOGGER.fatal("缺失mod：{}", modsFile);
+                Log.error("缺失mod：{}", modsFile);
                 throw new RuntimeException("缺失mod：" + modsFile);
             }
             FileUtil.genLink(new File(modsRun, modsFile.getName()), modsFile);

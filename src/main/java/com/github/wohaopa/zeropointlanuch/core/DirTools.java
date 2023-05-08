@@ -39,7 +39,7 @@ public class DirTools {
     public static File versionsDir;
 
     public static void init(File workDir) {
-        Log.LOGGER.info("目录管理初始化开始");
+        Log.start("目录管理");
         DirTools.workDir = workDir;
         DirTools.instancesDir = FileUtil.initAndMkDir(workDir, "instances");
         DirTools.librariesDir = FileUtil.initAndMkDir(workDir, "libraries");
@@ -49,6 +49,6 @@ public class DirTools {
         DirTools.shareDir = FileUtil.initAndMkDir(workDir, "share");
         DirTools.tmpDir = FileUtil.initAndMkDir(workDir, "tmpDir");
         DirTools.versionsDir = FileUtil.initAndMkDir(workDir, "versions");
-        Log.LOGGER.info("目录管理初始化结束");
+        Log.end();
     }
 }

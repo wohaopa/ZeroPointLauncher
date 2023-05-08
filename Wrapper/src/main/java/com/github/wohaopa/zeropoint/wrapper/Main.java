@@ -7,12 +7,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class Main {
-    private static String zpLaunch = "http://127.0.0.1/ZeroPointLaunch/Library/";
-    private static File rootDir;
+    private static String zpLaunch;
+    private static final File libDir;
 
-    public static List<String> lib = new ArrayList<>();
+    private static final List<String> lib = new ArrayList<>();
+
+    private static final Properties config = new Properties();
 
     static {
         // 懒得找了，写死得了
@@ -29,23 +32,56 @@ public class Main {
         lib.add("hamcrest-core-1.3.jar");
         lib.add("ZeroPointLaunch-Core.jar");
 
-        String userDir = System.getProperty("user.dit");
-        rootDir = new File(userDir, "lib");
+        String userDir = System.getProperty("user.dir");
+        libDir = new File(userDir, "lib");
+        File configFile = new File(userDir + "/config.properties");
+        if (!configFile.exists()) {
+            config.setProperty("download-url", "http://127.0.0.1/ZeroPointLaunch/Library/");
+            config.setProperty("check-libraries", "true");
+            config.setProperty("check-update", "true");
+            try {
+                config.store(new FileOutputStream(configFile), null);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try {
+                config.load(new FileInputStream(configFile));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public static void main(String[] args) {
 
-        lib.forEach(s -> {
-            File libFile = new File(rootDir, s);
-            if (!libFile.exists()) {
-                System.out.println("missing...: " + s);
-                try {
-                    downloadFile(s);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        zpLaunch=config.getProperty("download-url","http://127.0.0.1/ZeroPointLaunch/Library/");
+
+        if (config.getProperty("check-update", "false").equals("true")) {
+            File newCore = new File(libDir, "ZeroPointLaunch-Core-new.jar");
+            if (newCore.exists()) {
+                File curCore = new File(libDir, "ZeroPointLaunch-Core.jar");
+                File oldCore = new File(libDir, "ZeroPointLaunch-Core-old.jar");
+
+                if (oldCore.exists()) oldCore.delete();
+                if (curCore.exists()) curCore.renameTo(oldCore);
+                newCore.renameTo(curCore);
             }
-        });
+        }
+
+        if (config.getProperty("check-libraries", "false").equals("true")) {
+            lib.forEach(s -> {
+                File libFile = new File(libDir, s);
+                if (!libFile.exists()) {
+                    System.out.println("missing...: " + s);
+                    try {
+                        downloadFile(s);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        }
 
 
         try {
@@ -82,9 +118,9 @@ public class Main {
         byte[] getData = readInputStream(inputStream);
 
         //文件保存位置
-        rootDir.mkdirs();
+        libDir.mkdirs();
 
-        File file = new File(rootDir + File.separator + s);
+        File file = new File(libDir + File.separator + s);
         FileOutputStream fos = new FileOutputStream(file);
         fos.write(getData);
 
