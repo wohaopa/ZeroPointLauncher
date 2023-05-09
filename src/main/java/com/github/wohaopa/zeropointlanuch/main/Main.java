@@ -66,7 +66,7 @@ public class Main {
 
     private static void init() {
 
-        // 用于本地测试，会在测试环境设置为："D:\\DevProject\\JavaProject\\ZeroPointLaunch\\Wrapper\\build\\libs\\.GTNH"
+        // 用于本地测试，会在测试环境设置为："D:\DevProject\JavaProject\ZeroPointLaunch\TestResources"
         String rootDirStr = System.getProperty("zpl.rootDir");
 
         if (rootDirStr == null) {

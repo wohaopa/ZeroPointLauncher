@@ -62,7 +62,7 @@ spotless {
 
     java {
         target 'src/*/java/**/*.java', 'src/*/scala/**/*.java'
-//
+
         toggleOffOn()
         importOrderFile('spotless.importorder')
         removeUnusedImports()
@@ -74,12 +74,6 @@ spotless {
 
 
 tasks.register('copyLib', Copy) {
-    dependsOn 'copyCmd'
     from configurations.compileClasspath
-    into "$buildDir/libs"
-}
-
-tasks.register('copyCmd', Copy) {
-    from 'resources/启动.bat'
     into "$buildDir/libs"
 }
