@@ -66,9 +66,8 @@ public class Main {
 
     private static void init() {
 
-        String rootDirStr = System.getProperty("zpl.rootdir");
-        // String rootDirStr =
-        // "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\Wrapper\\build\\libs\\.GTNH";
+        // 用于本地测试，会在测试环境设置为："D:\\DevProject\\JavaProject\\ZeroPointLaunch\\Wrapper\\build\\libs\\.GTNH"
+        String rootDirStr = System.getProperty("zpl.rootDir");
 
         if (rootDirStr == null) {
             rootDirStr = System.getProperty("user.dir") + "/.GTNH";
@@ -76,8 +75,8 @@ public class Main {
         workDir = new File(rootDirStr);
         Core.initDirTools(workDir); // 目录工具初始化
 
-        if (!System.getProperty("zpl.skipUpdate")
-            .equals("true") && !Core.launcherVersion.equals("内部测试版本")) {
+        String skip = System.getProperty("zpl.skipUpdate");
+        if (skip != null && !skip.equals("true") && !Core.launcherVersion.equals("内部测试版本")) {
             check_update();
         }
 
@@ -108,7 +107,11 @@ public class Main {
             try {
                 DownloadUtil.takeDownloadResult();
             } catch (ExecutionException | InterruptedException e) {
-                throw new RuntimeException(e);
+                updateLog.info(e);
+            }
+            if (!versionFile.exists()) {
+                updateLog.info("未能成功加载版本信息，跳过更新");
+                return;
             }
             JSONObject versionJson = (JSONObject) JsonUtil.fromJson(versionFile);
             String latestVersion = (String) versionJson.get("latest");
@@ -185,11 +188,11 @@ public class Main {
             }
 
             try {
-                System.out.println(cmdStr + " - start");
-                if (cmdObj.execute(args)) System.out.println(cmdStr + " - success");
-                else System.out.println(cmdStr + " - warn");
+                System.out.println("start - " + cmdStr);
+                if (cmdObj.execute(args)) System.out.println("success - " + cmdStr);
+                else System.out.println("warn - " + cmdStr);
             } catch (Exception e) {
-                System.out.println(cmdStr + " - error");
+                System.out.println("error - " + cmdStr);
                 e.printStackTrace();
             }
 
