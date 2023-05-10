@@ -49,7 +49,9 @@ public class Core {
      * @param version 实例版本
      */
     public static void installStandard(File zipFile, File dir, String name, String version) {
+        Log.start("标准实例安装");
         InstanceInstaller.installStandard(zipFile, dir, name, version);
+        Log.end();
     }
 
     /** 检查实例文件夹 */
@@ -71,7 +73,7 @@ public class Core {
             if (file.isFile() && file.getName()
                 .endsWith(".zip")) {
                 String name = file.getName();
-                name = name.replace("GT_New_Horizons_", "");
+                // name = name.replace("GT_New_Horizons_", "");
                 name = name.replace("_Client.zip", "");
                 if (!Instance.containsKey(name)) {
                     Log.debug("发现安装包 {}，名为 {}", file.getName(), name);
@@ -100,8 +102,10 @@ public class Core {
      * @param targetVersion
      */
     public static void installTranslation(File translationFile, File dir, String name, Instance targetVersion) {
+        Log.start("汉化实例安装");
         String version = targetVersion.information.version;
         InstanceInstaller.installTranslation(translationFile, dir, name, version, targetVersion);
+        Log.end();
     }
 
     public static void downloadFile(String url) {
@@ -113,13 +117,29 @@ public class Core {
         }
     }
 
+    /**
+     * 生成运行目录
+     *
+     * @param inst   实例
+     * @param sharer 分享器
+     * @return 目录地址
+     */
     public static String genRuntimeDir(Instance inst, Sharer sharer) {
+        Log.start("运行目录生成");
         inst.genRuntimeDir(sharer);
-        return inst.information.runDir;
+        Log.end();
+        return inst.runDir.toString();
     }
 
-    public static void genTransferOld(Instance instance, File file) {
-
+    /**
+     * 根据实例生成.minecraft差异
+     *
+     * @param outDir   输出目录
+     * @param instance 实例
+     * @param file     .minecraft
+     */
+    public static void genTransferOld(File outDir, Instance instance, File file) {
+        Log.start(".minecraft对比");
         List<String> exclude = new ArrayList<>();
         for (File file1 : Objects.requireNonNull(file.listFiles())) {
             if (file1.getName()
@@ -136,19 +156,70 @@ public class Core {
         long b = System.currentTimeMillis();
         Log.debug("对比用时：{}s", (b - a) / 1000.0);
 
-        File outDir = new File(instance.insDir, "private-outDir");
         if (outDir.exists()) {
-            File oldOutDir = new File(instance.insDir, "private-outDir-old");
+            File oldOutDir = new File(outDir.getParentFile(), outDir.getName() + ".backup");
             FileUtil.delete(oldOutDir);
             if (!outDir.renameTo(oldOutDir)) FileUtil.delete(outDir);
         } else {
             outDir.mkdir();
         }
-        differ.addition.forEach(s -> {
+
+        File imageDir = new File(outDir, "image");
+
+        for (String s : differ.addition) {
             File f1 = new File(file, s);
-            File f2 = new File(outDir, s).getParentFile();
+            if (f1.isDirectory()) {
+                File[] fileList = f1.listFiles();
+                if (fileList == null || fileList.length == 0) continue;
+            }
+            File f2 = new File(imageDir, s).getParentFile();
             if (!f2.exists()) f2.mkdirs();
             FileUtil.copyDir(f1, f2);
-        });
+        }
+
+        File versionJsonFile = new File(outDir, "version.json");
+        Instance.Information information = new Instance.Information();
+
+        information.name = instance.information.name = "-Changed";
+        information.version = instance.information.version;
+        information.depVersion = instance.information.name;
+        information.sharer = instance.information.sharer;
+        information.includeMods = instance.information.includeMods;
+        information.excludeMods = instance.information.excludeMods;
+        information.checksum = null;
+
+        Instance.Information.toJson(information, versionJsonFile);
+        Log.end();
+    }
+
+    public static void installZPL(File dir, String name, String version) {}
+
+    /** 根据.minecraft生成ZPL实例 */
+    public static void genZPLInstance(File instDir, String name, File src) {
+        Log.start("ZPL标准实例生成");
+
+        File versionFile = new File(instDir, "version.json");
+        File imageDir = new File(instDir, "image");
+
+        // 复制文件
+        List<String> list = new ArrayList<>();
+        list.add("mods");
+        list.add("config");
+        list.add("scripts");
+        // list.add("resourcepacks");// 没必要
+        list.forEach(s -> FileUtil.copyDir(new File(src, s), imageDir));
+
+        Instance.Information information = new Instance.Information();
+        information.name = name;
+        information.version = name;
+        information.sharer = "Common";
+        information.depVersion = "null";
+        information.excludeMods = new ArrayList<>();
+        information.checksum = FileUtil.genChecksum(imageDir);
+        information.includeMods = InstanceInstaller.genModList(new File(imageDir, "mods"), true);
+        Mapper.saveConfigJson(imageDir, Mapper.defaultJson());
+
+        Instance.Information.toJson(information, versionFile);
+        Log.end();
     }
 }

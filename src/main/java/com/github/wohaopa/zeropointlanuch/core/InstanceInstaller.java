@@ -29,7 +29,6 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
-import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.ZipUtil;
 
 public class InstanceInstaller {
@@ -63,19 +62,14 @@ public class InstanceInstaller {
         } catch (Exception e) {
             throw new RuntimeException("版本加载错误：" + e);
         }
-        if (!inst.information.insDir.equals(versionFile.getParent())) {
-            Log.info("实例文件被移动：{}", inst.information.insDir);
-            inst.information.insDir = versionFile.getParent();
-            inst.information.imageDir = inst.information.insDir + "\\image";
-            inst.information.runDir = inst.information.insDir + "\\.minecraft";
-            inst.savaInformation();
-        }
 
-        inst.insDir = new File(inst.information.insDir);
-        inst.imageDir = new File(inst.information.imageDir);
-        inst.runDir = new File(inst.information.runDir);
+        inst.insDir = versionFile.getParentFile();
+        inst.imageDir = FileUtil.initAndMkDir(inst.insDir, "image");
+        inst.runDir = FileUtil.initAndMkDir(inst.insDir, ".minecraft");
 
-        Instance.put(inst.information.name, inst);
+        String name = inst.information.name;
+        if (!Instance.containsKey(name)) Instance.put(name, inst);
+        else Log.error("实例名重复：{}", name);
     }
 
     /**
@@ -103,15 +97,12 @@ public class InstanceInstaller {
         inst.imageDir = FileUtil.initAndMkDir(dir, "image");
         inst.runDir = FileUtil.initAndMkDir(dir, ".minecraft");
 
-        inst.information.insDir = inst.insDir.toString();
-        inst.information.imageDir = inst.imageDir.toString();
-        inst.information.runDir = inst.runDir.toString();
         inst.information.sharer = "Common"; // 使用默认共享器
 
         Log.debug("正在生成校验文件");
         inst.information.checksum = FileUtil.genChecksum(inst.imageDir); // 加载文件校验
 
-        inst.information.includeMods = genModList(new File(inst.imageDir, "mods")); // 加载mods信息
+        inst.information.includeMods = genModList(new File(inst.imageDir, "mods"), true); // 加载mods信息
         inst.information.excludeMods = new ArrayList<>();
 
         inst.savaInformation(); // 保存版本信息
@@ -130,7 +121,6 @@ public class InstanceInstaller {
      */
     public static void installStandard(File zip, File dir, String name, String version) {
 
-        Log.start("标准实例安装");
         // 准备好目录
         File image = FileUtil.initAndMkDir(dir, "image");
 
@@ -157,12 +147,9 @@ public class InstanceInstaller {
         jsonObject.putOpt("file", list);
         json.get("exclude", JSONArray.class)
             .add(jsonObject);
-
-        File config = new File(image, "zpl_margi_config.json");
-        FileUtil.fileWrite(config, JsonUtil.toJson(json));
+        Mapper.saveConfigJson(image, json);
 
         Log.info("实例 {} 安装完成！", name);
-        Log.end();
     }
 
     /**
@@ -186,7 +173,6 @@ public class InstanceInstaller {
 
     public static void installTranslation(File translationFile, File dir, String name, String version,
         Instance targetVersion) {
-        Log.start("汉化实例安装");
 
         File image = FileUtil.initAndMkDir(dir, "image");
 
@@ -210,10 +196,9 @@ public class InstanceInstaller {
                 }
             }
         }
-        Log.end();
     }
 
-    private static List<String> genModList(File modsDir) {
+    public static List<String> genModList(File modsDir, boolean move) {
         List<String> mods = new ArrayList<>();
         if (!modsDir.exists()) return mods;
         for (File mod : Objects.requireNonNull(modsDir.listFiles())) {
@@ -226,9 +211,9 @@ public class InstanceInstaller {
                         break;
                     }
                 }
-                String path = modRepo + "/" + modFileName;
+                String path = modRepo + "\\" + modFileName;
                 mods.add(path);
-                if (!FileUtil.moveFile(mod, new File(DirTools.modsDir, path))) {
+                if (move && !FileUtil.moveFile(mod, new File(DirTools.modsDir, path))) {
                     Log.info("已在mod库中发现：{} 即将删除临时文件", modFileName);
                     if (mod.delete()) Log.warn("文件：{} 删除失败，可能被占用，请手动删除", mod.getPath());
                 }

@@ -66,7 +66,7 @@ public class Main {
 
     private static void init() {
 
-        // 用于本地测试，会在测试环境设置为："D:\DevProject\JavaProject\ZeroPointLaunch\TestResources"
+        // 用于本地测试，会在测试环境设置为："D:\DevProject\JavaProject\ZeroPointLaunch\TestResources\.GTNH"
         String rootDirStr = System.getProperty("zpl.rootDir");
 
         if (rootDirStr == null) {
@@ -76,7 +76,7 @@ public class Main {
         Core.initDirTools(workDir); // 目录工具初始化
 
         String skip = System.getProperty("zpl.skipUpdate");
-        if (skip != null && !skip.equals("true") && !Core.launcherVersion.equals("内部测试版本")) {
+        if (skip != null && !skip.equals("true")) {
             check_update();
         }
 

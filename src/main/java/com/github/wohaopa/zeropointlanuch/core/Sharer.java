@@ -51,10 +51,7 @@ public class Sharer {
         this.parent = parent;
         File file = new File(rootDir, "zpl_margi_config.json");
         if (!file.exists()) {
-            FileUtil.fileWrite(
-                file,
-                Mapper.defaultJson()
-                    .toJSONString(4));
+            Mapper.saveConfigJson(file.getParentFile(), Mapper.defaultJson());
         }
     }
 

@@ -29,10 +29,6 @@ import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class Differ {
 
-    public void setExclude(List<String> exclude) {
-        this.exclude = exclude;
-    }
-
     public static Differ diff(File dir, Identification identification, List<String> exclude) {
 
         Differ differ = new Differ(dir.getPath() + "\\", exclude);

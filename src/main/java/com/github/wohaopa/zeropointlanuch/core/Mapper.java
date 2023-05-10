@@ -108,6 +108,11 @@ public class Mapper {
         return object;
     }
 
+    public static void saveConfigJson(File image, JSONObject json) {
+        File config = new File(image, "zpl_margi_config.json");
+        FileUtil.fileWrite(config, JsonUtil.toJson(json));
+    }
+
     private void doLink(String name, File link, File target) {
         List<String> include1 = include.get(name);
         String fileName = link.getPath();

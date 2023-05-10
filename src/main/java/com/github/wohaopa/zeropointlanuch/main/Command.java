@@ -218,7 +218,7 @@ public class Command {
 
         @Override
         public boolean execute(String[] args) throws IOException {
-            if (args.length < 3) {
+            if (args.length < 4) {
                 System.out.println("用法：" + usage());
                 return false;
             }
@@ -229,19 +229,54 @@ public class Command {
                 return false;
             }
 
-            File file = new File(args[2].replace("\"", ""));
-            if (!file.exists() || file.isFile()) {
-                System.out.println("错误：" + file + "不存在/不是目录。");
+            File outDir = new File(args[2].replace("\"", ""));
+            if (outDir.exists()) {
+                System.out.println("警告：" + outDir + "存在，将自动移动");
+            }
+
+            File minecraftDir = new File(args[3].replace("\"", ""));
+            if (!minecraftDir.exists() || minecraftDir.isFile()) {
+                System.out.println("错误：" + minecraftDir + "不存在/不是目录。");
                 return false;
             }
 
-            Core.genTransferOld(instance, file);
+            Core.genTransferOld(outDir, instance, minecraftDir);
             return true;
         }
 
         @Override
         public String usage() {
-            return "genTransferOld <实例名> <.minecraft路径> - 将原来的GTNH迁移至ZPL对应版本的实例";
+            return "genTransferOld <实例名> <输出文件夹路径> <.minecraft路径> - 将原来的GTNH迁移至ZPL对应版本的实例";
+        }
+    };
+
+    public static ICommand genZPLInstance = new ICommand() {
+
+        @Override
+        public boolean execute(String[] args) throws IOException {
+            if (args.length < 4) {
+                System.out.println("用法：" + usage());
+                return false;
+            }
+            String instName = args[1];
+
+            File outDir = new File(args[2]);
+            if (outDir.isFile()) outDir.delete();
+            outDir.mkdirs();
+
+            File srcDir = new File(args[3]);
+            if (!srcDir.exists() || srcDir.isFile()) {
+                System.out.println("错误：" + srcDir + "不存在/不是目录。");
+                return false;
+            }
+            Core.genZPLInstance(outDir, instName, srcDir);
+
+            return true;
+        }
+
+        @Override
+        public String usage() {
+            return "genZPLInstance <实例名> <输出文件夹路径> <目标文件夹路径> - 生成ZPL标准实例";
         }
     };
 }

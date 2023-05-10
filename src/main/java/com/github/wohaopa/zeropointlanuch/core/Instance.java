@@ -77,13 +77,13 @@ public class Instance {
     /** 加载实例信息，仅在初始化阶段使用本方法来加载持久化的实例 */
     public Information loadInformation() {
         Log.debug("正在加载：{}", versionFile);
-        return JsonUtil.fromJson(FileUtil.fileRead(versionFile), Information.class);
+        return Information.formJson(versionFile);
     }
 
     /** 保存实例信息 */
     public void savaInformation() {
         Log.debug("正在保存：{}", versionFile);
-        FileUtil.fileWrite(versionFile, JsonUtil.toJson(information));
+        Information.toJson(information, versionFile);
     }
 
     /** 生成实例的运行目录（.minecraft） 可被其他启动器直接启动 */
@@ -137,11 +137,16 @@ public class Instance {
     @SuppressWarnings("unused")
     public static class Information {
 
+        public static Information formJson(File file) {
+            return JsonUtil.fromJson(FileUtil.fileRead(file), Information.class);
+        }
+
+        public static void toJson(Information information, File file) {
+            FileUtil.fileWrite(file, JsonUtil.toJson(information));
+        }
+
         public String name;
         public String version;
-        public String imageDir;
-        public String insDir;
-        public String runDir;
         public String depVersion;
         public String sharer;
         public List<String> includeMods;
@@ -160,24 +165,12 @@ public class Instance {
             return version;
         }
 
-        public String getImageDir() {
-            return imageDir;
-        }
-
         public List<String> getIncludeMods() {
             return includeMods;
         }
 
         public List<String> getExcludeMods() {
             return excludeMods;
-        }
-
-        public String getInsDir() {
-            return insDir;
-        }
-
-        public String getRunDir() {
-            return runDir;
         }
 
         public String getSharer() {
