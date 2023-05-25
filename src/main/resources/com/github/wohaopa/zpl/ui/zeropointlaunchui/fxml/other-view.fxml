@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="550.0" prefWidth="1000.0"
+            xmlns="http://javafx.com/javafx/11.0.14-internal"
+            fx:controller="com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.OtherController">
+    <children>
+        <Label layoutX="269.0" layoutY="163.0" text="其他"/>
+    </children>
+</AnchorPane>

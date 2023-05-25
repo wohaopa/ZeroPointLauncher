@@ -9,10 +9,12 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
     private static String zpLaunch;
-    private static final File libDir;
+    private static final File rootDir;
 
     private static final List<String> lib = new ArrayList<>();
 
@@ -20,22 +22,22 @@ public class Main {
 
     static {
         // 懒得找了，写死得了
-        lib.add("hutool-all-5.8.17.jar");
-        lib.add("log4j-core-2.20.0.jar");
-        lib.add("log4j-api-2.20.0.jar");
-        lib.add("commons-compress-1.21.jar");
-        lib.add("xz-1.9.jar");
-        lib.add("junit-platform-engine-1.9.2.jar");
-        lib.add("junit-platform-commons-1.9.2.jar");
-        lib.add("junit-vintage-engine-5.9.2.jar");
-        lib.add("junit-4.13.2.jar");
-        lib.add("opentest4j-1.2.0.jar");
-        lib.add("hamcrest-core-1.3.jar");
-        lib.add("ZeroPointLaunch-Core.jar");
+        lib.add("lib/hutool-all-5.8.17.jar");
+        lib.add("lib/log4j-core-2.20.0.jar");
+        lib.add("lib/log4j-api-2.20.0.jar");
+        lib.add("lib/commons-compress-1.21.jar");
+        lib.add("lib/xz-1.9.jar");
+        lib.add("lib/junit-platform-engine-1.9.2.jar");
+        lib.add("lib/junit-platform-commons-1.9.2.jar");
+        lib.add("lib/junit-vintage-engine-5.9.2.jar");
+        lib.add("lib/junit-4.13.2.jar");
+        lib.add("lib/opentest4j-1.2.0.jar");
+        lib.add("lib/hamcrest-core-1.3.jar");
+        lib.add("lib/ZeroPointLaunch-Core.jar");
 
         String userDir = System.getProperty("user.dir");
-        libDir = new File(userDir, "lib");
-        File configFile = new File(userDir + "/config.properties");
+        rootDir = new File(userDir);
+        File configFile = new File(rootDir, "/config.properties");
         if (!configFile.exists()) {
             config.setProperty("download-url", "http://127.0.0.1/ZeroPointLaunch/");
             config.setProperty("check-libraries", "true");
@@ -56,13 +58,13 @@ public class Main {
 
     public static void main(String[] args) {
 
-        zpLaunch = config.getProperty("download-url", "http://127.0.0.1/ZeroPointLaunch/") + "Library/";
+        zpLaunch = config.getProperty("download-url", "http://127.0.0.1/ZeroPointLaunch/");
 
         if (config.getProperty("check-update", "false").equals("true")) {
-            File newCore = new File(libDir, "ZeroPointLaunch-Core-new.jar");
+            File newCore = new File(rootDir, "lib/ZeroPointLaunch-Core-new.jar");
             if (newCore.exists()) {
-                File curCore = new File(libDir, "ZeroPointLaunch-Core.jar");
-                File oldCore = new File(libDir, "ZeroPointLaunch-Core-old.jar");
+                File curCore = new File(rootDir, "lib/ZeroPointLaunch-Core.jar");
+                File oldCore = new File(rootDir, "lib/ZeroPointLaunch-Core-old.jar");
 
                 if (oldCore.exists()) oldCore.delete();
                 if (curCore.exists()) curCore.renameTo(oldCore);
@@ -72,11 +74,11 @@ public class Main {
 
         if (config.getProperty("check-libraries", "false").equals("true")) {
             lib.forEach(s -> {
-                File libFile = new File(libDir, s);
+                File libFile = new File(rootDir, s);
                 if (!libFile.exists()) {
                     System.out.println("missing...: " + s);
                     try {
-                        downloadFile(s);
+                        downloadFile(s, libFile.getName());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -103,25 +105,44 @@ public class Main {
     }
 
 
-    private static void downloadFile(String s) throws IOException {
+    private static void downloadFile(String urlPath, String fileName) throws IOException {
+        if (fileName.equals("ZeroPointLaunch-Core.jar")) {
+            File versionJson = new File(rootDir, "lib\\version.json");
+            downloadFile("version.json", "version.json");
+            try {
+                FileReader fr = new FileReader(versionJson);
+                char[] buff = new char[(int) versionJson.length()];
+                fr.read(buff);
+                String context = new String(buff);
+                Pattern ptn = Pattern.compile("\"download-url\": \"(.+)\",");
+                Matcher matcher = ptn.matcher(context);
+                if (matcher.find()) {
+                    urlPath = matcher.group(1);
+                }
+                fr.close();
+
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            versionJson.delete();
+        }
 
 
-        URL url = new URL(zpLaunch + s);
+        URL url = new URL(zpLaunch + urlPath);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         //设置超时间为3秒
         conn.setConnectTimeout(3 * 1000);
         //防止屏蔽程序抓取而返回403错误
         conn.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
-
         //得到输入流
         InputStream inputStream = conn.getInputStream();
         //获取自己数组
         byte[] getData = readInputStream(inputStream);
 
         //文件保存位置
-        libDir.mkdirs();
 
-        File file = new File(libDir + File.separator + s);
+        File file = new File(rootDir, "lib\\" + fileName);
+        file.getParentFile().mkdirs();
         FileOutputStream fos = new FileOutputStream(file);
         fos.write(getData);
 

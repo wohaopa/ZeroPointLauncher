@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx"
+            fx:controller="com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.AccountController"
+            prefHeight="550.0" prefWidth="1000.0">
+
+</AnchorPane>

@@ -1,0 +1,114 @@
+.root-pane {
+    -fx-background-color: none;
+}
+.rx-carousel {
+    -fx-background-color: none;
+    -fx-border-width: 0px;
+
+}
+
+.title {
+    -fx-background-color: none;
+    -fx-text-fill: #F49900;
+}
+
+.top-pane {
+    -fx-background-color: #2A2F4F;
+}
+.top-pane .button {
+    -fx-background-color: #1B2040;
+}
+.top-pane .button:hover{
+    -fx-background-color: red;
+}
+
+
+.nav-btn-box {
+    -fx-background-color: none;
+}
+.nav-btn-box .rx-toggle-button{
+    -fx-background-color: none;
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-background-radius: 25px;
+    -fx-border-radius: 25px;
+}
+.nav-btn-box .rx-toggle-button:hover{
+    -fx-background-color: #9DB2BF;
+    -fx-border-color:  #9DB2BF;
+
+}
+.nav-btn-box .rx-toggle-button:selected{
+    -fx-background-color: #526D82;
+}
+
+.home-pane .waring-box .text-area .scroll-pane .content{
+    -fx-background-color: #E4DCCF;
+    -fx-text-fill: red;
+}
+.home-pane .waring-box .text-area .scroll-pane {
+    -fx-background-color: none;
+}
+
+.home-pane .waring-box .text-area {
+    -fx-background-color: none;
+    -fx-background-radius: 20px;
+}
+.home-pane .waring-box .label {
+    -fx-background-color:  #EA5455;
+    -fx-background-radius:  20px;
+    -fx-font-size: 16;
+}
+.home-pane .waring-box {
+    -fx-background-color: #E4DCCF;
+    -fx-background-radius: 20px;
+    -fx-border-color: #E2777A;
+    -fx-border-width: 2px;
+    -fx-border-radius: 20px;
+
+}
+
+.home-pane .account-box,.info-box {
+    -fx-background-color: #F9F5EBD0;
+    -fx-padding: 20px;
+    -fx-background-radius: 10px;
+}
+
+.home-pane .account-box .label{
+    -fx-text-fill: #002B5B;
+    -fx-font-size: 13px;
+    -fx-padding: 5px;
+}
+.home-pane :hover{
+    -fx-background-color: #E4DCCFD0;
+    -fx-background-radius: 10px;
+}
+
+
+.home-pane .launch-btn {
+    -fx-background-color: #F9D949D0;
+    -fx-font-size: 22px;
+    -fx-text-fill: white;
+}
+.hone-pane .list-btn * {
+    -fx-background-color: none;
+}
+
+.hone-pane .list-btn {
+    -fx-background-color: #F9D949D0;
+    -fx-font-size: 22px;
+    -fx-text-fill: white;
+}
+
+.home-pane .launch-btn:hover,.list-btn :hover {
+    -fx-background-color: #F97B22D0;
+    -fx-background-radius: 0px;
+}
+
+.button {
+    -fx-background-color: #F0F0F0;
+    -fx-background-radius: 0px;
+}
+.button:hover{
+    -fx-background-color: gray;
+}
