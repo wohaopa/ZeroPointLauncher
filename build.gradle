@@ -1,7 +1,9 @@
 
+
 plugins {
     id 'java'
     id 'application'
+    id 'edu.sc.seis.launch4j' version '2.5.4'
     id 'com.diffplug.spotless' version '6.7.2'
     id 'org.javamodularity.moduleplugin' version '1.8.12'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
@@ -32,6 +34,21 @@ spotless {
     java {
         googleJavaFormat()
     }
+}
+
+launch4j {
+    mainClassName = 'com.github.wohaopa.zpl.ui.zeropointlaunchui.Main'
+    outfile = 'ZPL.exe'
+    language = 'SIMPLIFIED_CHINESE'
+    fileDescription = 'ZeroPointLaunch, a dedicated starter for GTNH.'
+    companyName = 'wohaopa'
+    copyright = companyName
+    messagesStartupError = 'Startup error!'
+    messagesLauncherError = 'Launcher Error'
+    messagesJreVersionError = 'Java version error! Please use Java17!'
+
+    icon = "${projectDir}/icons/logo.ico"
+    jvmOptions = ["--module-path .\\lib\\ --add-modules javafx.controls,javafx.fxml"]
 }
 
 dependencies {

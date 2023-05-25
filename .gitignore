@@ -1,6 +1,7 @@
 # 默认忽略的文件
 /.gradle/
 /.idea/
+/.GTNH/
 /build/
 /TestResources/
 /Wrapper/build/
