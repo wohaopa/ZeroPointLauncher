@@ -2,6 +2,7 @@ module com.github.wohaopa.zpl.ui.zeropointlaunchui {
   requires javafx.controls;
   requires javafx.fxml;
   requires rxcontrols;
+  requires ZeroPointLaunch.Core;
 
   opens com.github.wohaopa.zpl.ui.zeropointlaunchui to
       javafx.fxml;

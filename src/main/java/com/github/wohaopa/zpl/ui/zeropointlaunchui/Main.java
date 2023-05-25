@@ -20,6 +20,7 @@
 
 package com.github.wohaopa.zpl.ui.zeropointlaunchui;
 
+import java.io.File;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -28,6 +29,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import com.github.wohaopa.zeropointlanuch.core.DirTools;
+
 public class Main extends Application {
 
     @Override
@@ -35,13 +38,23 @@ public class Main extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("fxml/main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         scene.setFill(Color.TRANSPARENT);
-        stage.setTitle("ZeroPointLaunch-UI");
+        stage.setTitle("ZeroPointLaunch");
         stage.setScene(scene);
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.show();
     }
 
     public static void main(String[] args) {
-        launch();
+        Main.initDir();
+        Application.launch(Main.class, args);
+    }
+
+    private static void initDir() {
+        String rootDirStr = System.getProperty("zpl.rootDir");
+
+        if (rootDirStr == null) {
+            rootDirStr = System.getProperty("user.dir") + "/.GTNH";
+        }
+        DirTools.init(new File(rootDirStr)); // 目录工具初始化
     }
 }
