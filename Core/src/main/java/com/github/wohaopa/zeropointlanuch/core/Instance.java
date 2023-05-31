@@ -134,6 +134,11 @@ public class Instance {
         }
     }
 
+    @Override
+    public String toString() {
+        return information.name + "(" + information.version + ")";
+    }
+
     @SuppressWarnings("unused")
     public static class Information {
 

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.leewyatt.rxcontrols.controls.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <AnchorPane prefHeight="550.0" prefWidth="1000.0" style="-fx-background-color: white;" stylesheets="@../csss/main.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.InstanceController">
    <children>
-      <ListView layoutX="760.0" layoutY="32.0" prefHeight="518.0" prefWidth="240.0" />
+      <ListView fx:id="instanceListView" layoutX="760.0" layoutY="32.0" prefHeight="467.0" prefWidth="240.0" />
       <Button layoutX="759.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="240.0" text="添加实例" />
       <GridPane layoutX="14.0" layoutY="14.0">
         <columnConstraints>
@@ -20,25 +21,25 @@
         </rowConstraints>
          <children>
             <Label text="实例名：" />
-            <Label text="ZeroPointServer" GridPane.columnIndex="1" />
+            <Label fx:id="nameLabel" text="ZeroPointServer" GridPane.columnIndex="1" />
             <Label text="实例版本：" GridPane.rowIndex="1" />
-            <Label text="2.3.2" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label fx:id="versionLabel" text="2.3.2" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Label text="分享器：" GridPane.rowIndex="2" />
-            <Label text="Java8" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label fx:id="sharerLabel" text="Java8" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label text="继承版本：" GridPane.rowIndex="3" />
-            <Label text="2.3.2-zpl" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label fx:id="depInstanceLabel" text="2.3.2-zpl" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          </children>
       </GridPane>
       <VBox layoutX="14.0" layoutY="145.0" prefHeight="388.0" prefWidth="200.0">
          <children>
             <Label text="加载mod" />
-            <ListView prefHeight="371.0" prefWidth="200.0" />
+            <ListView fx:id="includeModListView" prefHeight="371.0" prefWidth="200.0" />
          </children>
       </VBox>
       <VBox layoutX="228.0" layoutY="145.0" prefHeight="388.0" prefWidth="200.0">
          <children>
             <Label text="排除mod" />
-            <ListView prefHeight="371.0" prefWidth="200.0" />
+            <ListView fx:id="excludeModListView" prefHeight="371.0" prefWidth="200.0" />
          </children>
       </VBox>
       <GridPane layoutX="228.0" layoutY="16.0">
@@ -53,10 +54,10 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Button mnemonicParsing="false" text="打开实例目录" />
-            <Button mnemonicParsing="false" text="打开运行目录" GridPane.rowIndex="3" />
-            <Button mnemonicParsing="false" text="打开image目录" GridPane.rowIndex="1" />
-            <Button mnemonicParsing="false" text="打开分享器目录" GridPane.rowIndex="2" />
+            <Button mnemonicParsing="false" onMouseClicked="#onInstanceDirClicked" text="打开实例目录" />
+            <Button mnemonicParsing="false" onMouseClicked="#onRunDirClicked" text="打开运行目录" GridPane.rowIndex="3" />
+            <Button mnemonicParsing="false" onMouseClicked="#onImgDirClicked" text="打开image目录" GridPane.rowIndex="1" />
+            <Button mnemonicParsing="false" onMouseClicked="#onSharerDirClicked" text="打开分享器目录" GridPane.rowIndex="2" />
             <Button mnemonicParsing="false" text="迁移旧实例" GridPane.columnIndex="1" />
             <Button mnemonicParsing="false" text="导出实例" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Button mnemonicParsing="false" text="刷新运行目录" GridPane.columnIndex="1" GridPane.rowIndex="2" />
@@ -75,5 +76,7 @@
             <ListView prefHeight="221.0" prefWidth="200.0" />
          </children>
       </VBox>
+      <Button layoutX="759.0" layoutY="524.0" mnemonicParsing="false" onMouseClicked="#onRefreshClicked" prefHeight="23.0" prefWidth="240.0" text="刷新" />
+      <RXTextField fx:id="workDirTextField" buttonDisplayMode="SHOW" editable="false" layoutX="759.0" layoutY="499.0" onClickButton="#onChooseWorkDir" prefHeight="23.0" prefWidth="240.0" />
    </children>
 </AnchorPane>

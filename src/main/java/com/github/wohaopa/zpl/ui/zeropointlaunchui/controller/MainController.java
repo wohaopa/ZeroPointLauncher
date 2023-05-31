@@ -21,7 +21,18 @@
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -30,6 +41,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Window;
 
+import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zpl.ui.zeropointlaunchui.Main;
 import com.leewyatt.rxcontrols.animation.carousel.AnimNone;
 import com.leewyatt.rxcontrols.controls.RXCarousel;
@@ -45,7 +57,8 @@ public class MainController {
     public RXCarousel mainCarousel;
 
     private double offsetX, offsetY;
-    private Window window;
+    private static Window window;
+    public static _Current_ current = new _Current_();
 
     @FXML
     void initialize() throws IOException {
@@ -65,6 +78,7 @@ public class MainController {
                     .indexOf(nv);
                 mainCarousel.setSelectedIndex(index);
             });
+        if (window != null) throw new RuntimeException("多份实例！");
     }
 
     @FXML
@@ -72,8 +86,8 @@ public class MainController {
         if (window == null) window = topBar.getScene()
             .getWindow();
 
-        window.setX(mouseEvent.getScreenX() - offsetX);
-        window.setY(mouseEvent.getScreenY() - offsetY);
+        getWindow().setX(mouseEvent.getScreenX() - offsetX);
+        getWindow().setY(mouseEvent.getScreenY() - offsetY);
     }
 
     @FXML
@@ -86,5 +100,33 @@ public class MainController {
     public void exitAction(ActionEvent actionEvent) {
         Platform.exit();
         System.exit(0);
+    }
+
+    protected static Window getWindow() {
+        return window;
+    }
+}
+
+class _Current_ {
+
+    ObjectProperty<ObservableList<String>> includeMod = new SimpleObjectProperty<>();
+    ObjectProperty<ObservableList<String>> excludeMod = new SimpleObjectProperty<>();
+    ObjectProperty<ObservableList<String>> includeFile = new SimpleObjectProperty<>();
+    ObjectProperty<ObservableList<String>> excludeFile = new SimpleObjectProperty<>();
+    Instance instance = null;
+    StringProperty depInstance = new SimpleStringProperty();
+    StringProperty name = new SimpleStringProperty();
+    StringProperty version = new SimpleStringProperty();
+    StringProperty sharer = new SimpleStringProperty();
+
+    void changeInstance(Instance instance) {
+        this.instance = instance;
+        name.setValue(instance.information.name);
+        version.setValue(instance.information.version);
+        sharer.setValue(instance.information.sharer);
+        depInstance.setValue(instance.information.depVersion);
+        includeMod.setValue(FXCollections.observableList(instance.information.includeMods));
+        excludeMod.setValue(FXCollections.observableList(instance.information.excludeMods));
+//        includeMod.setValue(FXCollections.observableList(instance.information.includeMods));
     }
 }

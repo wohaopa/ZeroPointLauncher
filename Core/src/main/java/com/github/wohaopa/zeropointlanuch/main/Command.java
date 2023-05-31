@@ -61,7 +61,7 @@ public class Command {
 
         @Override
         public boolean execute(String[] args) {
-            Core.lookup();
+            Core.refresh();
             return true;
         }
 
@@ -93,7 +93,7 @@ public class Command {
 
         @Override
         public boolean execute(String[] args) {
-            List<Instance> list = Core.listInst();
+            List<Instance> list = (List<Instance>) Core.listInst();
             System.out.println("共有：" + list.size() + "个GTNH实例被识别");
             for (Instance instance : list)
                 System.out.println("实例名：" + instance.information.name + " 版本：" + instance.information.version);

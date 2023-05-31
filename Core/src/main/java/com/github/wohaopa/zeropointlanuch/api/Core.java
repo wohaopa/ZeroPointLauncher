@@ -22,6 +22,7 @@ package com.github.wohaopa.zeropointlanuch.api;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -55,7 +56,7 @@ public class Core {
     }
 
     /** 检查实例文件夹 */
-    public static void lookup() {
+    public static void refresh() {
         Log.start("实例初始化");
         Instance.clear();
         for (File file : Objects.requireNonNull(DirTools.instancesDir.listFiles())) {
@@ -68,20 +69,20 @@ public class Core {
             }
         }
         Log.end();
-        Log.start("文件初始化");
-        for (File file : Objects.requireNonNull(DirTools.zipDir.listFiles())) {
-            if (file.isFile() && file.getName()
-                .endsWith(".zip")) {
-                String name = file.getName();
-                // name = name.replace("GT_New_Horizons_", "");
-                name = name.replace("_Client.zip", "");
-                if (!Instance.containsKey(name)) {
-                    Log.debug("发现安装包 {}，名为 {}", file.getName(), name);
-                    InstanceInstaller.installStandard(file, new File(DirTools.instancesDir, name), name, name);
-                }
-            }
-        }
-        Log.end();
+        // Log.start("文件初始化");
+        // for (File file : Objects.requireNonNull(DirTools.zipDir.listFiles())) {
+        // if (file.isFile() && file.getName()
+        // .endsWith(".zip")) {
+        // String name = file.getName();
+        // // name = name.replace("GT_New_Horizons_", "");
+        // name = name.replace("_Client.zip", "");
+        // if (!Instance.containsKey(name)) {
+        // Log.debug("发现安装包 {}，名为 {}", file.getName(), name);
+        // InstanceInstaller.installStandard(file, new File(DirTools.instancesDir, name), name, name);
+        // }
+        // }
+        // }
+        // Log.end();
     }
 
     /**
@@ -89,8 +90,8 @@ public class Core {
      *
      * @return 实例列表
      */
-    public static List<Instance> listInst() {
-        return new ArrayList<>(Instance.list());
+    public static Collection<Instance> listInst() {
+        return Instance.list();
     }
 
     /**

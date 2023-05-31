@@ -22,7 +22,7 @@
                             prefHeight="50.0" styleClass="top-pane" BorderPane.alignment="CENTER">
                     <children>
                         <Label alignment="CENTER" prefHeight="50.0" prefWidth="326.0" styleClass="title"
-                               text="ZeroPointLaunch-UI" textAlignment="CENTER">
+                               text="ZeroPointLaunch" textAlignment="CENTER">
                             <graphic>
                                 <RXAvatar prefHeight="40.0" prefWidth="40.0" shapeType="HEXAGON_V">
                                     <image>

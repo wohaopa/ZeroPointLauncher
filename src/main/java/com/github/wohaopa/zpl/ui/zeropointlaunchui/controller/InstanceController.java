@@ -20,5 +20,84 @@
 
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
+import java.io.File;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.DirectoryChooser;
+
+import com.github.wohaopa.zeropointlanuch.api.Core;
+import com.github.wohaopa.zeropointlanuch.core.DirTools;
+import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.Sharer;
+import com.leewyatt.rxcontrols.controls.RXTextField;
+import com.leewyatt.rxcontrols.event.RXActionEvent;
+
 public class InstanceController {
+
+    @FXML
+    public RXTextField workDirTextField;
+    public ListView<Instance> instanceListView;
+    public Label nameLabel;
+    public Label versionLabel;
+    public Label sharerLabel;
+    public Label depInstanceLabel;
+    public ListView<String> includeModListView;
+    public ListView<String> excludeModListView;
+
+    @FXML
+    void initialize() {
+        workDirTextField.setText(DirTools.workDir.toString());
+        instanceListView.getSelectionModel()
+            .selectedItemProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                if (newValue != null) {
+                    MainController.current.changeInstance(newValue);
+                }
+            });
+        // 绑定
+        nameLabel.textProperty()
+            .bind(MainController.current.name);
+        versionLabel.textProperty()
+            .bind(MainController.current.version);
+        sharerLabel.textProperty()
+            .bind(MainController.current.sharer);
+        depInstanceLabel.textProperty()
+            .bind(MainController.current.depInstance);
+        includeModListView.itemsProperty().bind(MainController.current.includeMod);
+        excludeModListView.itemsProperty().bind(MainController.current.excludeMod);
+    }
+
+    @FXML
+    public void onRefreshClicked(MouseEvent mouseEvent) {
+        Core.refresh();
+        instanceListView.getItems()
+            .setAll(Core.listInst());
+    }
+
+    public void onChooseWorkDir(RXActionEvent rxActionEvent) {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setInitialDirectory(DirTools.workDir);
+        File dir = chooser.showDialog(MainController.getWindow());
+        if (dir != null) DirTools.init(dir);
+        workDirTextField.setText(DirTools.workDir.toString());
+    }
+
+    public void onInstanceDirClicked(MouseEvent mouseEvent) {
+        // Clicked
+        Util.openFileLocation(MainController.current.instance.insDir);
+    }
+
+    public void onRunDirClicked(MouseEvent mouseEvent) {
+        Util.openFileLocation(MainController.current.instance.runDir);
+    }
+
+    public void onImgDirClicked(MouseEvent mouseEvent) {
+        Util.openFileLocation(MainController.current.instance.imageDir);
+    }
+
+    public void onSharerDirClicked(MouseEvent mouseEvent) {
+        Util.openFileLocation(Sharer.get(MainController.current.instance.information.sharer).rootDir);
+    }
 }
