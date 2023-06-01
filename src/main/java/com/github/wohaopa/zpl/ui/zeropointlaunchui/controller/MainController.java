@@ -42,7 +42,7 @@ import com.leewyatt.rxcontrols.animation.carousel.AnimNone;
 import com.leewyatt.rxcontrols.controls.RXCarousel;
 import com.leewyatt.rxcontrols.pane.RXCarouselPane;
 
-public class MainController {
+public class MainController extends RootController {
 
     @FXML
     public AnchorPane topBar;

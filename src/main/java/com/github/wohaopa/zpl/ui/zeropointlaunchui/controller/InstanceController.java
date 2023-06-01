@@ -35,7 +35,7 @@ import com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.dialog.ModDialog;
 import com.leewyatt.rxcontrols.controls.RXTextField;
 import com.leewyatt.rxcontrols.event.RXActionEvent;
 
-public class InstanceController {
+public class InstanceController extends RootController {
 
     @FXML
     public RXTextField workDirTextField;
@@ -47,6 +47,8 @@ public class InstanceController {
     public ListView<String> includeModListView;
     public ListView<String> excludeModListView;
 
+    private ComboBox<Instance> comboBox;
+
     @FXML
     void initialize() {
         workDirTextField.setText(DirTools.workDir.toString());
@@ -54,6 +56,8 @@ public class InstanceController {
             .selectedItemProperty()
             .addListener((observable, oldValue, newValue) -> {
                 if (newValue != null) {
+                    if (comboBox != null) comboBox.getSelectionModel()
+                        .select(newValue);
                     MainController.current.changeInstance(newValue);
                 }
             });
@@ -78,6 +82,13 @@ public class InstanceController {
             .size() != 0)
             instanceListView.getSelectionModel()
                 .select(0);
+
+        comboBox = ((HomeController) getController("HomeController")).comboBox;
+
+        comboBox.itemsProperty()
+            .bind(instanceListView.itemsProperty());
+        comboBox.getSelectionModel()
+            .select(0);
     }
 
     @FXML

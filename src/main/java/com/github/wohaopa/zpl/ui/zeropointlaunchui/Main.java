@@ -22,6 +22,7 @@ package com.github.wohaopa.zpl.ui.zeropointlaunchui;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -34,6 +35,8 @@ import com.github.wohaopa.zeropointlanuch.core.DirTools;
 import com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.MainController;
 
 public class Main extends Application {
+
+    public static boolean admin = false;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -54,7 +57,22 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         Main.initDir();
+        Main.checkPermission();
         Application.launch(Main.class, args);
+    }
+
+    private static void checkPermission() {
+        try {
+            File file1 = new File(DirTools.tmpDir, "Permission");
+            File file2 = new File(DirTools.tmpDir, "Permission_Link");
+            if (file1.createNewFile()) {
+                Files.createSymbolicLink(file2.toPath(), file1.toPath());
+                file1.delete();
+                file2.delete();
+                admin = true;
+            }
+
+        } catch (IOException ignored) {}
     }
 
     private static void initDir() {

@@ -182,7 +182,7 @@ public class Mapper {
     public void makeSymlink() {
 
         fileToName.forEach((s, item) -> {
-            if (!"__.minecraft__".equals(item.list.get(0))) FileUtil.genLink(new File(runDir, s), item.file);
+            if (!"__.minecraft__".equals(item.list.get(0))) FileUtil.makeSymlink(new File(runDir, s), item.file);
 
         });
 

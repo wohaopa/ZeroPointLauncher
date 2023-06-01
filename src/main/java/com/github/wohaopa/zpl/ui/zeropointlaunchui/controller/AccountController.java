@@ -20,5 +20,5 @@
 
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
-public class AccountController {
+public class AccountController extends RootController {
 }

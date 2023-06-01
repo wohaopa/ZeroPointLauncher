@@ -20,5 +20,5 @@
 
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
-public class OtherController {
+public class OtherController extends RootController {
 }

@@ -20,5 +20,18 @@
 
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
-public class AddInstanceController extends RootController {
+import java.util.HashMap;
+import java.util.Map;
+
+public class RootController {
+
+    private static final Map<String, RootController> map = new HashMap<>();
+
+    public RootController() {
+        map.put(getClass().getSimpleName(), this);
+    }
+
+    protected static RootController getController(String name) {
+        return map.get(name);
+    }
 }

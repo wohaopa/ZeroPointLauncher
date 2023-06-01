@@ -10,8 +10,8 @@
     <children>
 
         <Button layoutX="750.0" layoutY="425.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" styleClass="launch-btn" text="启动" />
-        <ChoiceBox layoutX="750.0" layoutY="475.0" prefHeight="20.0" prefWidth="200.0" styleClass="list-btn" />
-        <FlowPane alignment="TOP_CENTER" layoutX="690.0" layoutY="50.0" prefHeight="153.0" prefWidth="284.0" styleClass="waring-box">
+        <ComboBox fx:id="comboBox" layoutX="750.0" layoutY="475.0" prefHeight="20.0" prefWidth="200.0" styleClass="list-btn" />
+        <FlowPane fx:id="wringPane" alignment="TOP_CENTER" layoutX="690.0" layoutY="50.0" prefHeight="153.0" prefWidth="284.0" styleClass="waring-box">
             <children>
                 <Label alignment="CENTER" prefHeight="40.0" prefWidth="106.0" text="警告！" textAlignment="CENTER" textFill="#e0e0e0">
                     <graphic>

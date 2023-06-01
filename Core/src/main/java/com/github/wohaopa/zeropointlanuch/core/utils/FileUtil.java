@@ -128,7 +128,7 @@ public class FileUtil {
      * @param link   link文件
      * @param target 源文件
      */
-    public static void genLink(File link, File target) {
+    public static void makeSymlink(File link, File target) {
         if (adminFlag) return;
 
         try {

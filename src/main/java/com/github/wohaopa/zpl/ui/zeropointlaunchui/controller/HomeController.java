@@ -20,15 +20,20 @@
 
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
-import java.io.IOException;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.*;
 
-public class HomeController {
+import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zpl.ui.zeropointlaunchui.Main;
 
-    // @FXML
-    private AnchorPane root;
+public class HomeController extends RootController {
+
+    public FlowPane wringPane;
+    public ComboBox<Instance> comboBox;
 
     @FXML
-    void initialize() throws IOException {}
+    void initialize() {
+        wringPane.setVisible(!Main.admin);
+    }
 }
