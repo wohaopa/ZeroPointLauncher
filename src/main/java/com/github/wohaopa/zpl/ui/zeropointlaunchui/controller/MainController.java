@@ -21,16 +21,11 @@
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -78,13 +73,10 @@ public class MainController {
                     .indexOf(nv);
                 mainCarousel.setSelectedIndex(index);
             });
-        if (window != null) throw new RuntimeException("多份实例！");
     }
 
     @FXML
     public void topBarDraggedAction(MouseEvent mouseEvent) {
-        if (window == null) window = topBar.getScene()
-            .getWindow();
 
         getWindow().setX(mouseEvent.getScreenX() - offsetX);
         getWindow().setY(mouseEvent.getScreenY() - offsetY);
@@ -104,6 +96,10 @@ public class MainController {
 
     protected static Window getWindow() {
         return window;
+    }
+
+    public static void setWindow(Window window) {
+        MainController.window = window;
     }
 }
 
@@ -127,6 +123,6 @@ class _Current_ {
         depInstance.setValue(instance.information.depVersion);
         includeMod.setValue(FXCollections.observableList(instance.information.includeMods));
         excludeMod.setValue(FXCollections.observableList(instance.information.excludeMods));
-//        includeMod.setValue(FXCollections.observableList(instance.information.includeMods));
+        // includeMod.setValue(FXCollections.observableList(instance.information.includeMods));
     }
 }

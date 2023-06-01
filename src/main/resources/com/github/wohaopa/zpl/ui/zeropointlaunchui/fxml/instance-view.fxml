@@ -33,7 +33,7 @@
       <VBox layoutX="14.0" layoutY="145.0" prefHeight="388.0" prefWidth="200.0">
          <children>
             <Label text="加载mod" />
-            <ListView fx:id="includeModListView" prefHeight="371.0" prefWidth="200.0" />
+            <ListView fx:id="includeModListView" onMouseClicked="#onIncludeModListViewClicked" prefHeight="371.0" prefWidth="200.0" />
          </children>
       </VBox>
       <VBox layoutX="228.0" layoutY="145.0" prefHeight="388.0" prefWidth="200.0">

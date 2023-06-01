@@ -17,6 +17,10 @@ version '0.1.0'
 application {
     mainModule = 'com.github.wohaopa.zpl.ui.zeropointlaunchui'
     mainClass = 'com.github.wohaopa.zpl.ui.zeropointlaunchui.Main'
+    applicationDefaultJvmArgs = [
+            "-Dzpl.rootDir=D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"
+    ]
+
 }
 
 javafx {

@@ -25,11 +25,13 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import com.github.wohaopa.zeropointlanuch.core.DirTools;
+import com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.MainController;
 
 public class Main extends Application {
 
@@ -41,6 +43,12 @@ public class Main extends Application {
         stage.setTitle("ZeroPointLaunch");
         stage.setScene(scene);
         stage.initStyle(StageStyle.TRANSPARENT);
+        stage.getIcons()
+            .add(
+                new Image(
+                    Main.class.getResource("img/logo.png")
+                        .toExternalForm()));
+        MainController.setWindow(stage);
         stage.show();
     }
 

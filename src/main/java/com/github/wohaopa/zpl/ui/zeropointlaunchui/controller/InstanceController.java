@@ -21,9 +21,11 @@
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
 import java.io.File;
+import java.util.List;
+
+import com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.dialog.ModDialog;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 
@@ -56,6 +58,8 @@ public class InstanceController {
                     MainController.current.changeInstance(newValue);
                 }
             });
+        // includeModListView.setCellFactory(param -> new _ListCell());
+
         // 绑定
         nameLabel.textProperty()
             .bind(MainController.current.name);
@@ -65,8 +69,16 @@ public class InstanceController {
             .bind(MainController.current.sharer);
         depInstanceLabel.textProperty()
             .bind(MainController.current.depInstance);
-        includeModListView.itemsProperty().bind(MainController.current.includeMod);
-        excludeModListView.itemsProperty().bind(MainController.current.excludeMod);
+        includeModListView.itemsProperty()
+            .bind(MainController.current.includeMod);
+        excludeModListView.itemsProperty()
+            .bind(MainController.current.excludeMod);
+
+        onRefreshClicked(null);
+        if (instanceListView.getItems()
+            .size() != 0)
+            instanceListView.getSelectionModel()
+                .select(0);
     }
 
     @FXML
@@ -99,5 +111,14 @@ public class InstanceController {
 
     public void onSharerDirClicked(MouseEvent mouseEvent) {
         Util.openFileLocation(Sharer.get(MainController.current.instance.information.sharer).rootDir);
+    }
+
+    public void onIncludeModListViewClicked(MouseEvent mouseEvent) {
+        if (mouseEvent.getClickCount() > 1) {
+            List<String> list = includeModListView.getSelectionModel()
+                .getSelectedItems();
+            ModDialog alert = new ModDialog(list.get(0));
+            alert.showAndWait();
+        }
     }
 }

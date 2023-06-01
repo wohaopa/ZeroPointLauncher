@@ -32,7 +32,7 @@ public class Util {
         try {
 
             Runtime.getRuntime()
-                .exec("explorer.exe /e," + path.toString()+"\\");
+                .exec("explorer.exe /e," + path.toString() + "\\");
 
         } catch (IOException ex) {
 
