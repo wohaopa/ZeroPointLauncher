@@ -75,8 +75,6 @@ public class Mapper {
         // this.all_include = include.getOrDefault("__zpl_all__", new ArrayList<>());
         this.all_exclude = exclude.get("__zpl_all__");
 
-
-
         this.genMapData();
     }
 
@@ -106,10 +104,10 @@ public class Mapper {
 
         // 执行sharer映射
         Sharer curSharer = sharer;
-        do{
+        do {
             genMapData0(curSharer.rootDir, curSharer.name);
             curSharer = Sharer.get(curSharer.parent);
-        }while (curSharer!=null);
+        } while (curSharer != null);
 
         // 执行img映射
         String s = "null";
@@ -194,7 +192,7 @@ public class Mapper {
 
                 FileUtil.genLink(Path.of(runDirStr, s), Path.of(modsRepoDirStr, modFullName));
 
-            }else {
+            } else {
                 String file = nameToImg.get(instName);
                 if (file == null) {
                     file = Instance.get(instName).imageDir.toString();
@@ -202,7 +200,6 @@ public class Mapper {
                 }
                 FileUtil.genLink(Path.of(runDirStr, s), Path.of(file, s));
             }
-
 
         });
 
@@ -238,8 +235,6 @@ public class Mapper {
         File config = new File(image, "zpl_margi_config.json");
         FileUtil.fileWrite(config, JsonUtil.toJson(json));
     }
-
-
 
     public static class _Config {
 
