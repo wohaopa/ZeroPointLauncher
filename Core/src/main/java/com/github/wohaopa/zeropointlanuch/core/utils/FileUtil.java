@@ -128,16 +128,19 @@ public class FileUtil {
      * @param link   link文件
      * @param target 源文件
      */
-    public static void genLink(Path link, Path target) {
+    public static void genLink(File link, File target) {
         if (adminFlag) return;
 
         try {
-            if (cn.hutool.core.io.FileUtil.isFile(link, true)) {
+            if (link.exists()) {
                 Log.info("跳过文件：{} 文件已存在", link);
                 return;
             }
-            cn.hutool.core.io.FileUtil.mkdir(link.getParent());
-            Files.createSymbolicLink(link, target);
+            if (!link.getParentFile()
+                .exists())
+                link.getParentFile()
+                    .mkdirs();
+            Files.createSymbolicLink(link.toPath(), target.toPath());
         } catch (IOException e) {
             adminFlag = true;
             Log.info("无法创建文件链接，可能是没有管理员权限，文件：{} 目标：{}", link, target);

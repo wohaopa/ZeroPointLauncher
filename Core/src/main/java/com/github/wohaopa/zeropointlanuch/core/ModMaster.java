@@ -20,6 +20,7 @@
 
 package com.github.wohaopa.zeropointlanuch.core;
 
+import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,7 +31,6 @@ import cn.hutool.core.io.resource.ResourceUtil;
 public class ModMaster {
 
     private static final Map<String, String> modiMap;
-    private static final Map<String, String> nameToModRep = new HashMap<>();
 
     static {
         modiMap = new HashMap<>();
@@ -55,12 +55,10 @@ public class ModMaster {
     }
 
     public static String getModFileName(String mod) {
-        String name = mod.substring(mod.lastIndexOf("\\") + 1);
-        nameToModRep.put(name, mod);
-        return name;
+        return mod.substring(mod.lastIndexOf("\\") + 1);
     }
 
-    public static String getModFullName(String s) {
-        return nameToModRep.get(s);
+    public static File getModFile(String modName) {
+        return null;
     }
 }

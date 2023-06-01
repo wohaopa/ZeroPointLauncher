@@ -21,7 +21,6 @@
 package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.*;
 
 import cn.hutool.json.JSONArray;
@@ -37,7 +36,7 @@ public class Mapper {
     private final Map<String, List<String>> include = new HashMap<>();
 
     // 第一个String是key，第二个List是value
-    private final Map<String, List<String>> fileToName = new HashMap<>();
+    private final Map<String, _Item_Name> fileToName = new HashMap<>();
     private final Map<String, List<String>> nameToFile = new HashMap<>();
 
     private final List<String> loadedMod = new ArrayList<>();
@@ -82,7 +81,7 @@ public class Mapper {
 
         // 先审查runDir的内容，需要清理所有symlink才可以
         List<String> runDirFiles = new ArrayList<>();
-        String name = this.instance.information.name;
+        String name = "__.minecraft__";
         int index = this.runDir.toString()
             .length() + 1;
         for (File file : Objects.requireNonNull(this.runDir.listFiles())) {
@@ -91,13 +90,13 @@ public class Mapper {
                     String s = file1.toString()
                         .substring(index);
                     runDirFiles.add(s);
-                    fileToName.put(s, List.of(name));
+                    fileToName.put(s, new _Item_Name(name, file1));
                 }
             } else {
                 String s = file.toString()
                     .substring(index);
                 runDirFiles.add(s);
-                fileToName.put(s, List.of(name));
+                fileToName.put(s, new _Item_Name(name, file));
             }
         }
         nameToFile.put(name, runDirFiles);
@@ -124,7 +123,7 @@ public class Mapper {
         for (String mod : loadedMod) {
             String p = "mods\\" + ModMaster.getModFileName(mod);
             if (fileToName.containsKey(p)) throw new RuntimeException("不应在mods文件夹中存放GTNH的mod！");
-            fileToName.put(p, List.of("__zpl_mod__"));
+            fileToName.put(p, new _Item_Name("__zpl_mod__", new File(DirTools.workDir, mod)));
         }
     }
 
@@ -152,19 +151,19 @@ public class Mapper {
                     if (all_exclude.contains(t1) || (excludeList != null && excludeList.contains(t1))) continue;
 
                     runDirFiles.add(t1);
-                    List<String> tmpList = fileToName.get(t1);
-                    if (tmpList == null || (includeList != null && includeList.contains(t1)))
-                        this.fileToName.put(t1, List.of(name));
-                    else tmpList.add(name);
+                    _Item_Name tmpItem = fileToName.get(t1);
+                    if (tmpItem == null || (includeList != null && includeList.contains(t1)))
+                        this.fileToName.put(t1, new _Item_Name(name, file1));
+                    else tmpItem.list.add(name);
 
                 }
             } else {
 
                 runDirFiles.add(t);
-                List<String> tmpList = fileToName.get(t);
-                if (tmpList == null || (includeList != null && includeList.contains(t)))
-                    this.fileToName.put(t, List.of(name));
-                else tmpList.add(name);
+                _Item_Name tmpItem = fileToName.get(t);
+                if (tmpItem == null || (includeList != null && includeList.contains(t)))
+                    this.fileToName.put(t, new _Item_Name(name, file));
+                else tmpItem.list.add(name);
 
             }
         }
@@ -181,25 +180,9 @@ public class Mapper {
     }
 
     public void makeSymlink() {
-        Map<String, String> nameToImg = new HashMap<>();
-        String modsRepoDirStr = DirTools.modsDir.toString();
-        String runDirStr = runDir.toString();
 
-        fileToName.forEach((s, list) -> {
-            String instName = list.get(0);
-            if (instName.equals("__zpl_mod__")) {
-                String modFullName = ModMaster.getModFullName(s.substring(5));
-
-                FileUtil.genLink(Path.of(runDirStr, s), Path.of(modsRepoDirStr, modFullName));
-
-            } else {
-                String file = nameToImg.get(instName);
-                if (file == null) {
-                    file = Instance.get(instName).imageDir.toString();
-                    nameToImg.put(instName, file);
-                }
-                FileUtil.genLink(Path.of(runDirStr, s), Path.of(file, s));
-            }
+        fileToName.forEach((s, item) -> {
+            if (!"__.minecraft__".equals(item.list.get(0))) FileUtil.genLink(new File(runDir, s), item.file);
 
         });
 
@@ -234,6 +217,18 @@ public class Mapper {
     public static void saveConfigJson(File image, JSONObject json) {
         File config = new File(image, "zpl_margi_config.json");
         FileUtil.fileWrite(config, JsonUtil.toJson(json));
+    }
+
+    private static class _Item_Name {
+
+        List<String> list = new ArrayList<>();
+        File file;
+
+        public _Item_Name(String name, File file) {
+            this.list.add(name);
+            this.file = file;
+        }
+
     }
 
     public static class _Config {
