@@ -20,39 +20,47 @@
 
 package com.github.wohaopa.zeropointlanuch.core;
 
-import java.io.File;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
+import cn.hutool.core.io.resource.ResourceUtil;
 
-public class Sharer {
+public class ModMaster {
 
-    private static Map<String, Sharer> inst = new HashMap<>();
+    private static final Map<String, String> modiMap;
+    private static final Map<String, String> nameToModRep = new HashMap<>();
 
     static {
-        inst.put("Common", new Sharer("Common", FileUtil.initAndMkDir(DirTools.shareDir, "Common"), "null"));
-        inst.put("Java8", new Sharer("Java8", FileUtil.initAndMkDir(DirTools.shareDir, "Java8"), "Common"));
-        inst.put("Java17", new Sharer("Java17", FileUtil.initAndMkDir(DirTools.shareDir, "Java17"), "Common"));
-        inst.put("HMCL", new Sharer("HMCL", FileUtil.initAndMkDir(DirTools.shareDir, "HMCL"), "Common"));
+        modiMap = new HashMap<>();
+        String mapStr = ResourceUtil.readStr("zpl-mod-repo.map", Charset.defaultCharset())
+            .replace("\r", "");
+
+        String[] mapStrLine = mapStr.split("\n");
+        Arrays.stream(mapStrLine)
+            .forEach(line -> {
+                String[] tmp = line.split("->");
+                modiMap.put(tmp[0], tmp[1]);
+            });
     }
 
-    public static Sharer get(String name) {
-        return inst.get(name);
-    }
-
-    public File rootDir;
-    public String name;
-    public String parent;
-
-    private Sharer(String name, File rootDir, String parent) {
-        this.rootDir = rootDir;
-        this.name = name;
-        this.parent = parent;
-        File file = new File(rootDir, "zpl_margi_config.json");
-        if (!file.exists()) {
-            Mapper.saveConfigJson(file.getParentFile(), Mapper.defaultJson());
+    public static String getModRepo(String modFileName) {
+        for (String key : modiMap.keySet()) {
+            if (modFileName.startsWith(key)) {
+                return modiMap.get(key);
+            }
         }
+        return "_default";
     }
 
+    public static String getModFileName(String mod) {
+        String name = mod.substring(mod.lastIndexOf("\\") + 1);
+        nameToModRep.put(name, mod);
+        return name;
+    }
+
+    public static String getModFullName(String s) {
+        return nameToModRep.get(s);
+    }
 }

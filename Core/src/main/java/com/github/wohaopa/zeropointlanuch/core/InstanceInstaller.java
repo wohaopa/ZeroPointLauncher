@@ -21,10 +21,8 @@
 package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.*;
 
-import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 
@@ -32,21 +30,6 @@ import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.ZipUtil;
 
 public class InstanceInstaller {
-
-    public static Map<String, String> modidMap;
-
-    static {
-        modidMap = new HashMap<>();
-        String mapStr = ResourceUtil.readStr("zpl-mod-repo.map", Charset.defaultCharset())
-            .replace("\r", "");
-
-        String[] mapStrLine = mapStr.split("\n");
-        Arrays.stream(mapStrLine)
-            .forEach(line -> {
-                String[] tmp = line.split("->");
-                modidMap.put(tmp[1], tmp[0]);
-            });
-    }
 
     /**
      * 启动时默认初始已安装的实例
@@ -204,13 +187,7 @@ public class InstanceInstaller {
         for (File mod : Objects.requireNonNull(modsDir.listFiles())) {
             if (mod.isFile()) {
                 String modFileName = mod.getName();
-                String modRepo = "_default";
-                for (String key : modidMap.keySet()) {
-                    if (modFileName.startsWith(key)) {
-                        modRepo = modidMap.get(key);
-                        break;
-                    }
-                }
+                String modRepo = ModMaster.getModRepo(modFileName);
                 String path = modRepo + "\\" + modFileName;
                 mods.add(path);
                 if (move && !FileUtil.moveFile(mod, new File(DirTools.modsDir, path))) {

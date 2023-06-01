@@ -60,8 +60,8 @@
             <Button mnemonicParsing="false" onMouseClicked="#onSharerDirClicked" text="打开分享器目录" GridPane.rowIndex="2" />
             <Button mnemonicParsing="false" text="迁移旧实例" GridPane.columnIndex="1" />
             <Button mnemonicParsing="false" text="导出实例" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <Button mnemonicParsing="false" text="刷新运行目录" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <Button mnemonicParsing="false" text="清除符号链接" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Button mnemonicParsing="false" onMouseClicked="#onRefreshRunDirClicked" text="刷新运行目录" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Button mnemonicParsing="false" onMouseClicked="#onClearSymlinkClicked" text="清除符号链接" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          </children>
       </GridPane>
       <VBox layoutX="436.0" layoutY="16.0" prefHeight="258.0" prefWidth="200.0">

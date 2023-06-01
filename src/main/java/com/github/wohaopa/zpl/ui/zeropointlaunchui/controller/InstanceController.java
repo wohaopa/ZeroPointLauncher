@@ -22,8 +22,6 @@ package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
 import java.io.File;
 import java.util.List;
-
-import com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.dialog.ModDialog;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -33,6 +31,7 @@ import com.github.wohaopa.zeropointlanuch.api.Core;
 import com.github.wohaopa.zeropointlanuch.core.DirTools;
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.Sharer;
+import com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.dialog.ModDialog;
 import com.leewyatt.rxcontrols.controls.RXTextField;
 import com.leewyatt.rxcontrols.event.RXActionEvent;
 
@@ -120,5 +119,13 @@ public class InstanceController {
             ModDialog alert = new ModDialog(list.get(0));
             alert.showAndWait();
         }
+    }
+
+    public void onRefreshRunDirClicked(MouseEvent mouseEvent) {
+        MainController.current.instance.genRuntimeDir(null);
+    }
+
+    public void onClearSymlinkClicked(MouseEvent mouseEvent) {
+        MainController.current.instance.delSymlink();
     }
 }

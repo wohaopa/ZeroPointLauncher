@@ -66,11 +66,19 @@ public class Instance {
         return instances.values();
     }
 
-    public File versionFile;
-    public File insDir;
-    public File imageDir;
-    public File runDir;
-    public Information information;
+    // 实例对象属性与方法
+
+    public File versionFile;// 实例配置文件
+
+    public File insDir;// 实例文件夹
+
+    public File imageDir; // 镜像文件夹
+
+    public File runDir;// 运行文件夹
+
+    public Information information;// 实例信息，名称版本都在这
+
+    private Mapper mapper; // 映射器，（private主要用于lazy初始化、mapper初始化会产生大量操作，单启动并不需要mapper）
 
     private Instance() {}
 
@@ -86,52 +94,35 @@ public class Instance {
         Information.toJson(information, versionFile);
     }
 
-    /** 生成实例的运行目录（.minecraft） 可被其他启动器直接启动 */
-    public void genRuntimeDir(Sharer sharer) {
-        // 删除目录中的系统链接文件
-        for (File file : Objects.requireNonNull(this.runDir.listFiles())) {
-            if (file.isDirectory()) for (File file1 : Objects.requireNonNull(file.listFiles())) FileUtil.delLink(file1);
-            else FileUtil.delLink(file);
+    private Mapper getMapper() {
+        if (mapper == null) {
+            mapper = new Mapper(this);
         }
-        Mapper mapper = new Mapper(new File(this.imageDir, "zpl_margi_config.json"), this.runDir);
+        return mapper;
+    }
 
-        Sharer.execute(sharer == null ? this.information.sharer : sharer.name, mapper); // 优先共享文件
-
-        this.copyFileAsLink(mapper, this.information.excludeMods); // 本实例的共享文件
-
-        // 处理依赖
-        String depVersion = this.information.depVersion;
-        while (!"null".equals(depVersion)) {
-            Instance instance = Instance.instances.get(depVersion);
-            if (instance != null) {
-                instance.copyFileAsLink(mapper, this.information.excludeMods);
-
-                depVersion = instance.information.depVersion;
-            } else {
-                Log.error("未知版本：" + depVersion);
-                throw new RuntimeException("未知版本：" + depVersion);
+    public void delSymlink() {
+        for (File file : Objects.requireNonNull(this.runDir.listFiles())) {
+            if (!FileUtil.isSymLink(file) && file.isDirectory()) {
+                for (File file1 : Objects.requireNonNull(file.listFiles()))
+                    if (FileUtil.isSymLink(file1)) FileUtil.delete(file1);
+            } else if (FileUtil.isSymLink(file)) {
+                FileUtil.delete(file);
             }
         }
     }
 
-    /** 生成文件链接，由被被依赖的实例在genRuntimeDir()中调用 */
-    private void copyFileAsLink(Mapper mapper, List<String> excludeModsList) {
-        // 处理本实例的image
-        mapper.execute(this.information.name, this.imageDir);
+    /** 生成实例的运行目录（.minecraft） 可被其他启动器直接启动 */
+    public void genRuntimeDir(Sharer sharer) {
 
-        // 处理mod
-        File modsDir = DirTools.modsDir;
-        File modsRun = new File(mapper.getTargetDir(), "mods");
+        this.delSymlink(); // 删除目录中的系统链接文件
 
-        for (String mods : this.information.includeMods) {
-            if (excludeModsList.contains(mods)) continue; // 排除
-            File modsFile = new File(modsDir, mods);
-            if (!modsFile.exists()) {
-                Log.error("缺失mod：{}", modsFile);
-                throw new RuntimeException("缺失mod：" + modsFile);
-            }
-            FileUtil.genLink(new File(modsRun, modsFile.getName()), modsFile);
-        }
+        this.getMapper()
+            .refresh(sharer == null ? Sharer.get(this.information.sharer) : sharer);
+
+        this.getMapper()
+            .makeSymlink();
+
     }
 
     @Override

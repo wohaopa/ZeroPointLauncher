@@ -119,20 +119,6 @@ public class Core {
     }
 
     /**
-     * 生成运行目录
-     *
-     * @param inst   实例
-     * @param sharer 分享器
-     * @return 目录地址
-     */
-    public static String genRuntimeDir(Instance inst, Sharer sharer) {
-        Log.start("运行目录生成");
-        inst.genRuntimeDir(sharer);
-        Log.end();
-        return inst.runDir.toString();
-    }
-
-    /**
      * 根据实例生成.minecraft差异
      *
      * @param outDir   输出目录

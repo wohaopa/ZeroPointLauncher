@@ -128,17 +128,16 @@ public class FileUtil {
      * @param link   link文件
      * @param target 源文件
      */
-    public static void genLink(File link, File target) {
+    public static void genLink(Path link, Path target) {
         if (adminFlag) return;
 
         try {
-            if (link.exists()) {
+            if (cn.hutool.core.io.FileUtil.isFile(link, true)) {
                 Log.info("跳过文件：{} 文件已存在", link);
                 return;
             }
-            link.getParentFile()
-                .mkdirs();
-            Files.createSymbolicLink(link.toPath(), target.toPath());
+            cn.hutool.core.io.FileUtil.mkdir(link.getParent());
+            Files.createSymbolicLink(link, target);
         } catch (IOException e) {
             adminFlag = true;
             Log.info("无法创建文件链接，可能是没有管理员权限，文件：{} 目标：{}", link, target);
@@ -182,13 +181,13 @@ public class FileUtil {
      *
      * @param file 目标文件
      */
-    public static void delLink(File file) {
+    public static boolean isSymLink(File file) {
         Path path = file.toPath();
         try {
-            if (!path.equals(path.toRealPath())) delete(file);
+            return !path.equals(path.toRealPath());
         } catch (IOException e) {
-            delete(file); // 一般无法找到源文件，即源文件失效
-            Log.error("无法判断文件链接：{} 错误：{}", file.getPath(), e);
+            FileUtil.delete(file);// 源文件失效，删除即可
+            return false;
         }
     }
 

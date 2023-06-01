@@ -21,6 +21,7 @@
 package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 
 import cn.hutool.json.JSONArray;
@@ -35,29 +36,181 @@ public class Mapper {
     private final Map<String, List<String>> exclude = new HashMap<>();
     private final Map<String, List<String>> include = new HashMap<>();
 
-    private final List<String> all_exclude;
+    // 第一个String是key，第二个List是value
+    private final Map<String, List<String>> fileToName = new HashMap<>();
+    private final Map<String, List<String>> nameToFile = new HashMap<>();
 
-    private final File targetDir;
+    private final List<String> loadedMod = new ArrayList<>();
+    private List<String> all_exclude;
+    private final List<String> exclude_mods;
+    // private final List<String> all_include; // 逻辑上重复
+
+    private Sharer sharer;
+
+    private final File runDir;
     private final File mainConfig;
+    private final Instance instance;
 
-    public Mapper(File config, File targetDir) {
-        List<String> all = new ArrayList<>();
-        all.add("zpl_margi_config.json");
-        exclude.put("__zpl_all__", all);
-        this.targetDir = targetDir;
-        this.mainConfig = config;
-        this.analyticConfig(config);
-        // this.all_include = include.getOrDefault("__zpl_all__", new ArrayList<>());
-        this.all_exclude = exclude.get("__zpl_all__");
+    public Mapper(Instance instance) {
+        this.instance = instance;
+        this.runDir = instance.runDir;
+        this.mainConfig = new File(instance.imageDir, "zpl_margi_config.json");
+        this.exclude_mods = instance.information.excludeMods;
     }
 
-    public File getTargetDir() {
-        return targetDir;
+    public void refresh(Sharer sharer) {
+
+        this.exclude.clear();
+        this.include.clear();
+        this.fileToName.clear();
+        this.nameToFile.clear();
+        this.loadedMod.clear();
+
+        this.sharer = sharer;
+
+        List<String> all = new ArrayList<>();
+        all.add("zpl_margi_config.json");
+        this.exclude.put("__zpl_all__", all);
+        this.loadConfigJson();
+        // this.all_include = include.getOrDefault("__zpl_all__", new ArrayList<>());
+        this.all_exclude = exclude.get("__zpl_all__");
+
+
+
+        this.genMapData();
+    }
+
+    private void genMapData() {
+
+        // 先审查runDir的内容，需要清理所有symlink才可以
+        List<String> runDirFiles = new ArrayList<>();
+        String name = this.instance.information.name;
+        int index = this.runDir.toString()
+            .length() + 1;
+        for (File file : Objects.requireNonNull(this.runDir.listFiles())) {
+            if (file.isDirectory()) {
+                for (File file1 : Objects.requireNonNull(file.listFiles())) {
+                    String s = file1.toString()
+                        .substring(index);
+                    runDirFiles.add(s);
+                    fileToName.put(s, List.of(name));
+                }
+            } else {
+                String s = file.toString()
+                    .substring(index);
+                runDirFiles.add(s);
+                fileToName.put(s, List.of(name));
+            }
+        }
+        nameToFile.put(name, runDirFiles);
+
+        // 执行sharer映射
+        Sharer curSharer = sharer;
+        do{
+            genMapData0(curSharer.rootDir, curSharer.name);
+            curSharer = Sharer.get(curSharer.parent);
+        }while (curSharer!=null);
+
+        // 执行img映射
+        String s = "null";
+        Instance curr = instance;
+        while (curr != null) {
+            genMapData0(curr.imageDir, curr.information.name);
+            genMapData1(curr.information.includeMods);
+            s = curr.information.depVersion;
+            curr = Instance.get(s);
+        }
+        if (!s.equals("null")) throw new RuntimeException("未找到实例：" + s);
+
+        // 注入mod
+        for (String mod : loadedMod) {
+            String p = "mods\\" + ModMaster.getModFileName(mod);
+            if (fileToName.containsKey(p)) throw new RuntimeException("不应在mods文件夹中存放GTNH的mod！");
+            fileToName.put(p, List.of("__zpl_mod__"));
+        }
+    }
+
+    private void genMapData0(File imgDir, String name) {
+
+        List<String> includeList = include.get(name);
+        List<String> excludeList = exclude.get(name);
+        if (excludeList != null && excludeList.size() == 0) return;// 排除版本
+
+        File configFile = new File(imgDir, "zpl_margi_config.json");
+        List shareDirList = ((JSONObject) JsonUtil.fromJson(configFile)).get("shareDir", List.class);
+
+        List<String> runDirFiles = new ArrayList<>();
+        int index = imgDir.toString()
+            .length() + 1;
+        for (File file : Objects.requireNonNull(imgDir.listFiles())) {
+            String t = file.toString()
+                .substring(index);
+            if (all_exclude.contains(t) || (excludeList != null && excludeList.contains(t))) continue;
+
+            if (file.isDirectory() && !shareDirList.contains(t)) {
+                for (File file1 : Objects.requireNonNull(file.listFiles())) {
+                    String t1 = file1.toString()
+                        .substring(index);
+                    if (all_exclude.contains(t1) || (excludeList != null && excludeList.contains(t1))) continue;
+
+                    runDirFiles.add(t1);
+                    List<String> tmpList = fileToName.get(t1);
+                    if (tmpList == null || (includeList != null && includeList.contains(t1)))
+                        this.fileToName.put(t1, List.of(name));
+                    else tmpList.add(name);
+
+                }
+            } else {
+
+                runDirFiles.add(t);
+                List<String> tmpList = fileToName.get(t);
+                if (tmpList == null || (includeList != null && includeList.contains(t)))
+                    this.fileToName.put(t, List.of(name));
+                else tmpList.add(name);
+
+            }
+        }
+        this.nameToFile.put(name, runDirFiles);
+
+    }
+
+    private void genMapData1(List<String> list) {
+        list.forEach(s -> {
+            if (!loadedMod.contains(s) && !exclude_mods.contains(s)) {
+                loadedMod.add(s);
+            }
+        });
+    }
+
+    public void makeSymlink() {
+        Map<String, String> nameToImg = new HashMap<>();
+        String modsRepoDirStr = DirTools.modsDir.toString();
+        String runDirStr = runDir.toString();
+
+        fileToName.forEach((s, list) -> {
+            String instName = list.get(0);
+            if (instName.equals("__zpl_mod__")) {
+                String modFullName = ModMaster.getModFullName(s.substring(5));
+
+                FileUtil.genLink(Path.of(runDirStr, s), Path.of(modsRepoDirStr, modFullName));
+
+            }else {
+                String file = nameToImg.get(instName);
+                if (file == null) {
+                    file = Instance.get(instName).imageDir.toString();
+                    nameToImg.put(instName, file);
+                }
+                FileUtil.genLink(Path.of(runDirStr, s), Path.of(file, s));
+            }
+
+
+        });
+
     }
 
     /** 用于解析json文件 */
-    public void analyticConfig(File configFile) {
-        JSONObject json = (JSONObject) JsonUtil.fromJson(configFile);
+    public void loadConfigJson() {
+        JSONObject json = (JSONObject) JsonUtil.fromJson(mainConfig);
         List<_Config> exclude1 = json.getBeanList("exclude", _Config.class);
         exclude1.forEach(config -> {
             if (config.name == null) config.name = "__zpl_all__";
@@ -73,33 +226,6 @@ public class Mapper {
         });
     }
 
-    public void execute(String name, File dir) {
-
-        File file = new File(dir, "zpl_margi_config.json");
-        List list = ((JSONObject) JsonUtil.fromJson(file)).get("shareDir", List.class);
-        execute0(name, dir, list);
-    }
-
-    /**
-     * 执行映射用
-     *
-     * @param name 提供image的实例名
-     * @param dir  image目录
-     */
-    private void execute0(String name, File dir, List<String> shareDir) {
-        for (File file : Objects.requireNonNull(dir.listFiles())) {
-            if (file.isDirectory() && !shareDir.contains(file.getName())) {
-                for (File file1 : Objects.requireNonNull(file.listFiles())) {
-                    File tmp = new File(targetDir, file.getName() + "/" + file1.getName());
-                    doLink(name, tmp, file1);
-                }
-            } else {
-                File tmp = new File(targetDir, file.getName());;
-                doLink(name, tmp, file);
-            }
-        }
-    }
-
     public static JSONObject defaultJson() {
         JSONObject object = new JSONObject();
         object.putOpt("include", new JSONArray());
@@ -113,66 +239,27 @@ public class Mapper {
         FileUtil.fileWrite(config, JsonUtil.toJson(json));
     }
 
-    private void doLink(String name, File link, File target) {
-        List<String> include1 = include.get(name);
-        String fileName = link.getPath();
 
-        if (link.exists()) {
-            if (include1 != null) {
-                for (String str : include1) {
-                    if (fileName.endsWith(str)) {
-                        link.delete();
-                        break;
-                    }
-                }
-            }
-            /*
-             * 不需要全局包含，因为逻辑上默认全局包含
-             * for (String str : all_include) {
-             * if (fileName.endsWith(str)) {
-             * link.delete();
-             * break;
-             * }
-             * }
-             */
+
+    public static class _Config {
+
+        String name;
+        List<String> file;
+
+        public String getName() {
+            return name;
         }
 
-        List<String> exclude1 = exclude.get(name);
-        if (exclude1 != null) {
-            for (String str : exclude1) {
-                if (fileName.endsWith(str)) {
-                    return;
-                }
-            }
-        }
-        for (String str : all_exclude) {
-            if (fileName.endsWith(str)) {
-                return;
-            }
+        public void setName(String name) {
+            this.name = name;
         }
 
-        FileUtil.genLink(link, target);
-    }
-}
+        public List<String> getFile() {
+            return file;
+        }
 
-class _Config {
-
-    String name;
-    List<String> file;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<String> getFile() {
-        return file;
-    }
-
-    public void setFile(List<String> file) {
-        this.file = file;
+        public void setFile(List<String> file) {
+            this.file = file;
+        }
     }
 }
