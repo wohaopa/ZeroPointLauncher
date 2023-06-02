@@ -189,7 +189,11 @@ public class FileUtil {
         try {
             return !path.equals(path.toRealPath());
         } catch (IOException e) {
-            FileUtil.delete(file);// 源文件失效，删除即可
+            try {
+                Files.delete(file.toPath());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
             return false;
         }
     }

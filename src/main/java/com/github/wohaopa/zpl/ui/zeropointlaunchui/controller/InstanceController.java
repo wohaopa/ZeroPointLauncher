@@ -42,10 +42,11 @@ public class InstanceController extends RootController {
     public ListView<Instance> instanceListView;
     public Label nameLabel;
     public Label versionLabel;
-    public Label sharerLabel;
     public Label depInstanceLabel;
     public ListView<String> includeModListView;
     public ListView<String> excludeModListView;
+    public ComboBox<String> sharerComboBox;
+    public ListView loadedModListView;
 
     private ComboBox<Instance> comboBox;
 
@@ -59,17 +60,21 @@ public class InstanceController extends RootController {
                     if (comboBox != null) comboBox.getSelectionModel()
                         .select(newValue);
                     MainController.current.changeInstance(newValue);
+                    sharerComboBox.getSelectionModel()
+                        .select(MainController.current.sharer.get());
                 }
             });
-        // includeModListView.setCellFactory(param -> new _ListCell());
 
         // 绑定
         nameLabel.textProperty()
             .bind(MainController.current.name);
         versionLabel.textProperty()
             .bind(MainController.current.version);
-        sharerLabel.textProperty()
-            .bind(MainController.current.sharer);
+        sharerComboBox.getItems()
+            .setAll(Sharer.getNames());
+        sharerComboBox.getSelectionModel()
+            .select("Common");
+
         depInstanceLabel.textProperty()
             .bind(MainController.current.depInstance);
         includeModListView.itemsProperty()
@@ -81,7 +86,7 @@ public class InstanceController extends RootController {
         if (instanceListView.getItems()
             .size() != 0)
             instanceListView.getSelectionModel()
-                .select(0);
+                .selectFirst();
 
         comboBox = ((HomeController) getController("HomeController")).comboBox;
 
@@ -133,10 +138,19 @@ public class InstanceController extends RootController {
     }
 
     public void onRefreshRunDirClicked(MouseEvent mouseEvent) {
-        MainController.current.instance.genRuntimeDir(null);
+        MainController.current.instance.genRuntimeDir();
     }
 
     public void onClearSymlinkClicked(MouseEvent mouseEvent) {
         MainController.current.instance.delSymlink();
+    }
+
+    public void onLoadInstanceClicked(MouseEvent mouseEvent) {
+        Button button = (Button) mouseEvent.getSource();
+        button.setText("加载中...");
+        button.setDisable(true);
+        MainController.current.instance.loadMap();
+        button.setDisable(false);
+        button.setText("加载实例");
     }
 }

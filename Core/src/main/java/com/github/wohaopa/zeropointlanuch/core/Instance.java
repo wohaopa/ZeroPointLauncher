@@ -113,12 +113,9 @@ public class Instance {
     }
 
     /** 生成实例的运行目录（.minecraft） 可被其他启动器直接启动 */
-    public void genRuntimeDir(Sharer sharer) {
+    public void genRuntimeDir() {
 
         this.delSymlink(); // 删除目录中的系统链接文件
-
-        this.getMapper()
-            .refresh(sharer == null ? Sharer.get(this.information.sharer) : sharer);
 
         this.getMapper()
             .makeSymlink();
@@ -128,6 +125,10 @@ public class Instance {
     @Override
     public String toString() {
         return information.name + "(" + information.version + ")";
+    }
+
+    public void loadMap() {
+        getMapper().refresh(null);
     }
 
     @SuppressWarnings("unused")

@@ -55,6 +55,9 @@ public class Mapper {
         this.runDir = instance.runDir;
         this.mainConfig = new File(instance.imageDir, "zpl_margi_config.json");
         this.exclude_mods = instance.information.excludeMods;
+        this.sharer = Sharer.get(instance.information.sharer);
+
+        refresh(null);
     }
 
     public void refresh(Sharer sharer) {
@@ -65,7 +68,11 @@ public class Mapper {
         this.nameToFile.clear();
         this.loadedMod.clear();
 
-        this.sharer = sharer;
+        Sharer oldSharer = null;
+        if (sharer != null) {
+            oldSharer = this.sharer;
+            this.sharer = sharer;
+        }
 
         List<String> all = new ArrayList<>();
         all.add("zpl_margi_config.json");
@@ -75,6 +82,14 @@ public class Mapper {
         this.all_exclude = exclude.get("__zpl_all__");
 
         this.genMapData();
+
+        if (oldSharer != null) {
+            this.sharer = oldSharer;
+        }
+    }
+
+    public List<String> getLoadedMod() {
+        return loadedMod;
     }
 
     private void genMapData() {
@@ -85,22 +100,23 @@ public class Mapper {
         int index = this.runDir.toString()
             .length() + 1;
         for (File file : Objects.requireNonNull(this.runDir.listFiles())) {
-            if (file.isDirectory()) {
-                for (File file1 : Objects.requireNonNull(file.listFiles())) {
-                    String s = file1.toString()
+            if (!FileUtil.isSymLink(file)) {
+                if (file.isDirectory()) {
+                    for (File file1 : Objects.requireNonNull(file.listFiles())) {
+                        String s = file1.toString()
+                            .substring(index);
+                        runDirFiles.add(s);
+                        fileToName.put(s, new _Item_Name(name, file1));
+                    }
+                } else {
+                    String s = file.toString()
                         .substring(index);
                     runDirFiles.add(s);
-                    fileToName.put(s, new _Item_Name(name, file1));
+                    fileToName.put(s, new _Item_Name(name, file));
                 }
-            } else {
-                String s = file.toString()
-                    .substring(index);
-                runDirFiles.add(s);
-                fileToName.put(s, new _Item_Name(name, file));
             }
         }
         nameToFile.put(name, runDirFiles);
-
         // 执行sharer映射
         Sharer curSharer = sharer;
         do {

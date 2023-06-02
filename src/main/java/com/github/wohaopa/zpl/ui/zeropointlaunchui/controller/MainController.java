@@ -107,6 +107,7 @@ class _Current_ {
 
     ObjectProperty<ObservableList<String>> includeMod = new SimpleObjectProperty<>();
     ObjectProperty<ObservableList<String>> excludeMod = new SimpleObjectProperty<>();
+    ObjectProperty<ObservableList<String>> loadedMod = new SimpleObjectProperty<>();
     ObjectProperty<ObservableList<String>> includeFile = new SimpleObjectProperty<>();
     ObjectProperty<ObservableList<String>> excludeFile = new SimpleObjectProperty<>();
     Instance instance = null;

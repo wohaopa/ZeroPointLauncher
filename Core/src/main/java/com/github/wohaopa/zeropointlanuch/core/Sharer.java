@@ -23,12 +23,13 @@ package com.github.wohaopa.zeropointlanuch.core;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class Sharer {
 
-    private static Map<String, Sharer> inst = new HashMap<>();
+    private static final Map<String, Sharer> inst = new HashMap<>();
 
     static {
         inst.put("Common", new Sharer("Common", FileUtil.initAndMkDir(DirTools.shareDir, "Common"), "null"));
@@ -39,6 +40,10 @@ public class Sharer {
 
     public static Sharer get(String name) {
         return inst.get(name);
+    }
+
+    public static Set<String> getNames() {
+        return inst.keySet();
     }
 
     public File rootDir;
