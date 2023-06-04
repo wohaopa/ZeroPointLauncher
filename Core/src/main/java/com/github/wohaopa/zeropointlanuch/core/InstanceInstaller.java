@@ -190,7 +190,7 @@ public class InstanceInstaller {
                 String modRepo = ModMaster.getModRepo(modFileName);
                 String path = modRepo + "\\" + modFileName;
                 mods.add(path);
-                if (move && !FileUtil.moveFile(mod, new File(DirTools.modsDir, path))) {
+                if (move && !FileUtil.moveFile(mod, new File(ZplDirectory.getModsDirectory(), path))) {
                     Log.info("已在mod库中发现：{} 即将删除临时文件", modFileName);
                     if (mod.delete()) Log.warn("文件：{} 删除失败，可能被占用，请手动删除", mod.getPath());
                 }

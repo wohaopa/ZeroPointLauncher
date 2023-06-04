@@ -20,7 +20,9 @@
 
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.dialog;
 
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 
 public class ModDialog extends Dialog<String> {
 
@@ -30,5 +32,9 @@ public class ModDialog extends Dialog<String> {
 
         this.setHeaderText("选择一个版本，ZPL会自动下载相应的mod");
         this.setContentText("标准仓库：");
+
+        final DialogPane dialogPane = getDialogPane();
+        dialogPane.getButtonTypes()
+            .addAll(ButtonType.OK, ButtonType.CANCEL);
     }
 }

@@ -218,4 +218,8 @@ public class FileUtil {
         if (hash == null || hash.isEmpty()) return true;
         return Objects.equals(DigestUtil.sha1Hex(file), hash);
     }
+
+    public static boolean exists(File dir, String path) {
+        return cn.hutool.core.io.FileUtil.exists(Path.of(dir.toString(), path), false);
+    }
 }

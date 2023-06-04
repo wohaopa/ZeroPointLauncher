@@ -28,9 +28,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 
 import com.github.wohaopa.zeropointlanuch.api.Core;
-import com.github.wohaopa.zeropointlanuch.core.DirTools;
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.Sharer;
+import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.dialog.ModDialog;
 import com.leewyatt.rxcontrols.controls.RXTextField;
 import com.leewyatt.rxcontrols.event.RXActionEvent;
@@ -52,7 +52,9 @@ public class InstanceController extends RootController {
 
     @FXML
     void initialize() {
-        workDirTextField.setText(DirTools.workDir.toString());
+        workDirTextField.setText(
+            ZplDirectory.getWorkDirectory()
+                .toString());
         instanceListView.getSelectionModel()
             .selectedItemProperty()
             .addListener((observable, oldValue, newValue) -> {
@@ -105,10 +107,12 @@ public class InstanceController extends RootController {
 
     public void onChooseWorkDir(RXActionEvent rxActionEvent) {
         DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setInitialDirectory(DirTools.workDir);
+        chooser.setInitialDirectory(ZplDirectory.getWorkDirectory());
         File dir = chooser.showDialog(MainController.getWindow());
-        if (dir != null) DirTools.init(dir);
-        workDirTextField.setText(DirTools.workDir.toString());
+        if (dir != null) ZplDirectory.init(dir);
+        workDirTextField.setText(
+            ZplDirectory.getWorkDirectory()
+                .toString());
     }
 
     public void onInstanceDirClicked(MouseEvent mouseEvent) {
@@ -139,18 +143,17 @@ public class InstanceController extends RootController {
 
     public void onRefreshRunDirClicked(MouseEvent mouseEvent) {
         MainController.current.instance.genRuntimeDir();
+        MainController.setTip("刷新运行目录完成！");
     }
 
     public void onClearSymlinkClicked(MouseEvent mouseEvent) {
         MainController.current.instance.delSymlink();
+        MainController.setTip("清空完成！");
     }
 
-    public void onLoadInstanceClicked(MouseEvent mouseEvent) {
-        Button button = (Button) mouseEvent.getSource();
-        button.setText("加载中...");
-        button.setDisable(true);
-        MainController.current.instance.loadMap();
-        button.setDisable(false);
-        button.setText("加载实例");
+    public void onRefreshInstanceClicked(MouseEvent mouseEvent) {
+
+        MainController.current.instance.refreshMapper();
+        MainController.setTip("映射刷新完成！");
     }
 }

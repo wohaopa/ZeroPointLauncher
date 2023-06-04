@@ -34,12 +34,6 @@ import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 public class Core {
 
     public static final String launcherVersion = "0.0.1";
-    public static boolean dirToolsInit = false;
-
-    public static void initDirTools(File rootDir) {
-        DirTools.init(rootDir);
-        dirToolsInit = true;
-    }
 
     /**
      * 安装标准实例
@@ -59,7 +53,9 @@ public class Core {
     public static void refresh() {
         Log.start("实例初始化");
         Instance.clear();
-        for (File file : Objects.requireNonNull(DirTools.instancesDir.listFiles())) {
+        for (File file : Objects.requireNonNull(
+            ZplDirectory.getInstancesDirectory()
+                .listFiles())) {
             if (file.isDirectory()) {
                 File version = new File(file, "version.json");
                 if (version.exists()) {
@@ -110,7 +106,7 @@ public class Core {
     }
 
     public static void downloadFile(String url) {
-        DownloadUtil.submitDownloadTasks(url, DirTools.tmpDir);
+        DownloadUtil.submitDownloadTasks(url, ZplDirectory.getTmpDirectory());
         try {
             DownloadUtil.takeDownloadResult();
         } catch (ExecutionException | InterruptedException e) {

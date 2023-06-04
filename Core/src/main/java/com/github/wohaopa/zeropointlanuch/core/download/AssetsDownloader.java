@@ -27,8 +27,8 @@ import java.util.concurrent.ExecutionException;
 
 import cn.hutool.json.JSONObject;
 
-import com.github.wohaopa.zeropointlanuch.core.DirTools;
 import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
@@ -40,7 +40,7 @@ public class AssetsDownloader {
         List<File> fail = new ArrayList<>();
         File mcAssetsFile = new File(assetsDir, "indexes/1.7.10.json");
         File objectsDir = FileUtil.initAndMkDir(assetsDir, "objects");
-        File tmpDir = DirTools.tmpDir;
+        File tmpDir = ZplDirectory.getTmpDirectory();
         if (!mcAssetsFile.exists()) {
             Log.debug("正在下载indexes/1.7.10.json文件");
             String mcAssetsFileUrl = DownloadProvider.getProvider()

@@ -1,41 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.leewyatt.rxcontrols.controls.RXAvatar?>
+<?import com.leewyatt.rxcontrols.controls.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="root" prefHeight="550.0" prefWidth="1000.0" styleClass="home-pane"
-            stylesheets="@../csss/main.css" xmlns="http://javafx.com/javafx/11.0.14-internal"
-            fx:controller="com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.HomeController">
+<?import javafx.scene.text.*?>
+
+<AnchorPane id="root" prefHeight="550.0" prefWidth="1000.0" styleClass="home-pane" stylesheets="@../csss/main.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.HomeController">
     <children>
 
-        <Button layoutX="750.0" layoutY="425.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0"
-                styleClass="launch-btn" text="启动"/>
-        <ComboBox fx:id="comboBox" layoutX="750.0" layoutY="475.0" prefHeight="20.0" prefWidth="200.0"
-                  styleClass="list-btn"/>
-        <FlowPane fx:id="wringPane" alignment="TOP_CENTER" layoutX="690.0" layoutY="50.0" prefHeight="153.0"
-                  prefWidth="284.0" styleClass="waring-box">
+        <Button layoutX="750.0" layoutY="425.0" mnemonicParsing="false" onMouseClicked="#onLaunchBtnClicked" prefHeight="50.0" prefWidth="200.0" styleClass="launch-btn" text="启动" />
+        <ComboBox fx:id="comboBox" layoutX="750.0" layoutY="475.0" prefHeight="20.0" prefWidth="200.0" styleClass="list-btn" />
+        <FlowPane fx:id="wringPane" alignment="TOP_CENTER" layoutX="690.0" layoutY="50.0" prefHeight="153.0" prefWidth="284.0" styleClass="waring-box">
             <children>
-                <Label alignment="CENTER" prefHeight="40.0" prefWidth="106.0" text="警告！" textAlignment="CENTER"
-                       textFill="#e0e0e0">
+                <Label alignment="CENTER" prefHeight="40.0" prefWidth="106.0" text="警告！" textAlignment="CENTER" textFill="#e0e0e0">
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" smooth="false">
                             <image>
-                                <Image url="@../img/icon/waring.png"/>
+                                <Image url="@../img/icon/waring.png" />
                             </image>
                         </ImageView>
                     </graphic>
                     <font>
-                        <Font name="Microsoft YaHei" size="16.0"/>
+                        <Font name="Microsoft YaHei" size="16.0" />
                     </font>
                 </Label>
-                <TextArea editable="false" focusTraversable="false" layoutY="59.0" prefHeight="102.0" prefWidth="289.0"
-                          text="当前ZPL无权限创建symlink，无法刷新此次修改后的实例。但您依旧可以启动刷新过的实例。刷新实例请以管理员权限运行，本程序完全开源，承诺只使用管理员权限创建系统链接！"
-                          wrapText="true">
+                <TextArea editable="false" focusTraversable="false" layoutY="59.0" prefHeight="102.0" prefWidth="289.0" text="当前ZPL无权限创建symlink，无法刷新此次修改后的实例。但您依旧可以启动刷新过的实例。刷新实例请以管理员权限运行，本程序完全开源，承诺只使用管理员权限创建系统链接！" wrapText="true">
                     <font>
-                        <Font name="Microsoft YaHei" size="13.0"/>
+                        <Font name="Microsoft YaHei" size="13.0" />
                     </font>
                 </TextArea>
             </children>
@@ -44,29 +36,29 @@
             <children>
                 <RXAvatar layoutX="115.0" layoutY="104.0" prefHeight="80.0" prefWidth="80.0">
                     <image>
-                        <Image url="@../img/tx.jpg"/>
+                        <Image url="@../img/tx.jpg" />
                     </image>
                 </RXAvatar>
-                <Label text="wohaopa"/>
-                <Label text="2411829240@qq.com"/>
+                <Label text="wohaopa" />
+                <Label text="2411829240@qq.com" />
 
             </children>
         </VBox>
 
         <GridPane layoutX="25.0" layoutY="325.0" styleClass="info-box">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
-                <Label text="GTNH最新版本："/>
-                <Label text="2.3.3" GridPane.columnIndex="1"/>
-                <Label text="ZPL支持版本：" GridPane.rowIndex="1"/>
-                <Label text="2.3.3" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <Label text="GTNH最新版本：" />
+                <Label text="2.3.3" GridPane.columnIndex="1" />
+                <Label text="ZPL支持版本：" GridPane.rowIndex="1" />
+                <Label text="2.3.3" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             </children>
         </GridPane>
 
@@ -77,10 +69,10 @@
             <images>
                 <BackgroundImage>
                     <image>
-                        <Image url="@../img/bg.png"/>
+                        <Image url="@../img/bg.png" />
                     </image>
                     <size>
-                        <BackgroundSize cover="true"/>
+                        <BackgroundSize cover="true" />
                     </size>
                 </BackgroundImage>
 

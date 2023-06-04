@@ -117,6 +117,8 @@ public class Instance {
 
         this.delSymlink(); // 删除目录中的系统链接文件
 
+        ModMaster.refreshMods(getMapper().getLoadedMod());
+
         this.getMapper()
             .makeSymlink();
 
@@ -127,7 +129,7 @@ public class Instance {
         return information.name + "(" + information.version + ")";
     }
 
-    public void loadMap() {
+    public void refreshMapper() {
         getMapper().refresh(null);
     }
 

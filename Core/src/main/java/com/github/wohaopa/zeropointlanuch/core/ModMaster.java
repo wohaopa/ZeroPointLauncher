@@ -22,15 +22,17 @@ package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import cn.hutool.core.io.resource.ResourceUtil;
+
+import com.github.wohaopa.zeropointlanuch.core.download.ModDownloader;
+import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class ModMaster {
 
     private static final Map<String, String> modiMap;
+    private static final Map<String, String> cache = new HashMap<>();
 
     static {
         modiMap = new HashMap<>();
@@ -46,19 +48,39 @@ public class ModMaster {
     }
 
     public static String getModRepo(String modFileName) {
+        if (cache.containsKey(modFileName)) return cache.get(modFileName);
+
         for (String key : modiMap.keySet()) {
             if (modFileName.startsWith(key)) {
-                return modiMap.get(key);
+                String tmp = modiMap.get(key);
+                cache.put(modFileName, tmp);
+                return tmp;
             }
         }
         return "_default";
     }
 
-    public static String getModFileName(String mod) {
-        return mod.substring(mod.lastIndexOf("\\") + 1);
+    public static String getModFileNameByFullName(String modFullName) {
+        return modFullName.substring(modFullName.lastIndexOf("\\") + 1);
     }
 
-    public static File getModFile(String modName) {
-        return null;
+    public static void refreshMods(List<String> modList) {
+        List<String> needDownload = new ArrayList<>();
+        for (String mod : modList) {
+            if (!FileUtil.exists(ZplDirectory.getModsDirectory(), mod)) {
+                needDownload.add(mod);
+            }
+        }
+        ModDownloader.downloadAll(needDownload);
+    }
+
+    public static File getModFullFileByFileName(String modFileName) {
+
+        return getModFullFileByFullName(getModRepo(modFileName) + "\\" + modFileName);
+
+    }
+
+    public static File getModFullFileByFullName(String modFullName) {
+        return new File(ZplDirectory.getModsDirectory(), modFullName);
     }
 }

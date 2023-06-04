@@ -22,6 +22,7 @@ package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
@@ -35,5 +36,9 @@ public class HomeController extends RootController {
     @FXML
     void initialize() {
         wringPane.setVisible(!Main.admin);
+    }
+
+    public void onLaunchBtnClicked(MouseEvent mouseEvent) {
+        MainController.setTip("当前启动器还没有启动功能");
     }
 }

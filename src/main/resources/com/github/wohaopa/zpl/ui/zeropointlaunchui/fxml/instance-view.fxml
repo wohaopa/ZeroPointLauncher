@@ -118,6 +118,6 @@
                 </Tab>
             </tabs>
         </TabPane>
-      <Button layoutX="551.0" layoutY="100.0" mnemonicParsing="false" onMouseClicked="#onLoadInstanceClicked" text="加载实例" />
+      <Button layoutX="551.0" layoutY="100.0" mnemonicParsing="false" onMouseClicked="#onRefreshInstanceClicked" text="刷新映射实例" />
     </children>
 </AnchorPane>

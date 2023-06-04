@@ -20,35 +20,6 @@
 
 package com.github.wohaopa.zeropointlanuch.core;
 
-import java.io.File;
+public class Launch {
 
-import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
-
-public class DirTools {
-
-    // private static boolean initialized = false;
-
-    public static File workDir;
-    public static File instancesDir;
-    public static File librariesDir;
-    public static File assetsDir;
-    public static File modsDir;
-    public static File zipDir;
-    public static File shareDir;
-    public static File tmpDir;
-    public static File versionsDir;
-
-    public static void init(File workDir) {
-        Log.start("目录管理");
-        DirTools.workDir = workDir;
-        DirTools.instancesDir = FileUtil.initAndMkDir(workDir, "instances");
-        DirTools.librariesDir = FileUtil.initAndMkDir(workDir, "libraries");
-        DirTools.assetsDir = FileUtil.initAndMkDir(workDir, "assets");
-        DirTools.modsDir = FileUtil.initAndMkDir(workDir, "mods");
-        DirTools.zipDir = FileUtil.initAndMkDir(workDir, "zip");
-        DirTools.shareDir = FileUtil.initAndMkDir(workDir, "share");
-        DirTools.tmpDir = FileUtil.initAndMkDir(workDir, "tmpDir");
-        DirTools.versionsDir = FileUtil.initAndMkDir(workDir, "versions");
-        Log.end();
-    }
 }

@@ -103,10 +103,12 @@ public class Mapper {
             if (!FileUtil.isSymLink(file)) {
                 if (file.isDirectory()) {
                     for (File file1 : Objects.requireNonNull(file.listFiles())) {
-                        String s = file1.toString()
-                            .substring(index);
-                        runDirFiles.add(s);
-                        fileToName.put(s, new _Item_Name(name, file1));
+                        if (!FileUtil.isSymLink(file1)) {
+                            String s = file1.toString()
+                                .substring(index);
+                            runDirFiles.add(s);
+                            fileToName.put(s, new _Item_Name(name, file1));
+                        }
                     }
                 } else {
                     String s = file.toString()
@@ -137,9 +139,9 @@ public class Mapper {
 
         // 注入mod
         for (String mod : loadedMod) {
-            String p = "mods\\" + ModMaster.getModFileName(mod);
+            String p = "mods\\" + ModMaster.getModFileNameByFullName(mod);
             if (fileToName.containsKey(p)) throw new RuntimeException("不应在mods文件夹中存放GTNH的mod！");
-            fileToName.put(p, new _Item_Name("__zpl_mod__", new File(DirTools.workDir, mod)));
+            fileToName.put(p, new _Item_Name("__zpl_mod__", ModMaster.getModFullFileByFullName(mod)));
         }
     }
 

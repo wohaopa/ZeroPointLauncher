@@ -31,7 +31,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import com.github.wohaopa.zeropointlanuch.core.DirTools;
+import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.MainController;
 
 public class Main extends Application {
@@ -58,17 +58,20 @@ public class Main extends Application {
     public static void main(String[] args) {
         Main.initDir();
         Main.checkPermission();
+
         Application.launch(Main.class, args);
     }
 
     private static void checkPermission() {
         try {
-            File file1 = new File(DirTools.tmpDir, "Permission");
-            File file2 = new File(DirTools.tmpDir, "Permission_Link");
+            File file1 = new File(ZplDirectory.getTmpDirectory(), "Permission");
+            File file2 = new File(ZplDirectory.getTmpDirectory(), "Permission_Link");
+            if (file1.exists()) file1.delete();
             if (file1.createNewFile()) {
                 Files.createSymbolicLink(file2.toPath(), file1.toPath());
-                file1.delete();
+
                 file2.delete();
+                file1.delete();
                 admin = true;
             }
 
@@ -81,6 +84,6 @@ public class Main extends Application {
         if (rootDirStr == null) {
             rootDirStr = System.getProperty("user.dir") + "/.GTNH";
         }
-        DirTools.init(new File(rootDirStr)); // 目录工具初始化
+        ZplDirectory.init(new File(rootDirStr)); // 目录工具初始化
     }
 }

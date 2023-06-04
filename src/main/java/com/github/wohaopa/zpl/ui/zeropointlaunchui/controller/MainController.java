@@ -21,6 +21,8 @@
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -31,6 +33,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Label;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -50,9 +53,13 @@ public class MainController extends RootController {
     public ToggleGroup navGroup;
     @FXML
     public RXCarousel mainCarousel;
+    public Label tipLabel;
+    public AnchorPane tipPane;
 
     private double offsetX, offsetY;
     private static Window window;
+    private static Label _tipLabel;
+    private static AnchorPane _tipPane;
     public static _Current_ current = new _Current_();
 
     @FXML
@@ -73,6 +80,8 @@ public class MainController extends RootController {
                     .indexOf(nv);
                 mainCarousel.setSelectedIndex(index);
             });
+        _tipLabel = tipLabel;
+        _tipPane = tipPane;
     }
 
     @FXML
@@ -100,6 +109,26 @@ public class MainController extends RootController {
 
     public static void setWindow(Window window) {
         MainController.window = window;
+    }
+
+    static int timerCount = 0;
+
+    public static void setTip(String tip) {
+        timerCount++;
+        _tipLabel.setText(tip);
+        _tipPane.setDisable(false);
+        _tipLabel.setVisible(true);
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                if (--timerCount == 0) {
+                    _tipLabel.setVisible(false);
+                    _tipPane.setDisable(true);
+                }
+            }
+        }, 3000);
     }
 }
 
