@@ -18,26 +18,28 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.download;
+package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import cn.hutool.json.JSONObject;
 
-import com.github.wohaopa.zeropointlanuch.core.Log;
-import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
+import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
 import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
-public class AssetsDownloader {
+public class Assets {
 
-    public static void verifyAssets(File assetsDir) throws ExecutionException, InterruptedException {
+    public static void verifyAssets(File assetsDir, String versionString)
+        throws ExecutionException, InterruptedException {
         Log.start("assets文件夹校验");
-        List<File> fail = new ArrayList<>();
+        Set<File> fail = new HashSet<>();
         File mcAssetsFile = new File(assetsDir, "indexes/1.7.10.json");
         File objectsDir = FileUtil.initAndMkDir(assetsDir, "objects");
         File tmpDir = ZplDirectory.getTmpDirectory();
@@ -61,6 +63,12 @@ public class AssetsDownloader {
             File file = new File(objectsDir, path);
             if (!FileUtil.checkSha1OfFile(file, hash)) fail.add(file);
         });
+
+        if (fail.size() == 0) {
+            Log.debug("assets文件完好");
+            Log.end();
+            return;
+        }
 
         // 补全文件
         List<String> downloads = new ArrayList<>();

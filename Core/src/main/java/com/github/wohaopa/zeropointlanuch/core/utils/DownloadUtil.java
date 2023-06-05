@@ -38,7 +38,7 @@ public class DownloadUtil {
 
     private static final Logger downloadLog = LogManager.getLogger("Download");
 
-    public static int tasksCount = 0;
+    private static int tasksCount = 0;
 
     static CompletionService<File> cs = ThreadUtil.newCompletionService(ThreadUtil.newExecutor(5));
 
@@ -76,7 +76,8 @@ public class DownloadUtil {
         Future<File> result;
         int count = tasksCount;
 
-        while (tasksCount-- != 0) {
+        while (tasksCount != 0) {
+            tasksCount--;
             downloadLog.debug("正在下载：{} 剩余：{}", count - tasksCount, tasksCount);
             result = cs.take();
             list.add(result.get());

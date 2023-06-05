@@ -20,6 +20,140 @@
 
 package com.github.wohaopa.zeropointlanuch.core;
 
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+
 public class Launch {
 
+    private static Map<String, Launch> inst = new HashMap<>();
+
+    static {
+        new Launch("ZPL-Java8");
+        new Launch("ZPL-Java17");
+    }
+
+    public static Launch getLauncher(String name) {
+        return inst.get(name);
+    }
+
+    String name;
+
+    int maxMemory = 8192;
+    int minMemory = 4096;
+
+    String extraJvmArgs = "";
+    String extraGameArgs = "";
+    String javaPath;
+
+    public Launch setJavaPath(String javaPath) {
+        this.javaPath = javaPath;
+        return this;
+    }
+
+    Version version;
+
+    private Launch(String name) {
+        this.name = name;
+        this.version = new Version(name, new File(ZplDirectory.getVersionsDirectory(), name + ".json"));
+        inst.put(name, this);
+    }
+
+    public String[] getLaunchArguments(Auth auth, File runDir) {
+
+        if (javaPath == null || javaPath.isEmpty()) throw new RuntimeException("java配置错误！");
+        List<String> commandLine = new ArrayList<>();
+
+        commandLine.add(javaPath);
+
+        commandLine.add("-Xmx" + maxMemory + "M");
+        commandLine.add("-Xms" + minMemory + "M");
+
+        if (extraGameArgs != null && !extraGameArgs.isEmpty()) {
+            commandLine.addAll(Arrays.asList(extraJvmArgs.split(" ")));
+        }
+
+        commandLine.addAll(version.getJvmArguments());
+
+        commandLine.add(version.getMainClass());
+
+        commandLine.addAll(parseArg(auth.parseArg(version.getGameArguments()), runDir));
+
+        if (extraGameArgs != null && !extraGameArgs.isEmpty()) {
+            commandLine.addAll(Arrays.asList(extraGameArgs.split(" ")));
+        }
+
+        return commandLine.toArray(new String[0]);
+    }
+
+    private List<String> parseArg(List<String> commands, File runDir) {
+        commands.set(commands.indexOf("${game_directory}"), runDir.toString());
+        return commands;
+    }
+
+    public void launch(Auth auth, File runDir) {
+
+        String[] commandLine = getLaunchArguments(auth, runDir);
+        Log.debug("启动指令：{}", commandLine);
+
+        Consumer<String> pump = new Consumer<>() {
+
+            static final Pattern pattern = Pattern.compile("<log4j:Message><!\\[CDATA\\[(.+)\\]\\]></log4j:Message>");
+
+            @Override
+            public void accept(String s) {
+                Matcher m = pattern.matcher(s);
+                if (m.find()) System.out.println(m.group(1));
+            }
+        };
+
+        ProcessBuilder pb = new ProcessBuilder();
+        pb.command(commandLine);
+        pb.directory(runDir);
+        try {
+            Process mc = pb.start();
+            System.out.println(mc.pid());
+            new Thread(new Logger(mc.getInputStream(), pump)).start();
+            new Thread(new Logger(mc.getErrorStream(), pump)).start();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+}
+
+class Logger implements Runnable {
+
+    InputStream in;
+    Consumer<String> callback;
+
+    public Logger(InputStream in, Consumer<String> callback) {
+        this.in = in;
+        this.callback = callback;
+    }
+
+    @Override
+    public void run() {
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, Charset.defaultCharset()))) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (Thread.currentThread()
+                    .isInterrupted()) {
+                    Thread.currentThread()
+                        .interrupt();
+                    break;
+                }
+
+                callback.accept(line);
+            }
+        } catch (IOException e) {
+
+        }
+    }
 }

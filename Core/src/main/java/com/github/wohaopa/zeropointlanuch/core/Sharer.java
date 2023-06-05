@@ -32,16 +32,10 @@ public class Sharer {
     private static final Map<String, Sharer> inst = new HashMap<>();
 
     static {
-        inst.put(
-            "Common",
-            new Sharer("Common", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "Common"), "null"));
-        inst.put(
-            "Java8",
-            new Sharer("Java8", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "Java8"), "Common"));
-        inst.put(
-            "Java17",
-            new Sharer("Java17", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "Java17"), "Common"));
-        inst.put("HMCL", new Sharer("HMCL", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "HMCL"), "Common"));
+        new Sharer("Common", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "Common"), "null");
+        new Sharer("Java8", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "Java8"), "Common");
+        new Sharer("Java17", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "Java17"), "Common");
+        new Sharer("HMCL", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "HMCL"), "Common");
     }
 
     public static Sharer get(String name) {
@@ -64,6 +58,9 @@ public class Sharer {
         if (!file.exists()) {
             Mapper.saveConfigJson(file.getParentFile(), Mapper.defaultJson());
         }
+
+        inst.put(name, this);
+
     }
 
 }

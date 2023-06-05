@@ -20,12 +20,17 @@
 
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.Launch;
+import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
 import com.github.wohaopa.zpl.ui.zeropointlaunchui.Main;
 
 public class HomeController extends RootController {
@@ -39,6 +44,22 @@ public class HomeController extends RootController {
     }
 
     public void onLaunchBtnClicked(MouseEvent mouseEvent) {
+
         MainController.setTip("当前启动器还没有启动功能");
+        Button btn = (Button) mouseEvent.getSource();
+        btn.setDisable(true);
+        btn.setText("assets检查");
+
+        new Thread(() -> {
+            Auth auth = new OfflineAuth("wohaopa");
+            Launch.getLauncher("ZPL-Java8")
+                .setJavaPath("C:\\Program Files\\Java\\jdk1.8.0_361\\bin\\java.exe")
+                .launch(auth, MainController.current.instance.runDir);
+
+            Platform.runLater(() -> {
+                btn.setText("library检查");
+                btn.setDisable(false);
+            });
+        }).start();
     }
 }
