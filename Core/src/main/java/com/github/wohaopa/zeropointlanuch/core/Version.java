@@ -42,64 +42,66 @@ public class Version {
     File logXml;
     File natives;
 
+    private boolean verified;
+
     public Version(String name, File versionJsonFile) {
         this.name = name;
         versionJsonObj = ((JSONObject) JsonUtil.fromJson(versionJsonFile));
         natives = new File(ZplDirectory.getNativesRootDirectory(), name);
         libraries = new Libraries();
-        try {
-            verifyVersion();
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     public void verifyVersion() throws ExecutionException, InterruptedException {
 
+        if (verified) return;
+
         {
             JSONObject downloadsObj = versionJsonObj.getByPath("downloads.client", JSONObject.class);
+            JSONObject downloadsObj2 = versionJsonObj.getByPath("logging.client.file", JSONObject.class);
+
             String url = downloadsObj.getStr("url");
             String sha1 = downloadsObj.getStr("sha1");
             String path = "net/minecraft/client/1.7.10/client-1.7.10.jar";
 
+            String url2 = downloadsObj2.getStr("url");
+            String sha12 = downloadsObj2.getStr("sha1");
+            String path2 = "client-1.7.xml";
+
             versionJar = new File(ZplDirectory.getLibrariesDirectory(), path);
+            logXml = new File(ZplDirectory.getWorkDirectory(), path2);
+
+            if (!FileUtil.checkSha1OfFile(logXml, sha12)) {
+                logXml.delete();
+                File file2 = new File(ZplDirectory.getTmpDirectory(), "client-1.7.xml");
+                if (!FileUtil.checkSha1OfFile(file2, sha12)) {
+                    DownloadUtil.submitDownloadTasks(url2, ZplDirectory.getTmpDirectory());
+                }
+            }
 
             if (!FileUtil.checkSha1OfFile(versionJar, sha1)) {
                 versionJar.delete();
                 File file = new File(ZplDirectory.getTmpDirectory(), "client.jar");
                 if (!FileUtil.checkSha1OfFile(file, sha1)) {
                     DownloadUtil.submitDownloadTasks(url, ZplDirectory.getTmpDirectory());
-                    Log.debug("正在补全缺失的1个文件");
-                    DownloadUtil.takeDownloadResult();
                 }
-                FileUtil.moveFile(file, versionJar);
+
             }
-        }
+            List<File> list = DownloadUtil.takeDownloadResult();
+            list.forEach(
+                file -> FileUtil.moveFile(
+                    file,
+                    file.getName()
+                        .endsWith(".xml") ? logXml : versionJar));
 
-        {
-            JSONObject downloadsObj = versionJsonObj.getByPath("logging.client.file", JSONObject.class);
-            String url = downloadsObj.getStr("url");
-            String sha1 = downloadsObj.getStr("sha1");
-            String path = "client-1.7.xml";
-
-            logXml = new File(ZplDirectory.getWorkDirectory(), path);
-
-            if (!FileUtil.checkSha1OfFile(logXml, sha1)) {
-                logXml.delete();
-                File file = new File(ZplDirectory.getTmpDirectory(), "client-1.7.xml");
-                if (!FileUtil.checkSha1OfFile(file, sha1)) {
-                    DownloadUtil.submitDownloadTasks(url, ZplDirectory.getTmpDirectory());
-                    Log.debug("正在补全缺失的1个文件");
-                    DownloadUtil.takeDownloadResult();
-                }
-                FileUtil.moveFile(file, logXml);
-            }
         }
 
         Assets.verifyAssets(ZplDirectory.getAssetsDirectory(), versionJsonObj.getStr("assets"));
 
         libraries
             .verifyLibraries(ZplDirectory.getLibrariesDirectory(), versionJsonObj.getJSONArray("libraries"), natives);
+
+        verified = true;
     }
 
     public String getMainClass() {

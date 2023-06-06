@@ -36,10 +36,13 @@ import com.github.wohaopa.zeropointlanuch.core.utils.ZipUtil;
 public class Libraries {
 
     String classpath;
+    private boolean verified;
 
     public void verifyLibraries(File librariesDir, JSONArray librariesObj, File natives)
         throws ExecutionException, InterruptedException {
-        classpath = null;
+
+        if (verified) return;
+
         Log.start("Libraries检查");
         List<_LibraryBase> libraries = new ArrayList<>();
 
@@ -71,46 +74,46 @@ public class Libraries {
 
             }
         }
-        if (failLib.size() == 0) {
-            StringBuilder sb = new StringBuilder();
-            String s = ";";
-            libFiles.forEach(
-                file -> sb.append(file.toString())
-                    .append(s));
-            classpath = sb.toString();
-            Log.debug("libraries检查完成！");
-            Log.end();
-            return;
-        }
 
-        File tmpDir = ZplDirectory.getTmpDirectory();
+        if (failLib.size() != 0) {
+            Log.debug("缺失{}个文件", failLib.size());
+            File tmpDir = ZplDirectory.getTmpDirectory();
 
-        List<String> downloads = new ArrayList<>();
-        for (_LibraryBase lib : failLib) {
-            String name = lib.getFileName();
-            if (!FileUtil.checkSha1OfFile(new File(tmpDir, name), name)) {
-                Log.debug("正在将{}文件加入下载队列", name);
-                downloads.add(
-                    DownloadProvider.getProvider()
-                        .getLibrariesUrl(lib.url));
+            List<String> downloads = new ArrayList<>();
+            for (_LibraryBase lib : failLib) {
+                String name = lib.getFileName();
+                if (!FileUtil.checkSha1OfFile(new File(tmpDir, name), name)) {
+                    Log.debug("正在将{}文件加入下载队列", name);
+                    downloads.add(
+                        DownloadProvider.getProvider()
+                            .getLibrariesUrl(lib.url));
+                }
+            }
+
+            DownloadUtil.submitDownloadTasks(downloads, tmpDir);
+            Log.debug("正在补全缺失的{}个文件", downloads.size());
+            DownloadUtil.takeDownloadResult();
+
+            for (_LibraryBase lib : failLib) {
+                FileUtil.moveFile(new File(tmpDir, lib.getFileName()), new File(librariesDir, lib.path), true);
+            }
+
+            for (_LibraryBase lib : failNativeLib) {
+                Log.debug("解压natives:{}", lib.name);
+                ZipUtil.unCompress(new File(librariesDir, lib.path), natives);
+                if (lib.extract) lib.exclude.forEach(s -> FileUtil.delete(new File(natives, s)));
             }
         }
 
-        DownloadUtil.submitDownloadTasks(downloads, tmpDir);
-        Log.debug("正在补全缺失的{}个文件", downloads.size());
-        DownloadUtil.takeDownloadResult();
-
-        for (_LibraryBase lib : failLib) {
-            FileUtil.moveFile(new File(tmpDir, lib.getFileName()), new File(librariesDir, lib.path), true);
-        }
-
-        for (_LibraryBase lib : failNativeLib) {
-
-            Log.debug("解压natives:{}", lib.name);
-            ZipUtil.unCompress(new File(librariesDir, lib.path), natives);
-            if (lib.extract) lib.exclude.forEach(s -> FileUtil.delete(new File(natives, s)));
-
-        }
+        StringBuilder sb = new StringBuilder();
+        String s = ";";
+        libFiles.forEach(
+            file -> sb.append(file.toString())
+                .append(s));
+        classpath = sb.toString();
+        verified = true;
+        Log.debug("校验完成！");
+        Log.end();
 
     }
 

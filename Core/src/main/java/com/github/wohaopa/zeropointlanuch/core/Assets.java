@@ -36,8 +36,12 @@ import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
 public class Assets {
 
+    private static boolean verified;
+
     public static void verifyAssets(File assetsDir, String versionString)
         throws ExecutionException, InterruptedException {
+        if (verified) return;
+
         Log.start("assets文件夹校验");
         Set<File> fail = new HashSet<>();
         File mcAssetsFile = new File(assetsDir, "indexes/1.7.10.json");
@@ -64,31 +68,32 @@ public class Assets {
             if (!FileUtil.checkSha1OfFile(file, hash)) fail.add(file);
         });
 
-        if (fail.size() == 0) {
-            Log.debug("assets文件完好");
-            Log.end();
-            return;
-        }
+        if (fail.size() != 0) {
+            Log.debug("缺失：{}个文件", fail.size());
+            // 补全文件
+            List<String> downloads = new ArrayList<>();
+            for (File file : fail) {
+                String name = file.getName();
+                if (!FileUtil.checkSha1OfFile(new File(tmpDir, name), name)) {
+                    Log.debug("正在将{}文件加入下载队列", name);
+                    downloads.add(
+                        DownloadProvider.getProvider()
+                            .getAssetsObjUrl(name));
+                }
+            }
 
-        // 补全文件
-        List<String> downloads = new ArrayList<>();
-        for (File file : fail) {
-            String name = file.getName();
-            if (!FileUtil.checkSha1OfFile(new File(tmpDir, name), name)) {
-                Log.debug("正在将{}文件加入下载队列", name);
-                downloads.add(
-                    DownloadProvider.getProvider()
-                        .getAssetsObjUrl(name));
+            DownloadUtil.submitDownloadTasks(downloads, tmpDir);
+            Log.debug("正在补全缺失的{}个文件", downloads.size());
+            DownloadUtil.takeDownloadResult();
+
+            for (File file : fail) {
+                FileUtil.moveFile(new File(tmpDir, file.getName()), file, true);
             }
         }
 
-        DownloadUtil.submitDownloadTasks(downloads, tmpDir);
-        Log.debug("正在补全缺失的{}个文件", downloads.size());
-        DownloadUtil.takeDownloadResult();
-
-        for (File file : fail) {
-            FileUtil.moveFile(new File(tmpDir, file.getName()), file, true);
-        }
+        Log.debug("校验完成");
+        verified = true;
         Log.end();
+
     }
 }

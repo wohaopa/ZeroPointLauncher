@@ -23,6 +23,7 @@ package com.github.wohaopa.zeropointlanuch.core;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,6 +41,10 @@ public class Launch {
 
     public static Launch getLauncher(String name) {
         return inst.get(name);
+    }
+
+    public static Set<String> getLaunches() {
+        return inst.keySet();
     }
 
     String name;
@@ -97,6 +102,12 @@ public class Launch {
     }
 
     public void launch(Auth auth, File runDir) {
+
+        try {
+            version.verifyVersion();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         String[] commandLine = getLaunchArguments(auth, runDir);
         Log.debug("启动指令：{}", commandLine);
