@@ -24,35 +24,40 @@ public class DownloadProvider {
 
     private static final DownloadProvider defaultProvider = new DownloadProvider();
 
-    private static DownloadProvider provider;
+    private static DownloadProvider provider = defaultProvider;
     String assetsBase;
 
-    String assetsIndexJsonUrl;
-    String librariesIndexJsonUrl;
+    String assetsIndexJson;
+    String modsBase;
+    String librariesBase;
 
     public DownloadProvider() {
         this.assetsBase = "https://resources.download.minecraft.net/";
-        this.assetsIndexJsonUrl = "https://launchermeta.mojang.com/v1/packages/1863782e33ce7b584fc45b037325a1964e095d3e/1.7.10.json";
-        this.librariesIndexJsonUrl = "https://libraries.minecraft.net/";
+        this.assetsIndexJson = "https://launchermeta.mojang.com/v1/packages/1863782e33ce7b584fc45b037325a1964e095d3e/1.7.10.json";
+        this.modsBase = "http://127.0.0.1/";
+    }
+
+    public static void setProvider(DownloadProvider provider) {
+        DownloadProvider.provider = provider;
     }
 
     public static DownloadProvider getProvider() {
-        return defaultProvider;
+        return provider;
     }
 
-    public String getLibrariesBaseUrl() {
-        return librariesIndexJsonUrl;
+    public String getLibrariesUrl(String url) {
+        return url;
     }
 
     public String getAssetsIndexJsonUrl() {
-        return assetsIndexJsonUrl;
+        return assetsIndexJson;
     }
 
     public String getAssetsObjUrl(String hash) {
         return assetsBase + hash.substring(0, 2) + "/" + hash;
     }
 
-    public String getModsUrlBase() {
-        return "http\\://127.0.0.1/ZeroPointLaunch/mods/";
+    public String getModsBaseUrl() {
+        return modsBase;
     }
 }

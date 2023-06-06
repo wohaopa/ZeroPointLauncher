@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 
+import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
 import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.ZipUtil;
@@ -89,7 +90,9 @@ public class Libraries {
             String name = lib.getFileName();
             if (!FileUtil.checkSha1OfFile(new File(tmpDir, name), name)) {
                 Log.debug("正在将{}文件加入下载队列", name);
-                downloads.add(lib.url);
+                downloads.add(
+                    DownloadProvider.getProvider()
+                        .getLibrariesUrl(lib.url));
             }
         }
 

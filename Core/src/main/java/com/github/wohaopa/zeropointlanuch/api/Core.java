@@ -25,10 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 import com.github.wohaopa.zeropointlanuch.core.*;
-import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class Core {
@@ -103,15 +101,6 @@ public class Core {
         String version = targetVersion.information.version;
         InstanceInstaller.installTranslation(translationFile, dir, name, version, targetVersion);
         Log.end();
-    }
-
-    public static void downloadFile(String url) {
-        DownloadUtil.submitDownloadTasks(url, ZplDirectory.getTmpDirectory());
-        try {
-            DownloadUtil.takeDownloadResult();
-        } catch (ExecutionException | InterruptedException e) {
-            Log.error("文件下载失败：{}", url);
-        }
     }
 
     /**

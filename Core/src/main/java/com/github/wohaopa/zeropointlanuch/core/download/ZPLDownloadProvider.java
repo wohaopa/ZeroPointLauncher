@@ -20,39 +20,33 @@
 
 package com.github.wohaopa.zeropointlanuch.core.download;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import com.github.wohaopa.zeropointlanuch.core.ModMaster;
-import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
-import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
-import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
+public class ZPLDownloadProvider extends DownloadProvider {
 
-public class ModDownloader {
+    List<String> librariesUrlList = new ArrayList<>();
 
-    private static final String BASE_MOD_URL = DownloadProvider.getProvider()
-        .getModsUrlBase();
+    public ZPLDownloadProvider() {
+        String baseUrl = "http://127.0.0.1/";
+        this.assetsBase = baseUrl;
+        this.assetsIndexJson = baseUrl + "1.7.10.json";
+        this.librariesBase = baseUrl;
+        this.modsBase = baseUrl;
 
-    public static void downloadAll(List<String> needDownload) {
-
-        List<String> urls = new ArrayList<>();
-
-        for (String s : needDownload) {
-            urls.add(BASE_MOD_URL + s);
-        }
-
-        DownloadUtil.submitDownloadTasks(urls, ZplDirectory.getTmpDirectory());
-        List<File> files;
-
-        try {
-            files = DownloadUtil.takeDownloadResult();
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        files.forEach(file -> FileUtil.moveFile(file, ModMaster.getModFullFileByFileName(file.getName())));
-
+        librariesUrlList.add("https://maven.minecraftforge.net/");
+        librariesUrlList.add("http://jenkins.usrv.eu:8081/nexus/content/groups/public/");
+        librariesUrlList.add("https://build.lwjgl.org/");
+        librariesUrlList.add("https://libraries.minecraft.net/");
+        librariesUrlList.add("https://files.prismlauncher.org/maven/");
+        librariesUrlList.add("https://launcher.mojang.com/");
     }
+
+    @Override
+    public String getLibrariesUrl(String url) {
+        for (String s : librariesUrlList) if (url.startsWith(s)) return url.replace(s, librariesBase);
+
+        return url;
+    }
+
 }

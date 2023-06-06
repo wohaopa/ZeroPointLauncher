@@ -23,10 +23,12 @@ package com.github.wohaopa.zeropointlanuch.core;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 
-import com.github.wohaopa.zeropointlanuch.core.download.ModDownloader;
+import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
+import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class ModMaster {
@@ -65,13 +67,29 @@ public class ModMaster {
     }
 
     public static void refreshMods(List<String> modList) {
-        List<String> needDownload = new ArrayList<>();
+        List<String> urls = new ArrayList<>();
         for (String mod : modList) {
             if (!FileUtil.exists(ZplDirectory.getModsDirectory(), mod)) {
-                needDownload.add(mod);
+                urls.add(BASE_MOD_URL + mod);
+                Log.info("缺失：{}", mod);
             }
         }
-        ModDownloader.downloadAll(needDownload);
+
+        DownloadUtil.submitDownloadTasks(urls, ZplDirectory.getTmpDirectory());
+        List<File> files = null;
+
+        try {
+            files = DownloadUtil.takeDownloadResult();
+        } catch (ExecutionException | InterruptedException e) {
+            // throw new RuntimeException(e);
+        }
+        if (files == null) {
+            Log.error("MOD下载失败！缺失mod请查看日志");
+            return;
+        }
+
+        files.forEach(file -> FileUtil.moveFile(file, ModMaster.getModFullFileByFileName(file.getName())));
+
     }
 
     public static File getModFullFileByFileName(String modFileName) {
@@ -83,4 +101,8 @@ public class ModMaster {
     public static File getModFullFileByFullName(String modFullName) {
         return new File(ZplDirectory.getModsDirectory(), modFullName);
     }
+
+    private static final String BASE_MOD_URL = DownloadProvider.getProvider()
+        .getModsBaseUrl();
+
 }

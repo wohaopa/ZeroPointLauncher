@@ -21,16 +21,22 @@
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 
 import com.github.wohaopa.zeropointlanuch.api.Core;
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.Sharer;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
+import com.github.wohaopa.zpl.ui.zeropointlaunchui.Main;
 import com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.dialog.ModDialog;
 import com.leewyatt.rxcontrols.controls.RXTextField;
 import com.leewyatt.rxcontrols.event.RXActionEvent;
@@ -49,6 +55,8 @@ public class InstanceController extends RootController {
     public ListView loadedModListView;
 
     private ComboBox<Instance> comboBox;
+
+    private Stage addInstanceWindow;
 
     @FXML
     void initialize() {
@@ -96,6 +104,24 @@ public class InstanceController extends RootController {
             .bind(instanceListView.itemsProperty());
         comboBox.getSelectionModel()
             .select(0);
+
+        // FXMLLoader fxmlLoader = new FXMLLoader();
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("fxml/add-instance-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            addInstanceWindow = new Stage();
+            addInstanceWindow.setScene(scene);
+            addInstanceWindow.setTitle("添加实例");
+            addInstanceWindow.getIcons()
+                .add(
+                    new Image(
+                        Main.class.getResource("img/logo.png")
+                            .toExternalForm()));
+        } catch (IOException e) {
+            // throw new RuntimeException(e);
+        }
     }
 
     @FXML
@@ -155,5 +181,11 @@ public class InstanceController extends RootController {
 
         MainController.current.instance.refreshMapper();
         MainController.setTip("映射刷新完成！");
+    }
+
+    public void onAddInstanceClicked(MouseEvent mouseEvent) {
+        // if (!addInstanceWindow.isShowing()) {
+        addInstanceWindow.show();
+        // }
     }
 }

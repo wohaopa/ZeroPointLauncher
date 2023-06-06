@@ -44,19 +44,17 @@ public class JsonUtil {
      * 字符串->对象
      *
      * @param json json字符串
-     * @param type 类型
      * @return json对象
-     * @param <T> json对象的类型
      */
-    public static <T> T fromJson(String json, Class<T> type) {
-        return JSONUtil.toBean(json, type);
+    public static JSON fromJson(String json) {
+        return JSONUtil.parse(json);
     }
 
     /**
      * 加载json文件
      *
      * @param jsonFile json文件
-     * @return JSON抽象对象
+     * @return JSON对象
      */
     public static JSON fromJson(File jsonFile) {
         return JSONUtil.readJSON(jsonFile, Charset.defaultCharset());

@@ -137,7 +137,8 @@ public class Instance {
     public static class Information {
 
         public static Information formJson(File file) {
-            return JsonUtil.fromJson(FileUtil.fileRead(file), Information.class);
+            return JsonUtil.fromJson(file)
+                .toBean(Information.class);
         }
 
         public static void toJson(Information information, File file) {
@@ -148,6 +149,7 @@ public class Instance {
         public String version;
         public String depVersion;
         public String sharer;
+        public String launcher;
         public List<String> includeMods;
         public List<String> excludeMods;
         public Map<String, Long> checksum;
@@ -174,6 +176,10 @@ public class Instance {
 
         public String getSharer() {
             return sharer;
+        }
+
+        public String getLauncher() {
+            return launcher;
         }
 
         public Map<String, Long> getChecksum() {

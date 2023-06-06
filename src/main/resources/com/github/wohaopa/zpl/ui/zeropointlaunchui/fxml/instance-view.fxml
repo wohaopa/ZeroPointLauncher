@@ -7,7 +7,7 @@
 <AnchorPane prefHeight="550.0" prefWidth="1000.0" style="-fx-background-color: white;" stylesheets="@../csss/main.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.InstanceController">
     <children>
         <ListView fx:id="instanceListView" layoutX="760.0" layoutY="32.0" prefHeight="467.0" prefWidth="240.0" />
-        <Button layoutX="759.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="240.0" text="添加实例" />
+        <Button layoutX="759.0" mnemonicParsing="false" onMouseClicked="#onAddInstanceClicked" prefHeight="31.0" prefWidth="240.0" text="添加实例" />
         <GridPane layoutX="14.0" layoutY="14.0">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

@@ -20,5 +20,10 @@
 
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
+import javafx.fxml.FXML;
+
 public class AddInstanceController extends RootController {
+
+    @FXML
+    void initialize() {}
 }
