@@ -164,34 +164,4 @@ public class Core {
         Log.end();
     }
 
-    public static void installZPL(File dir, String name, String version) {}
-
-    /** 根据.minecraft生成ZPL实例 */
-    public static void genZPLInstance(File instDir, String name, File src) {
-        Log.start("ZPL标准实例生成");
-
-        File versionFile = new File(instDir, "version.json");
-        File imageDir = new File(instDir, "image");
-
-        // 复制文件
-        List<String> list = new ArrayList<>();
-        list.add("mods");
-        list.add("config");
-        list.add("scripts");
-        // list.add("resourcepacks");// 没必要
-        list.forEach(s -> FileUtil.copyDir(new File(src, s), imageDir));
-
-        Instance.Information information = new Instance.Information();
-        information.name = name;
-        information.version = name;
-        information.sharer = "Common";
-        information.depVersion = "null";
-        information.excludeMods = new ArrayList<>();
-        information.checksum = FileUtil.genChecksum(imageDir);
-        information.includeMods = InstanceInstaller.genModList(new File(imageDir, "mods"), true);
-        Mapper.saveConfigJson(imageDir, Mapper.defaultJson());
-
-        Instance.Information.toJson(information, versionFile);
-        Log.end();
-    }
 }

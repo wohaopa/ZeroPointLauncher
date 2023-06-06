@@ -61,6 +61,7 @@ public class InstanceInstaller {
         File versionJson = new File(instanceDir, "version.json");
 
         Instance instance = Instance.newInstance();
+        instance.versionFile = versionJson;
         instance.information = information;
         instance.insDir = instanceDir;
         instance.imageDir = FileUtil.initAndMkDir(instanceDir, "image");
@@ -110,6 +111,7 @@ public class InstanceInstaller {
      * @param version    实例版本（不起作用）
      * @param depVersion 依赖的实例名
      */
+    @Deprecated
     private static Instance install(File dir, String name, String version, String depVersion) {
 
         File versFile = new File(dir, "version.json");
@@ -149,6 +151,7 @@ public class InstanceInstaller {
      * @param name    实例名（唯一识别码）
      * @param version 实例版本（不起作用）
      */
+    @Deprecated
     public static void installStandard(File zip, File dir, String name, String version) {
 
         // 准备好目录
@@ -188,6 +191,7 @@ public class InstanceInstaller {
      * @param versionJsonFile
      * @param dir
      */
+    @Deprecated
     public static void installVersionJson(File versionJsonFile, File dir) {}
 
     /**
@@ -199,8 +203,10 @@ public class InstanceInstaller {
      * @param version       实例版本（不起作用）
      * @param targetVersion 依赖的实例名
      */
+    @Deprecated
     public static void installUpdate(File updaterFile, File dir, String name, String version, String targetVersion) {}
 
+    @Deprecated
     public static void installTranslation(File translationFile, File dir, String name, String version,
         Instance targetVersion) {
 
@@ -228,7 +234,8 @@ public class InstanceInstaller {
         }
     }
 
-    public static List<String> genModList(File modsDir, boolean move) {
+
+    private static List<String> genModList(File modsDir, boolean move) {
         List<String> mods = new ArrayList<>();
         if (!modsDir.exists()) return mods;
         for (File mod : Objects.requireNonNull(modsDir.listFiles())) {
@@ -239,7 +246,7 @@ public class InstanceInstaller {
                 mods.add(path);
                 if (move && !FileUtil.moveFile(mod, new File(ZplDirectory.getModsDirectory(), path))) {
                     Log.info("已在mod库中发现：{} 即将删除临时文件", modFileName);
-                    if (mod.delete()) Log.warn("文件：{} 删除失败，可能被占用，请手动删除", mod.getPath());
+                    if (!mod.delete()) Log.warn("文件：{} 删除失败，可能被占用，请手动删除", mod.getPath());
                 }
             }
         }

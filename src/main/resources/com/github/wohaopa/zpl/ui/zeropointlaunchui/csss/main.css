@@ -119,3 +119,7 @@
     -fx-pref-width: 18;
     -fx-pref-height: 18;
 }
+
+.waring-input {
+    -fx-text-fill: red;
+}

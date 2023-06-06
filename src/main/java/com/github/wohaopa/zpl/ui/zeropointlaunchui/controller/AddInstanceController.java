@@ -21,15 +21,16 @@
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
 import java.io.File;
+
+import com.github.wohaopa.zeropointlanuch.core.*;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 
-import com.github.wohaopa.zeropointlanuch.core.Launch;
-import com.github.wohaopa.zeropointlanuch.core.Sharer;
-import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.leewyatt.rxcontrols.controls.RXTextField;
 import com.leewyatt.rxcontrols.event.RXActionEvent;
 
@@ -78,5 +79,38 @@ public class AddInstanceController extends RootController {
             .select("ZPL-Java8");
     }
 
-    public void onInstanceClicked(MouseEvent mouseEvent) {}
+    public void onInstanceClicked(MouseEvent mouseEvent) {
+        boolean flag = true;
+        File instanceDir = new File(ZplDirectory.getInstancesDirectory(), instanceName.getText());
+        if (Instance.containsKey(instanceName.getText())||instanceDir.exists()){
+            instanceName.getStyleClass().add("waring-input");
+            flag = false;
+        }
+
+        if(flag){
+            Button button = (Button) mouseEvent.getSource();
+            button.setDisable(true);
+            button.setText("正在安装");
+
+            new Thread(() -> {
+                instanceName.getStyleClass().remove("waring-input");
+
+                Instance.Information information = new Instance.Information();
+                information.name = instanceName.getText();
+                information.version = instanceVersion.getText();
+                information.depVersion = instanceDepName.getText();
+                information.sharer = sharerName.getValue();
+                information.launcher = launchName.getValue();
+
+                InstanceInstaller.installForZip(zip,instanceDir,information);
+
+                Platform.runLater(()->{
+                    button.setDisable(false);
+                    button.setText("安装实例");
+                });
+            }).start();
+
+        }
+
+    }
 }
