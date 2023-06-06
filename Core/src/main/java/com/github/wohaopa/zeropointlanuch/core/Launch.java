@@ -163,7 +163,7 @@ class Logger implements Runnable {
 
                 callback.accept(line);
             }
-        } catch (IOException e) {
+        } catch (IOException ignored) {
 
         }
     }

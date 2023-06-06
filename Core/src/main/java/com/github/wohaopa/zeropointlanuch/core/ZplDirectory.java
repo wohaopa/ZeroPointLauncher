@@ -40,6 +40,16 @@ public class ZplDirectory {
 
     private static File nativesRootDirectory;
 
+    static {
+        String rootDirStr = System.getProperty("zpl.rootDir");
+
+        if (rootDirStr == null) {
+            rootDirStr = System.getProperty("user.dir") + "/.GTNH";
+        }
+
+        init(new File(rootDirStr)); // 目录工具初始化
+    }
+
     public static void init(File workDir) {
         ZplDirectory.workDirectory = workDir;
         ZplDirectory.instancesDirectory = FileUtil.initAndMkDir(workDir, "instances");

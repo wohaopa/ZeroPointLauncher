@@ -69,7 +69,7 @@
             <images>
                 <BackgroundImage>
                     <image>
-                        <Image url="@../img/bg.png" />
+                        <Image url="@../img/bg.jpg" />
                     </image>
                     <size>
                         <BackgroundSize cover="true" />

@@ -21,8 +21,6 @@
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
 import java.io.File;
-
-import com.github.wohaopa.zeropointlanuch.core.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -31,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 
+import com.github.wohaopa.zeropointlanuch.core.*;
 import com.leewyatt.rxcontrols.controls.RXTextField;
 import com.leewyatt.rxcontrols.event.RXActionEvent;
 
@@ -62,7 +61,9 @@ public class AddInstanceController extends RootController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(ZplDirectory.getZipDirectory());
         fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("压缩包", "zip", "rar", "7z"));
-        File file = fileChooser.showOpenDialog(zipPath.getScene().getWindow());
+        File file = fileChooser.showOpenDialog(
+            zipPath.getScene()
+                .getWindow());
         if (file == null) return;
         zip = file;
         zipPath.setText(zip.getPath());
@@ -82,18 +83,20 @@ public class AddInstanceController extends RootController {
     public void onInstanceClicked(MouseEvent mouseEvent) {
         boolean flag = true;
         File instanceDir = new File(ZplDirectory.getInstancesDirectory(), instanceName.getText());
-        if (Instance.containsKey(instanceName.getText())||instanceDir.exists()){
-            instanceName.getStyleClass().add("waring-input");
+        if (Instance.containsKey(instanceName.getText()) || instanceDir.exists()) {
+            instanceName.getStyleClass()
+                .add("waring-input");
             flag = false;
         }
 
-        if(flag){
+        if (flag) {
             Button button = (Button) mouseEvent.getSource();
             button.setDisable(true);
             button.setText("正在安装");
 
             new Thread(() -> {
-                instanceName.getStyleClass().remove("waring-input");
+                instanceName.getStyleClass()
+                    .remove("waring-input");
 
                 Instance.Information information = new Instance.Information();
                 information.name = instanceName.getText();
@@ -102,15 +105,13 @@ public class AddInstanceController extends RootController {
                 information.sharer = sharerName.getValue();
                 information.launcher = launchName.getValue();
 
-                InstanceInstaller.installForZip(zip,instanceDir,information);
+                InstanceInstaller.installForZip(zip, instanceDir, information);
 
-                Platform.runLater(()->{
+                Platform.runLater(() -> {
                     button.setDisable(false);
                     button.setText("安装实例");
                 });
             }).start();
-
         }
-
     }
 }

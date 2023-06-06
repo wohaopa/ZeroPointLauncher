@@ -234,7 +234,6 @@ public class InstanceInstaller {
         }
     }
 
-
     private static List<String> genModList(File modsDir, boolean move) {
         List<String> mods = new ArrayList<>();
         if (!modsDir.exists()) return mods;

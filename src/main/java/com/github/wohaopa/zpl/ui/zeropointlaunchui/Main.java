@@ -78,12 +78,5 @@ public class Main extends Application {
         } catch (IOException ignored) {}
     }
 
-    private static void initDir() {
-        String rootDirStr = System.getProperty("zpl.rootDir");
-
-        if (rootDirStr == null) {
-            rootDirStr = System.getProperty("user.dir") + "/.GTNH";
-        }
-        ZplDirectory.init(new File(rootDirStr)); // 目录工具初始化
-    }
+    private static void initDir() {}
 }

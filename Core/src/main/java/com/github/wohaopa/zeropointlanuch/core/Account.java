@@ -18,16 +18,8 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.api;
+package com.github.wohaopa.zeropointlanuch.core;
 
-import org.junit.jupiter.api.Test;
+public class Account {
 
-class CoreTest {
-
-    @Test
-    void genZPLInstance() {
-
-        // Core.genZPLInstance(new File("D:\\ZeroPointServer\\Launcher\\copyTest\\test"),
-        // "2.3.2");
-    }
 }
