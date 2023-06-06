@@ -6,10 +6,10 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" stylesheets="@../csss/main.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.AddInstanceController">
    <children>
-      <GridPane layoutX="200.0" layoutY="63.0">
+      <GridPane layoutX="104.0" layoutY="75.0" prefHeight="150" prefWidth="400">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" prefWidth="75.0" />
+          <ColumnConstraints hgrow="SOMETIMES" prefWidth="325.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -20,12 +20,12 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <RXTextField buttonDisplayMode="SHOW" styleClass="work-dir-text-field" GridPane.columnIndex="1" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <ComboBox prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <ComboBox prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <RXTextField fx:id="zipPath" buttonDisplayMode="SHOW" onClickButton="#onOpenZip" styleClass="work-dir-text-field" GridPane.columnIndex="1" />
+            <TextField fx:id="instanceName" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="instanceVersion" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="instanceDepName" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <ComboBox fx:id="sharerName" prefHeight="23.0" prefWidth="325.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <ComboBox fx:id="launchName" prefHeight="23.0" prefWidth="325.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
             <Label text="安装包路径" />
             <Label text="实例名" GridPane.rowIndex="1" />
             <Label text="GTNH版本" GridPane.rowIndex="2" />
@@ -41,5 +41,6 @@
             <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="69.0" text="刷新" />
          </children>
       </HBox>
+      <Button layoutX="272.0" layoutY="243.0" mnemonicParsing="false" onMouseClicked="#onInstanceClicked" text="安装" />
    </children>
 </AnchorPane>

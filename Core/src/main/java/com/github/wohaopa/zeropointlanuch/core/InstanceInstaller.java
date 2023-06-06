@@ -55,6 +55,53 @@ public class InstanceInstaller {
         else Log.error("实例名重复：{}", name);
     }
 
+    public static void installForZip(File zip, File instanceDir, Instance.Information information) {
+        Log.start("实例安装");
+        instanceDir.mkdirs();
+        File versionJson = new File(instanceDir, "version.json");
+
+        Instance instance = Instance.newInstance();
+        instance.information = information;
+        instance.insDir = instanceDir;
+        instance.imageDir = FileUtil.initAndMkDir(instanceDir, "image");
+        instance.runDir = FileUtil.initAndMkDir(instanceDir, ".minecraft");
+
+        Log.debug("开始解压：{}", zip);
+        long time1 = System.currentTimeMillis();
+        ZipUtil.unCompress(zip, instance.imageDir); // 解压
+        long time2 = System.currentTimeMillis();
+        Log.debug("解压完成！用时：{}s", (time2 - time1) / 1000);
+
+        Log.debug("正在生成校验文件");
+        instance.information.checksum = FileUtil.genChecksum(instance.imageDir); // 加载文件校验
+
+        instance.information.includeMods = genModList(new File(instance.imageDir, "mods"), true); // 加载mods信息
+        instance.information.excludeMods = new ArrayList<>();
+
+        Log.debug("正在生成映射配置");
+        List<String> list = new ArrayList<>();
+        for (File f : Objects.requireNonNull(instance.imageDir.listFiles())) {
+            if (f.getName()
+                .endsWith(".md")) {
+                list.add(f.getName());
+            }
+        }
+
+        JSONObject json = Mapper.defaultJson();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.putOpt("name", instance.information.name);
+        jsonObject.putOpt("file", list);
+        json.get("exclude", JSONArray.class)
+            .add(jsonObject);
+        Mapper.saveConfigJson(instance.imageDir, json);
+
+        Log.debug("正在生成保存文件");
+        instance.savaInformation(); // 保存文件
+
+        Instance.put(instance.information.name, instance);
+        Log.end();
+    }
+
     /**
      * 安装实例的公共方法 在执行本函数前准备好目录
      *
