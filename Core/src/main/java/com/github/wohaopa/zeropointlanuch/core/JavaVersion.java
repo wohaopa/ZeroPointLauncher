@@ -25,10 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,8 +49,8 @@ public class JavaVersion {
         return inst.get(name);
     }
 
-    public static Set<String> getJavas() {
-        return inst.keySet();
+    public static Collection<JavaVersion> getJavas() {
+        return inst.values();
     }
 
     public final File javaExe;
@@ -108,6 +105,11 @@ public class JavaVersion {
 
         inst.put(name, this);
 
+    }
+
+    @Override
+    public String toString() {
+        return name + "(" + javaExe.toString() + ")";
     }
 
     public enum Java {

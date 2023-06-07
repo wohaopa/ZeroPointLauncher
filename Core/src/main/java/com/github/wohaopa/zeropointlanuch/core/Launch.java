@@ -29,6 +29,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Launch {
 
@@ -114,12 +116,14 @@ public class Launch {
 
         Consumer<String> pump = new Consumer<>() {
 
-            static final Pattern pattern = Pattern.compile("<log4j:Message><!\\[CDATA\\[(.+)\\]\\]></log4j:Message>");
+//            static final Pattern pattern = Pattern.compile("<log4j:Message><!\\[CDATA\\[(.+)\\]\\]></log4j:Message>");
 
             @Override
             public void accept(String s) {
-                Matcher m = pattern.matcher(s);
-                if (m.find()) System.out.println(m.group(1));
+//                Matcher m = pattern.matcher(s);
+//                if (m.find())
+                System.out.println(s);
+
             }
         };
 
@@ -129,8 +133,9 @@ public class Launch {
         try {
             Process mc = pb.start();
             System.out.println(mc.pid());
-            new Thread(new Logger(mc.getInputStream(), pump)).start();
-            new Thread(new Logger(mc.getErrorStream(), pump)).start();
+            new Thread(new Pump(mc.getInputStream(), pump)).start();
+            new Thread(new Pump(mc.getErrorStream(), pump)).start();
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -139,12 +144,12 @@ public class Launch {
 
 }
 
-class Logger implements Runnable {
+class Pump implements Runnable {
 
     InputStream in;
     Consumer<String> callback;
 
-    public Logger(InputStream in, Consumer<String> callback) {
+    public Pump(InputStream in, Consumer<String> callback) {
         this.in = in;
         this.callback = callback;
     }

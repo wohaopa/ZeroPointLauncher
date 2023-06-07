@@ -35,7 +35,8 @@ public class Config {
 
     static {
         loadConfig();
-        Runtime.getRuntime().addShutdownHook(new Thread(Config::saveConfig));
+        Runtime.getRuntime()
+            .addShutdownHook(new Thread(Config::saveConfig));
     }
 
     public static Config getConfig() {
@@ -44,18 +45,24 @@ public class Config {
 
     private static void loadConfig() {
         if (!configFile.exists()) config = new Config();
-        else config = JsonUtil.fromJson(configFile)
-            .toBean(Config.class);
+        else try {
+            config = JsonUtil.fromJson(configFile)
+                .toBean(Config.class);
+        } catch (Exception e) {
+            Log.warn("配置文件错误：{}",configFile.toString());
+            configFile.delete();
+            config = new Config();
+        }
     }
 
     public static void saveConfig() {
         FileUtil.fileWrite(configFile, JsonUtil.toJson(config));
     }
 
-    private Config() {}
+//    private Config() {}
 
-    public String java8Path;
-    public String java17Path;
+    private String java8Path;
+    private String java17Path;
 
     public String getJava8Path() {
         return java8Path;
@@ -64,5 +71,14 @@ public class Config {
     public String getJava17Path() {
         return java17Path;
     }
+
+    public void setJava8Path(String java8Path) {
+        this.java8Path = java8Path;
+    }
+
+    public void setJava17Path(String java17Path) {
+        this.java17Path = java17Path;
+    }
+
 
 }

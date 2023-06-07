@@ -27,6 +27,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 
+import com.github.wohaopa.zeropointlanuch.core.Config;
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.Launch;
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
@@ -45,20 +46,30 @@ public class HomeController extends RootController {
 
     public void onLaunchBtnClicked(MouseEvent mouseEvent) {
 
-        MainController.setTip("当前启动器还没有启动功能");
+        MainController.setTip("正在启动：" + MainController.current.name.getValue());
+
+        String javaPath = MainController.current.instance.information.launcher.equals("ZPL-Java17") ? Config.getConfig()
+            .getJava17Path()
+            : Config.getConfig()
+                .getJava8Path();
+
+        if (javaPath == null) {
+            MainController.setTip("无效Java，请在Config中设置正确的路径");
+            return;
+        }
+
         Button btn = (Button) mouseEvent.getSource();
         btn.setDisable(true);
-        btn.setText("assets检查");
+        btn.setText("正在启动");
 
         new Thread(() -> {
             Auth auth = new OfflineAuth("wohaopa");
             Launch.getLauncher("ZPL-Java8")
-                .setJavaPath("C:\\Program Files\\Java\\jdk1.8.0_361\\bin\\java.exe")
+                .setJavaPath(javaPath)
                 .launch(auth, MainController.current.instance.runDir);
 
             Platform.runLater(() -> {
-                btn.setText("library检查");
-                btn.setDisable(false);
+                btn.setText("等待游戏窗口出现");
             });
         }).start();
     }

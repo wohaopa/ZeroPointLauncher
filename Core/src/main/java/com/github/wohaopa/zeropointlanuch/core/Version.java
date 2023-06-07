@@ -66,10 +66,10 @@ public class Version {
 
             String url2 = downloadsObj2.getStr("url");
             String sha12 = downloadsObj2.getStr("sha1");
-            String path2 = "client-1.7.xml";
+            String path2 = "log4j2.xml";
 
             versionJar = new File(ZplDirectory.getLibrariesDirectory(), path);
-            logXml = new File(ZplDirectory.getWorkDirectory(), path2);
+            logXml = new File(ZplDirectory.getVersionsDirectory(), path2);
 
             if (!FileUtil.checkSha1OfFile(logXml, sha12)) {
                 logXml.delete();
@@ -124,7 +124,7 @@ public class Version {
         List<String> args = new ArrayList<>();
         args.add("-Dlog4j2.formatMsgNoLookups=true");
 
-        args.add("-Dlog4j.configurationFile=" + logXml.toString());
+        args.add("-Dlog4j.configurationFile="+logXml.toString());
         args.add("-Dfml.ignoreInvalidMinecraftCertificates=true");
         args.add("-Dfml.ignorePatchDiscrepancies=true");
         args.add("-Dminecraft.client.jar=" + versionJar.toString());
