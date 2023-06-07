@@ -49,7 +49,7 @@ public class Config {
             config = JsonUtil.fromJson(configFile)
                 .toBean(Config.class);
         } catch (Exception e) {
-            Log.warn("配置文件错误：{}",configFile.toString());
+            Log.warn("配置文件错误：{}", configFile.toString());
             configFile.delete();
             config = new Config();
         }
@@ -59,7 +59,7 @@ public class Config {
         FileUtil.fileWrite(configFile, JsonUtil.toJson(config));
     }
 
-//    private Config() {}
+    // private Config() {}
 
     private String java8Path;
     private String java17Path;
@@ -79,6 +79,5 @@ public class Config {
     public void setJava17Path(String java17Path) {
         this.java17Path = java17Path;
     }
-
 
 }

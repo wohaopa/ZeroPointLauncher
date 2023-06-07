@@ -68,9 +68,7 @@ public class HomeController extends RootController {
                 .setJavaPath(javaPath)
                 .launch(auth, MainController.current.instance.runDir);
 
-            Platform.runLater(() -> {
-                btn.setText("等待游戏窗口出现");
-            });
+            Platform.runLater(() -> { btn.setText("等待游戏窗口出现"); });
         }).start();
     }
 }

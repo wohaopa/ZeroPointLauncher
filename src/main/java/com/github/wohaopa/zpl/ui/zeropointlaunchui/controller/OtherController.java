@@ -20,38 +20,47 @@
 
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
-import com.github.wohaopa.zeropointlanuch.core.Config;
-import com.github.wohaopa.zeropointlanuch.core.JavaVersion;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 
+import com.github.wohaopa.zeropointlanuch.core.Config;
+import com.github.wohaopa.zeropointlanuch.core.JavaVersion;
+
 public class OtherController extends RootController {
+
     public ListView<JavaVersion> java8ListView;
     public ListView<JavaVersion> java17ListView;
+
     @FXML
     void initialize() {
-        JavaVersion.getJavas().forEach(javaVersion -> {
-            if (javaVersion.version == JavaVersion.Java.JAVA8)
-                java8ListView.getItems().add(javaVersion);
-            else if (javaVersion.version == JavaVersion.Java.JAVA17)
-                java17ListView.getItems().add(javaVersion);
-        });
+        JavaVersion.getJavas()
+            .forEach(javaVersion -> {
+                if (javaVersion.version == JavaVersion.Java.JAVA8) java8ListView.getItems()
+                    .add(javaVersion);
+                else if (javaVersion.version == JavaVersion.Java.JAVA17) java17ListView.getItems()
+                    .add(javaVersion);
+            });
 
-        java8ListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue != null){
-                Config.getConfig().setJava8Path(newValue.javaExe.toString());
-            }
-        });
-        java17ListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue != null){
-                Config.getConfig().setJava17Path(newValue.javaExe.toString());
-            }
-        });
-    }
-    public void onChooseJava17(MouseEvent mouseEvent) {
+        java8ListView.getSelectionModel()
+            .selectedItemProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                if (newValue != null) {
+                    Config.getConfig()
+                        .setJava8Path(newValue.javaExe.toString());
+                }
+            });
+        java17ListView.getSelectionModel()
+            .selectedItemProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                if (newValue != null) {
+                    Config.getConfig()
+                        .setJava17Path(newValue.javaExe.toString());
+                }
+            });
     }
 
-    public void onChooseJava8(MouseEvent mouseEvent) {
-    }
+    public void onChooseJava17(MouseEvent mouseEvent) {}
+
+    public void onChooseJava8(MouseEvent mouseEvent) {}
 }

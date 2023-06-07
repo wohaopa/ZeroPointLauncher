@@ -25,12 +25,8 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class Launch {
 
@@ -116,12 +112,13 @@ public class Launch {
 
         Consumer<String> pump = new Consumer<>() {
 
-//            static final Pattern pattern = Pattern.compile("<log4j:Message><!\\[CDATA\\[(.+)\\]\\]></log4j:Message>");
+            // static final Pattern pattern =
+            // Pattern.compile("<log4j:Message><!\\[CDATA\\[(.+)\\]\\]></log4j:Message>");
 
             @Override
             public void accept(String s) {
-//                Matcher m = pattern.matcher(s);
-//                if (m.find())
+                // Matcher m = pattern.matcher(s);
+                // if (m.find())
                 System.out.println(s);
 
             }
