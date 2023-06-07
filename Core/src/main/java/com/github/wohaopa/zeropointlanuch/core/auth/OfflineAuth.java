@@ -24,8 +24,6 @@ import java.util.UUID;
 
 public class OfflineAuth extends Auth {
 
-    String name;
-
     public OfflineAuth(String name) {
         super();
         this.name = name;
@@ -48,4 +46,5 @@ public class OfflineAuth extends Auth {
         var.put("user_properties", "{}");
         var.put("user_type", "Offline");
     }
+
 }

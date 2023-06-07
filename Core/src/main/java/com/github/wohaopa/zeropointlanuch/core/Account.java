@@ -20,6 +20,46 @@
 
 package com.github.wohaopa.zeropointlanuch.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
+
 public class Account {
 
+    private static List<Auth> auths = new ArrayList<>();
+
+    private static Auth cur;
+
+    static {
+        List<String> list = Config.getConfig()
+            .getAccounts();
+        if (list == null) {
+            Config.getConfig()
+                .setAccounts(new ArrayList<>());
+
+        } else if (!list.isEmpty()) {
+            list.forEach(s -> auths.add(new OfflineAuth(s)));
+        }
+    }
+
+    public static List<Auth> getAuths() {
+        return auths;
+    }
+
+    public static void add(Auth auth) {
+        auths.add(auth);
+        Config.getConfig()
+            .getAccounts()
+            .add(auth.getName());
+    }
+
+    public static void select(Auth value) {
+        cur = value;
+    }
+
+    public static Auth getCur() {
+        return cur;
+    }
 }

@@ -21,6 +21,7 @@
 package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
+import java.util.List;
 
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
@@ -65,6 +66,7 @@ public class Config {
 
     private String java8Path;
     private String java17Path;
+    private List<String> accounts;
 
     public String getJava8Path() {
         return java8Path;
@@ -72,6 +74,10 @@ public class Config {
 
     public String getJava17Path() {
         return java17Path;
+    }
+
+    public void setAccounts(List<String> accounts) {
+        this.accounts = accounts;
     }
 
     public void setJava8Path(String java8Path) {
@@ -82,4 +88,7 @@ public class Config {
         this.java17Path = java17Path;
     }
 
+    public List<String> getAccounts() {
+        return accounts;
+    }
 }

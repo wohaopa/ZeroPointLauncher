@@ -20,5 +20,43 @@
 
 package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
 
+import javafx.fxml.FXML;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
+
+import com.github.wohaopa.zeropointlanuch.core.Account;
+import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
+
 public class AccountController extends RootController {
+
+    public ListView<Auth> accountListView;
+    public TextField nameTextField;
+
+    @FXML
+    void initialize() {
+        accountListView.getItems()
+            .setAll(Account.getAuths());
+        accountListView.getSelectionModel()
+            .selectedItemProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                if (newValue != null) {
+                    Account.select(newValue);
+                }
+            });
+
+        accountListView.getSelectionModel()
+            .selectFirst();
+    }
+
+    public void onAddOutline(MouseEvent mouseEvent) {
+        String name = nameTextField.getText();
+        if (name != null && !name.isEmpty()) {
+            OfflineAuth auth = new OfflineAuth(name);
+            accountListView.getItems()
+                .add(auth);
+            Account.add(auth);
+        }
+    }
 }

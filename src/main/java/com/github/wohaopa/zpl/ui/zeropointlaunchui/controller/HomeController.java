@@ -27,11 +27,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 
+import com.github.wohaopa.zeropointlanuch.core.Account;
 import com.github.wohaopa.zeropointlanuch.core.Config;
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.Launch;
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
-import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
 import com.github.wohaopa.zpl.ui.zeropointlaunchui.Main;
 
 public class HomeController extends RootController {
@@ -64,13 +64,18 @@ public class HomeController extends RootController {
             return;
         }
 
+        Auth auth = Account.getCur();
+
+        if (auth == null) {
+            MainController.setTip("无效账户，请设置！");
+            return;
+        }
+
         Button btn = (Button) mouseEvent.getSource();
         btn.setDisable(true);
         btn.setText("等待游戏窗口出现");
 
         new Thread(() -> {
-            Auth auth = new OfflineAuth("wohaopa");
-
             launch.setJavaPath(javaPath)
                 .launch(auth, MainController.current.instance.runDir);
 

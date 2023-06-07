@@ -36,7 +36,6 @@ public class OtherController extends RootController {
 
     private FileChooser javaFileChooser;
 
-
     @FXML
     void initialize() {
 
@@ -45,7 +44,6 @@ public class OtherController extends RootController {
         javaFileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         javaFileChooser.getExtensionFilters()
             .addAll(new FileChooser.ExtensionFilter("所有文件", "*.*"), new FileChooser.ExtensionFilter("EXE", "*.exe"));
-
 
         JavaVersion.getJavas()
             .forEach(javaVersion -> {
@@ -86,8 +84,6 @@ public class OtherController extends RootController {
                         Config.getConfig()
                             .getJava17Path())));
     }
-
-
 
     public void onChooseJava(MouseEvent mouseEvent) {
         File file = javaFileChooser.showOpenDialog(MainController.getWindow());

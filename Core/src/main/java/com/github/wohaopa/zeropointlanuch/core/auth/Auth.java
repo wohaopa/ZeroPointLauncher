@@ -26,6 +26,8 @@ import java.util.Map;
 
 public abstract class Auth {
 
+    String name;
+
     Map<String, String> var = new HashMap<>();
 
     public Auth() {
@@ -48,5 +50,14 @@ public abstract class Auth {
         }
 
         return args;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
