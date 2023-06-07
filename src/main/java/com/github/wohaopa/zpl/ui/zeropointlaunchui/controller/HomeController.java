@@ -58,17 +58,26 @@ public class HomeController extends RootController {
             return;
         }
 
+        Launch launch = Launch.getLauncher(MainController.current.instance.information.launcher);
+        if (launch == null) {
+            MainController.setTip("无效Launcher，请在Config中设置正确的路径");
+            return;
+        }
+
         Button btn = (Button) mouseEvent.getSource();
         btn.setDisable(true);
-        btn.setText("正在启动");
+        btn.setText("等待游戏窗口出现");
 
         new Thread(() -> {
             Auth auth = new OfflineAuth("wohaopa");
-            Launch.getLauncher("ZPL-Java8")
-                .setJavaPath(javaPath)
+
+            launch.setJavaPath(javaPath)
                 .launch(auth, MainController.current.instance.runDir);
 
-            Platform.runLater(() -> { btn.setText("等待游戏窗口出现"); });
+            Platform.runLater(() -> {
+                btn.setText("启动");
+                btn.setDisable(false);
+            });
         }).start();
     }
 }

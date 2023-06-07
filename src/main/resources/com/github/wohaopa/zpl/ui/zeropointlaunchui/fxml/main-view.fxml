@@ -10,7 +10,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="620.0" prefWidth="1020.0" style="-fx-background-color: none;" stylesheets="@../csss/main.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.MainController">
+<AnchorPane prefHeight="620.0" prefWidth="1020.0" style="-fx-background-color: none;" stylesheets="@../csss/top.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.MainController">
     <BorderPane layoutX="10.0" layoutY="10.0" prefHeight="600.0" prefWidth="1000.0" styleClass="root-pane">
         <top>
             <AnchorPane fx:id="topBar" onMouseDragged="#topBarDraggedAction" onMousePressed="#topBarPressedAction" prefHeight="50.0" styleClass="top-pane" BorderPane.alignment="CENTER">

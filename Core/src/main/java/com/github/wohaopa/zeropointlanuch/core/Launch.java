@@ -25,6 +25,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
 
@@ -33,6 +34,7 @@ public class Launch {
     private static Map<String, Launch> inst = new HashMap<>();
 
     static {
+        Log.debug("正在初始化Launcher");
         new Launch("ZPL-Java8");
         new Launch("ZPL-Java17");
     }
@@ -101,24 +103,32 @@ public class Launch {
 
     public void launch(Auth auth, File runDir) {
 
+        Log.start("启动");
+
         try {
             version.verifyVersion();
         } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
+            Log.warn("文件校验失败。原因：{}", e);
+            Log.end();
+            return;
         }
 
         String[] commandLine = getLaunchArguments(auth, runDir);
         Log.debug("启动指令：{}", commandLine);
 
+        final boolean[] resume = { true };
+
         Consumer<String> pump = new Consumer<>() {
 
-            // static final Pattern pattern =
-            // Pattern.compile("<log4j:Message><!\\[CDATA\\[(.+)\\]\\]></log4j:Message>");
+            static final Pattern pattern = Pattern.compile("\\[[0-9:]+\\] \\[Client thread/INFO\\]: LWJGL Version: .+");
 
             @Override
             public void accept(String s) {
-                // Matcher m = pattern.matcher(s);
-                // if (m.find())
+                if (pattern.matcher(s)
+                    .find()) {
+                    resume[0] = false;
+                }
+
                 System.out.println(s);
 
             }
@@ -129,14 +139,23 @@ public class Launch {
         pb.directory(runDir);
         try {
             Process mc = pb.start();
-            System.out.println(mc.pid());
+            Log.debug("进程pid：{}", mc.pid());
             new Thread(new Pump(mc.getInputStream(), pump)).start();
             new Thread(new Pump(mc.getErrorStream(), pump)).start();
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            Log.warn("无法启动，错误：{}", e);
         }
 
+        try {
+            while (resume[0]) {
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException e) {
+            Log.warn("无法成功能识别游戏窗口，错误：{}", e);
+        }
+
+        Log.end();
     }
 
 }

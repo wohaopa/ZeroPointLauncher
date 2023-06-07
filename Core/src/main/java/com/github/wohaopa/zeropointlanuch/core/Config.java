@@ -44,6 +44,7 @@ public class Config {
     }
 
     private static void loadConfig() {
+        Log.debug("正在加载设置文件：{}", configFile.toString());
         if (!configFile.exists()) config = new Config();
         else try {
             config = JsonUtil.fromJson(configFile)
@@ -56,6 +57,7 @@ public class Config {
     }
 
     public static void saveConfig() {
+        Log.debug("正在保存设置文件：{}", configFile.toString());
         FileUtil.fileWrite(configFile, JsonUtil.toJson(config));
     }
 

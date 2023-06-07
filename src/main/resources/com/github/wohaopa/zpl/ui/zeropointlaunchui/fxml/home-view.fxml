@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane id="root" prefHeight="550.0" prefWidth="1000.0" styleClass="home-pane" stylesheets="@../csss/main.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.HomeController">
+<AnchorPane id="root" prefHeight="550.0" prefWidth="1000.0" styleClass="home-pane" stylesheets="@../csss/home.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.HomeController">
     <children>
 
         <Button layoutX="750.0" layoutY="425.0" mnemonicParsing="false" onMouseClicked="#onLaunchBtnClicked" prefHeight="50.0" prefWidth="200.0" styleClass="launch-btn" text="启动" />

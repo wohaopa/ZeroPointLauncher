@@ -43,7 +43,7 @@ public class Libraries {
 
         if (verified) return;
 
-        Log.start("Libraries检查");
+        Log.start("Libraries校验");
         List<_LibraryBase> libraries = new ArrayList<>();
 
         for (JSONObject lib : librariesObj.jsonIter()) libraries.add(new _LibraryBase(lib));

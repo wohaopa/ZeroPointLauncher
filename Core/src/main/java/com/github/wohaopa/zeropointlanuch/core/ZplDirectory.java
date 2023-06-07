@@ -51,6 +51,7 @@ public class ZplDirectory {
     }
 
     public static void init(File workDir) {
+        Log.debug("正在初始化ZPL目录：{}", workDir.toString());
         ZplDirectory.workDirectory = workDir;
         ZplDirectory.instancesDirectory = FileUtil.initAndMkDir(workDir, "instances");
         ZplDirectory.librariesDirectory = FileUtil.initAndMkDir(workDir, "libraries");

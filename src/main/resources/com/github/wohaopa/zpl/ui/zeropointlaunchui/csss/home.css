@@ -1,0 +1,67 @@
+.waring-box .text-area .scroll-pane .content{
+    -fx-background-color: #E4DCCF;
+    -fx-text-fill: red;
+}
+
+.waring-box .text-area .scroll-pane {
+    -fx-background-color: none;
+}
+
+.waring-box .text-area {
+    -fx-background-color: none;
+    -fx-background-radius: 20px;
+}
+.waring-box .label {
+    -fx-background-color:  #EA5455;
+    -fx-background-radius:  20px;
+    -fx-font-size: 16;
+}
+
+.waring-box {
+    -fx-background-color: #E4DCCF;
+    -fx-background-radius: 20px;
+    -fx-border-color: #E2777A;
+    -fx-border-width: 2px;
+    -fx-border-radius: 20px;
+}
+
+.account-box,
+.info-box {
+    -fx-background-color: #F9F5EBD0;
+    -fx-padding: 20px;
+    -fx-background-radius: 10px;
+}
+
+.account-box .label{
+    -fx-text-fill: #002B5B;
+    -fx-font-size: 13px;
+    -fx-padding: 5px;
+}
+
+.launch-btn{
+    -fx-background-color: #F9D949D0;
+    -fx-font-size: 22px;
+    -fx-text-fill: white;
+}
+
+
+.list-btn {
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+}
+.list-btn .list-cell,
+.list-btn .arrow-button{
+    -fx-background-color: #F9D949D0;
+}
+
+.launch-btn:hover,
+.list-btn .combo-box-popup .list-view .list-cell:hover,
+.list-btn .arrow-button:hover{
+    -fx-background-color: #F97B22D0;
+}
+
+.list-btn .combo-box-popup .list-view .list-cell:selected{
+    -fx-background-color: #F97B22D0;
+}
+
+

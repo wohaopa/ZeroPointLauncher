@@ -33,20 +33,21 @@ public class JavaVersion {
 
     private final static Pattern pattern = Pattern.compile("java version \"(.+)\"");
 
-    private final static Map<String, JavaVersion> inst = new HashMap<>();
+    private final static Map<File, JavaVersion> inst = new HashMap<>();
 
     static {
-
+        Log.debug("正在查找Java");
         File javaRoot = new File("C:\\Program Files\\java\\");
         if (javaRoot.exists()) {
             for (File file : Objects.requireNonNull(javaRoot.listFiles())) {
                 new JavaVersion(new File(file, "bin\\java.exe"));
             }
         }
+        Log.debug("找到：{}，个有效Java", inst.size());
     }
 
-    public static JavaVersion getJava(String name) {
-        return inst.get(name);
+    public static JavaVersion getJava(File file) {
+        return inst.get(file);
     }
 
     public static Collection<JavaVersion> getJavas() {
@@ -99,11 +100,13 @@ public class JavaVersion {
                 }
             }
         } catch (IOException ignored) {}
-        if (version1 == null) version1 = Java.unknown;
 
-        version = version1;
-
-        inst.put(name, this);
+        if (version1 == null) {
+            version = Java.unknown;
+        } else {
+            version = version1;
+            inst.put(javaExe, this);
+        }
 
     }
 

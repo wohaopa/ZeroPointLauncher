@@ -32,6 +32,7 @@ public class Sharer {
     private static final Map<String, Sharer> inst = new HashMap<>();
 
     static {
+
         new Sharer("Common", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "Common"), "null");
         new Sharer("Java8", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "Java8"), "Common");
         new Sharer("Java17", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "Java17"), "Common");

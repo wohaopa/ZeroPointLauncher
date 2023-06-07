@@ -55,6 +55,9 @@ public class Version {
 
         if (verified) return;
 
+        Log.start("校验" + name);
+        Log.debug("正在校验版本：{}", name);
+
         {
             JSONObject downloadsObj = versionJsonObj.getByPath("downloads.client", JSONObject.class);
 
@@ -82,6 +85,7 @@ public class Version {
             .verifyLibraries(ZplDirectory.getLibrariesDirectory(), versionJsonObj.getJSONArray("libraries"), natives);
 
         verified = true;
+        Log.end();
     }
 
     public String getMainClass() {
