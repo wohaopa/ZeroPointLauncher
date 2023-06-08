@@ -28,7 +28,7 @@ import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
 
 public class Account {
 
-    private static List<Auth> auths = new ArrayList<>();
+    private static final List<Auth> auths = new ArrayList<>();
 
     private static Auth cur;
 

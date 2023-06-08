@@ -29,7 +29,7 @@ import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 public class Config {
 
     private static Config config;
-    private static File configFile = new File(
+    private static final File configFile = new File(
         ZplDirectory.getWorkDirectory()
             .getParentFile(),
         "config.json");
@@ -62,7 +62,10 @@ public class Config {
         FileUtil.fileWrite(configFile, JsonUtil.toJson(config));
     }
 
-    // private Config() {}
+     public Config() {
+         java8Path="";
+         java17Path="";
+     }
 
     private String java8Path;
     private String java17Path;
