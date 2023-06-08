@@ -32,15 +32,15 @@
                 </TextArea>
             </children>
         </FlowPane>
-        <VBox alignment="TOP_CENTER" layoutX="25.0" layoutY="50.0" styleClass="account-box">
+        <VBox alignment="TOP_CENTER" layoutX="25.0" layoutY="50.0" onMouseClicked="#onUserClicked" styleClass="account-box">
             <children>
-                <RXAvatar layoutX="115.0" layoutY="104.0" prefHeight="80.0" prefWidth="80.0">
+                <RXAvatar layoutX="115.0" layoutY="104.0" onMouseClicked="#onUserClicked" prefHeight="80.0" prefWidth="80.0">
                     <image>
                         <Image url="@../img/tx.jpg" />
                     </image>
                 </RXAvatar>
-                <Label text="wohaopa" />
-                <Label text="2411829240@qq.com" />
+                <Label fx:id="userName" text="请输入用户名" />
+                <Label fx:id="userType" text="Offline" />
 
             </children>
         </VBox>

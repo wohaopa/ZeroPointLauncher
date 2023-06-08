@@ -26,22 +26,26 @@ import java.util.Map;
 
 public abstract class Auth {
 
-    String name;
+    protected String auth_player_name;
+    protected String auth_uuid;
+    protected String auth_access_token;
+    protected String user_properties;
+    protected String user_type;
 
-    Map<String, String> var = new HashMap<>();
+    private final Map<String, String> var = new HashMap<>();
 
-    public Auth() {
-        var.put("auth_player_name", null);
-        var.put("auth_uuid", null);
-        var.put("auth_access_token", null);
-        var.put("user_properties", null);
-        var.put("user_type", null);
-    }
+    public Auth() {}
 
     protected abstract void login();
 
     public List<String> parseArg(List<String> args) {
         login();
+
+        var.put("auth_player_name", auth_player_name);
+        var.put("auth_uuid", auth_uuid);
+        var.put("auth_access_token", auth_access_token);
+        var.put("user_properties", user_properties);
+        var.put("user_type", user_type);
 
         for (String key : var.keySet()) {
             int index = args.indexOf("${" + key + "}");
@@ -53,11 +57,15 @@ public abstract class Auth {
     }
 
     public String getName() {
-        return name;
+        return auth_player_name;
+    }
+
+    public String getUserType() {
+        return user_type;
     }
 
     @Override
     public String toString() {
-        return name;
+        return auth_player_name + "(" + user_type + ")";
     }
 }

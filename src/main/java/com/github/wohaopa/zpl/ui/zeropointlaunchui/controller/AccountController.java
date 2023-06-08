@@ -43,6 +43,7 @@ public class AccountController extends RootController {
             .addListener((observable, oldValue, newValue) -> {
                 if (newValue != null) {
                     Account.select(newValue);
+                    MainController.current.changeAccount(newValue);
                 }
             });
 

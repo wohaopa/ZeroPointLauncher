@@ -34,6 +34,7 @@ import javafx.stage.Stage;
 
 import com.github.wohaopa.zeropointlanuch.api.Core;
 import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.Launch;
 import com.github.wohaopa.zeropointlanuch.core.Sharer;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zpl.ui.zeropointlaunchui.Main;
@@ -52,7 +53,8 @@ public class InstanceController extends RootController {
     public ListView<String> includeModListView;
     public ListView<String> excludeModListView;
     public ComboBox<String> sharerComboBox;
-    public ListView loadedModListView;
+    public ListView<String> loadedModListView;
+    public ComboBox<String> launcherComboBox;
 
     private ComboBox<Instance> comboBox;
 
@@ -72,6 +74,28 @@ public class InstanceController extends RootController {
                     MainController.current.changeInstance(newValue);
                     sharerComboBox.getSelectionModel()
                         .select(MainController.current.sharer.get());
+                    launcherComboBox.getSelectionModel()
+                        .select(MainController.current.launcher.get());
+                }
+            });
+
+        sharerComboBox.getSelectionModel()
+            .selectedItemProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                if (MainController.current.instance != null && newValue != null) {
+                    MainController.current.sharer.setValue(newValue);
+                    MainController.current.instance.information.sharer = newValue;
+                    MainController.current.instance.savaInformation();
+                }
+            });
+
+        launcherComboBox.getSelectionModel()
+            .selectedItemProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                if (MainController.current.instance != null && newValue != null) {
+                    MainController.current.launcher.setValue(newValue);
+                    MainController.current.instance.information.launcher = newValue;
+                    MainController.current.instance.savaInformation();
                 }
             });
 
@@ -80,10 +104,16 @@ public class InstanceController extends RootController {
             .bind(MainController.current.name);
         versionLabel.textProperty()
             .bind(MainController.current.version);
+
         sharerComboBox.getItems()
             .setAll(Sharer.getNames());
         sharerComboBox.getSelectionModel()
             .select("Common");
+
+        launcherComboBox.getItems()
+            .addAll(Launch.getLaunches());
+        launcherComboBox.getSelectionModel()
+            .select("ZPL-Java8");
 
         depInstanceLabel.textProperty()
             .bind(MainController.current.depInstance);

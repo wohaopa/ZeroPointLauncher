@@ -24,6 +24,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 
@@ -38,10 +39,17 @@ public class HomeController extends RootController {
 
     public FlowPane wringPane;
     public ComboBox<Instance> comboBox;
+    public Label userName;
+    public Label userType;
 
     @FXML
     void initialize() {
         wringPane.setVisible(!Main.admin);
+
+        userName.textProperty()
+            .bind(MainController.current.accountName);
+        userType.textProperty()
+            .bind(MainController.current.accountType);
     }
 
     public void onLaunchBtnClicked(MouseEvent mouseEvent) {
@@ -84,5 +92,12 @@ public class HomeController extends RootController {
                 btn.setDisable(false);
             });
         }).start();
+    }
+
+    public void onUserClicked(MouseEvent mouseEvent) {
+        MainController c = (MainController) RootController.getController("MainController");
+        c.navGroup.selectToggle(
+            c.navGroup.getToggles()
+                .get(2));
     }
 }

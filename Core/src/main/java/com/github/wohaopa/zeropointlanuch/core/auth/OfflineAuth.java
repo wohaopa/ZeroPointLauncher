@@ -25,26 +25,22 @@ import java.util.UUID;
 public class OfflineAuth extends Auth {
 
     public OfflineAuth(String name) {
-        super();
-        this.name = name;
+
+        auth_player_name = name;
+        auth_uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + auth_player_name).getBytes())
+            .toString()
+            .replace("-", "");
+        user_properties = "{}";
+        user_type = "Offline";
     }
 
     @Override
     protected void login() {
 
-        var.put("auth_player_name", name);
-        var.put(
-            "auth_uuid",
-            UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes())
-                .toString()
-                .replace("-", ""));
-        var.put(
-            "auth_access_token",
-            UUID.randomUUID()
-                .toString()
-                .replace("-", ""));
-        var.put("user_properties", "{}");
-        var.put("user_type", "Offline");
+        auth_access_token = UUID.randomUUID()
+            .toString()
+            .replace("-", "");
+
     }
 
 }

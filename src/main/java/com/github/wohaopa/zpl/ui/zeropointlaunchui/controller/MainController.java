@@ -40,6 +40,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Window;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
 import com.github.wohaopa.zpl.ui.zeropointlaunchui.Main;
 import com.leewyatt.rxcontrols.animation.carousel.AnimNone;
 import com.leewyatt.rxcontrols.controls.RXCarousel;
@@ -134,6 +135,9 @@ public class MainController extends RootController {
 
 class _Current_ {
 
+    StringProperty accountName = new SimpleStringProperty();
+    StringProperty accountType = new SimpleStringProperty();
+
     ObjectProperty<ObservableList<String>> includeMod = new SimpleObjectProperty<>();
     ObjectProperty<ObservableList<String>> excludeMod = new SimpleObjectProperty<>();
     ObjectProperty<ObservableList<String>> loadedMod = new SimpleObjectProperty<>();
@@ -144,15 +148,22 @@ class _Current_ {
     StringProperty name = new SimpleStringProperty();
     StringProperty version = new SimpleStringProperty();
     StringProperty sharer = new SimpleStringProperty();
+    StringProperty launcher = new SimpleStringProperty();
 
     void changeInstance(Instance instance) {
         this.instance = instance;
         name.setValue(instance.information.name);
         version.setValue(instance.information.version);
         sharer.setValue(instance.information.sharer);
+        launcher.setValue(instance.information.launcher);
         depInstance.setValue(instance.information.depVersion);
         includeMod.setValue(FXCollections.observableList(instance.information.includeMods));
         excludeMod.setValue(FXCollections.observableList(instance.information.excludeMods));
         // includeMod.setValue(FXCollections.observableList(instance.information.includeMods));
+    }
+
+    void changeAccount(Auth auth) {
+        accountName.setValue(auth.getName());
+        accountType.setValue(auth.getUserType());
     }
 }

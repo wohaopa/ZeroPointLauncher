@@ -112,7 +112,7 @@ public class JavaVersion {
 
     @Override
     public String toString() {
-        return name + "(" + javaExe.toString() + ")";
+        return name + " (" + javaExe.toString() + ")";
     }
 
     public enum Java {
