@@ -190,10 +190,10 @@ public class FileUtil {
             return !path.equals(path.toRealPath());
         } catch (IOException e) {
             try {
-                Files.delete(file.toPath());
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+                Files.delete(path); // 无法追溯源文件
+                file.delete();
+            } catch (IOException ignored) {}
+            if (Files.exists(path)) throw new RuntimeException("无法删除文件：" + path);
             return false;
         }
     }

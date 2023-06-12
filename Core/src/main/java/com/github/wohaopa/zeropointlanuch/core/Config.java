@@ -62,10 +62,10 @@ public class Config {
         FileUtil.fileWrite(configFile, JsonUtil.toJson(config));
     }
 
-     public Config() {
-         java8Path="";
-         java17Path="";
-     }
+    public Config() {
+        java8Path = "";
+        java17Path = "";
+    }
 
     private String java8Path;
     private String java17Path;
