@@ -78,6 +78,10 @@ public abstract class MyFileBase {
 
     }
 
+    public static void diff(MyFileBase myFileBase1, MyFileBase myFileBase2) {
+        myFileBase1.diffWith(myFileBase2);
+    }
+
     public MyFileBase saveChecksumAsJson(File file) {
         FileUtil.fileWrite(file, JsonUtil.toJson(this.saveChecksum()));
         return this;
