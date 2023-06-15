@@ -141,24 +141,24 @@ public class MyDirectory extends MyFileBase {
     }
 
     @Override
-    protected Object saveChecksum() {
+    protected Object getChecksum() {
         if (getSate() == Sate.only_other) return null; // 并不在本文件系统中
         JSONObject objects = new JSONObject();
         for (MyFileBase fileBase : subs.values()) {
-            objects.putOpt(fileBase.name, fileBase.saveChecksum());
+            objects.putOpt(fileBase.name, fileBase.getChecksum());
         }
         return objects;
     }
 
     @Override
-    protected Object saveDiff(Sate... sates) {
+    protected Object getDiff(Sate... sates) {
         if (getSate() == Sate.no_define) return null; // 未进行比较的无法保存
         if (getSate() == Sate.only_other) for (Sate s : sates) if (Sate.only_other == s) return Sate.only_other.desc;
         // only_other只是在本文件系统中有标识，特殊处理
 
         JSONObject objects = new JSONObject();
         for (MyFileBase fileBase : subs.values()) {
-            objects.putOpt(fileBase.name, fileBase.saveDiff(sates));
+            objects.putOpt(fileBase.name, fileBase.getDiff(sates));
         }
         if (objects.size() > 0) return objects;
         return null;

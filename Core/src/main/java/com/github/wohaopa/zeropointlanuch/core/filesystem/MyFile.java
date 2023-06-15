@@ -64,16 +64,16 @@ public class MyFile extends MyFileBase {
     }
 
     @Override
-    protected Object saveChecksum() {
+    protected Object getChecksum() {
         if (getSate() == Sate.only_other) return null; // 并不在本文件系统中
         return checksum();
     }
 
     @Override
-    protected Object saveDiff(Sate... sates) {
+    protected Object getDiff(Sate... sates) {
         if (getSate() == Sate.no_define) return null;
         for (Sate s : sates) {
-            if (getSate() == s) return saveChecksum();
+            if (getSate() == s) return getChecksum();
         }
         return null;
     }
