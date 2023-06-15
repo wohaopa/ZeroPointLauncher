@@ -18,22 +18,25 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.filesystem;
+package filesystem;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Scanner;
 
-public class MyFileSystemDiffer {
+import com.github.wohaopa.zeropointlanuch.core.filesystem.MyFileBase;
+
+public class MyFileSystemTest {
 
     public static void main(String[] args) {
-
-        new MyFileSystemDiffer().geneDiff();
-
+        geneDiff();
     }
 
-    Map<String, File> map = new HashMap<>();
+    static Map<String, File> map = new HashMap<>();
 
-    public void geneDiff() {
+    public static void geneDiff() {
 
         File root = new File(System.getProperty("user.dir"));
         Scanner scanner = new Scanner(System.in);
@@ -85,7 +88,7 @@ public class MyFileSystemDiffer {
                 my2 = MyFileBase.getMyFileSystemByFile(file2, MyFileBase.DEFAULT_FI);
             }
             if (my1 != null && my2 != null) {
-                my1.diffWith(my2);
+                MyFileBase.diff(my1, my2);
 
                 my1.saveDiffAsJson(
                     new File(root, "no_equal.json"),

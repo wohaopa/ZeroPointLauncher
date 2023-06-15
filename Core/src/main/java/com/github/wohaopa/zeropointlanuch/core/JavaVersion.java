@@ -36,6 +36,7 @@ public class JavaVersion {
     private final static Map<File, JavaVersion> inst = new HashMap<>();
 
     static {
+        Log.start("JavaCheck");
         Log.debug("正在查找Java");
         File javaRoot = new File("C:\\Program Files\\java\\");
         if (javaRoot.exists()) {
@@ -44,6 +45,7 @@ public class JavaVersion {
             }
         }
         Log.debug("找到：{}，个有效Java", inst.size());
+        Log.end();
     }
 
     public static JavaVersion getJava(File file) {
@@ -60,6 +62,7 @@ public class JavaVersion {
     public final Java version;
 
     public JavaVersion(File javaExe) {
+
         Java version1 = null;
 
         this.javaExe = javaExe;
@@ -90,11 +93,13 @@ public class JavaVersion {
                     name = m.group(1);
                     if (name.startsWith("1.8.0_")) {
                         version1 = Java.JAVA8;
+                        Log.debug(line);
                         break;
                     }
                     String[] strs = name.split("\\.");
                     if (strs.length >= 1) {
                         version1 = Integer.parseInt(strs[0]) >= 17 ? Java.JAVA17 : Java.unknown;
+                        Log.debug(line);
                         break;
                     }
                 }
