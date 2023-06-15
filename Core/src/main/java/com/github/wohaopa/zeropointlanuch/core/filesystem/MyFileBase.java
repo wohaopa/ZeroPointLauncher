@@ -36,6 +36,7 @@ public abstract class MyFileBase {
     public static final String separator = File.separator;
 
     public static final Map<String, List<String>> DEFAULT_FI = new HashMap<>();
+
     static {
         ArrayList<String> list = new ArrayList<>();
         list.add(".asm");
@@ -82,25 +83,33 @@ public abstract class MyFileBase {
         myFileBase1.diffWith(myFileBase2);
     }
 
+    // 成员方法，void方法返回this指针，便于流式调用
     public MyFileBase saveChecksumAsJson(File file) {
-        FileUtil.fileWrite(file, JsonUtil.toJson(this.saveChecksum()));
+        FileUtil.fileWrite(file, JsonUtil.toJson(this.getChecksum()));
         return this;
     }
 
     public MyFileBase saveDiffAsJson(File file, Sate... sate) {
 
-        FileUtil.fileWrite(file, JsonUtil.toJson(this.saveDiff(sate)));
-
+        FileUtil.fileWrite(file, JsonUtil.toJson(this.getDiff(sate)));
         return this;
     }
 
-    String name;// 文件名
-    String path;// 相对路径
-    MyDirectory parent;// 父文件
-    File file;// 文件对象
+    String name; // 文件名
+    String path; // 相对路径
+    MyDirectory parent; // 父文件
+    File file; // 文件对象
 
-    private Sate sate;
+    // 映射
+    boolean shader; // 映射此文件
+    MyFileBase target; // 映射目标
+    List<MyFileBase> targets; // 目标文件系统的同级对象
 
+
+    // 差异
+    private Sate sate; // 文件状态
+
+    /** 用于差异系统的状态枚举 */
     public enum Sate {
 
         no_define("未定义"),
@@ -130,24 +139,24 @@ public abstract class MyFileBase {
 
     public abstract boolean isDirectory();
 
+    protected abstract Object getChecksum();
+
     protected abstract MyFileBase diffWith(MyFileBase other);
 
-    protected abstract Object saveChecksum();
-
-    protected abstract Object saveDiff(Sate... sates);
+    protected abstract Object getDiff(Sate... sates);
 
     protected MyFileBase setSate(Sate sate) {
         this.sate = sate;
         return this;
     }
 
+    protected Sate getSate() {
+        return sate;
+    }
+
     protected MyFileBase setFile(File file) {
         this.file = file;
         return this;
-    }
-
-    protected Sate getSate() {
-        return sate;
     }
 
     @Override
