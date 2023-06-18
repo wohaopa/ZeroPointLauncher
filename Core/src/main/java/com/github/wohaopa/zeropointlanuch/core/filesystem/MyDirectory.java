@@ -25,6 +25,7 @@ import java.util.*;
 
 import cn.hutool.json.JSONObject;
 
+import com.github.wohaopa.zeropointlanuch.core.Log;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class MyDirectory extends MyFileBase {
@@ -44,6 +45,7 @@ public class MyDirectory extends MyFileBase {
     }
 
     protected MyFileBase makeMyFileSystemInstance(File file, Map<String, List<String>> exclude) {
+        Log.debug("Search file:{} ...", file.getName());
 
         List<String> exclude0 = exclude == null ? null : exclude.get(path);
 
@@ -151,6 +153,46 @@ public class MyDirectory extends MyFileBase {
     }
 
     @Override
+    protected MyFileBase margeWith(final MyFileBase other, final MargeInfo margeInfo) {
+        MyDirectory other1 = (MyDirectory) other;
+
+        if (margeInfo.include(other1.path)) this.target = other1;
+        else if (!margeInfo.exclude(other1.path)) other1.list()
+            .forEach(s -> {
+                MyFileBase otherFileBase = other1.getSub(s);
+                if (!otherFileBase.shade) {
+                    if (contains(s)) {
+                        MyFileBase fileBase = getSub(s);
+                        if (fileBase.isDirectory() && fileBase.shade) {
+                            ((MyDirectory) fileBase).devolveShade().shade = false;
+                        }
+                        fileBase.margeWith(otherFileBase, margeInfo);
+                    } else {
+                        MyFileBase fileBase = putSub(otherFileBase.name, otherFileBase.isFile());
+                        fileBase.addTarget(otherFileBase);
+                        fileBase.shade = true;
+                    }
+                }
+            });
+
+        return this;
+    }
+
+    /**
+     * 下放映射
+     * 
+     * @return
+     */
+    private MyDirectory devolveShade() {
+        for (MyFileBase otherFileBase : ((MyDirectory) target).subs.values()) {
+            MyFileBase fileBase = putSub(otherFileBase.name, otherFileBase.isFile());
+            fileBase.addTarget(otherFileBase);
+            fileBase.shade = true;
+        }
+        return this;
+    }
+
+    @Override
     protected Object getDiff(Sate... sates) {
         if (getSate() == Sate.no_define) return null; // 未进行比较的无法保存
         if (getSate() == Sate.only_other) for (Sate s : sates) if (Sate.only_other == s) return Sate.only_other.desc;
@@ -208,6 +250,10 @@ public class MyDirectory extends MyFileBase {
 
     public MyFileBase getSub(String name) {
         return subs.get(name);
+    }
+
+    public boolean contains(String name) {
+        return subs.containsKey(name);
     }
 
 }

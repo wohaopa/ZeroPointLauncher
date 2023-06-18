@@ -70,6 +70,13 @@ public class MyFile extends MyFileBase {
     }
 
     @Override
+    protected MyFileBase margeWith(MyFileBase other, MargeInfo margeInfo) {
+        if (margeInfo.include(other.path)) this.target = other;
+        else if (!margeInfo.exclude(other.path)) addTarget(other);
+        return this;
+    }
+
+    @Override
     protected Object getDiff(Sate... sates) {
         if (getSate() == Sate.no_define) return null;
         for (Sate s : sates) {

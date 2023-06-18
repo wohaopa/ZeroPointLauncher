@@ -21,10 +21,7 @@
 package com.github.wohaopa.zeropointlanuch.core.filesystem;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import cn.hutool.json.JSONObject;
 
@@ -51,6 +48,7 @@ public abstract class MyFileBase {
     }
 
     public static MyFileBase getMyFileSystemByFile(File file, Map<String, List<String>> exclude) {
+
         if (file.isFile()) {
             return new MyFile(null, file.getName()).setFile(file);
         } else {
@@ -83,6 +81,10 @@ public abstract class MyFileBase {
         myFileBase1.diffWith(myFileBase2);
     }
 
+    public static void marge(MyFileBase myFileBase1, MyFileBase myFileBase2, MargeInfo margeInfo) {
+        myFileBase1.margeWith(myFileBase2, margeInfo);
+    }
+
     // 成员方法，void方法返回this指针，便于流式调用
     public MyFileBase saveChecksumAsJson(File file) {
         FileUtil.fileWrite(file, JsonUtil.toJson(this.getChecksum()));
@@ -101,10 +103,9 @@ public abstract class MyFileBase {
     File file; // 文件对象
 
     // 映射
-    boolean shader; // 映射此文件
+    boolean shade; // 映射此文件
     MyFileBase target; // 映射目标
-    List<MyFileBase> targets; // 目标文件系统的同级对象
-
+    private List<MyFileBase> targets; // 目标文件系统的同级对象
 
     // 差异
     private Sate sate; // 文件状态
@@ -141,6 +142,51 @@ public abstract class MyFileBase {
 
     protected abstract Object getChecksum();
 
+    public static class MargeInfo {
+
+        private final List<MyFileBase> fails;
+        private final List<String> include;
+        private final List<String> exclude;
+
+        public MargeInfo(List<String> include, List<String> exclude) {
+            this.include = include;
+            this.exclude = exclude;
+            this.fails = new ArrayList<>();
+        }
+
+        public List<String> getFails() {
+            return (List<String>) fails.stream()
+                .map(myFileBase -> myFileBase.path);
+        }
+
+        public void addFail(MyFileBase myFileBase) {
+            this.fails.add(myFileBase);
+        }
+
+        public boolean include(String path) {
+            if (include == null || include.isEmpty()) return false;
+            return include.contains(path);
+        }
+
+        public boolean exclude(String path) {
+            if (exclude == null || exclude.isEmpty()) return false;
+            return exclude.contains(path);
+        }
+
+    }
+
+    // 映射
+    protected abstract MyFileBase margeWith(MyFileBase other, MargeInfo margeInfo);
+
+    protected MyFileBase addTarget(MyFileBase target) {
+        if (this.target == null) this.target = target;
+        if (this.targets == null) this.targets = new LinkedList<>();
+        targets.add(target);
+
+        return this;
+    }
+
+    // 差异
     protected abstract MyFileBase diffWith(MyFileBase other);
 
     protected abstract Object getDiff(Sate... sates);
@@ -161,6 +207,6 @@ public abstract class MyFileBase {
 
     @Override
     public String toString() {
-        return path + "(" + sate.desc + ")";
+        return path + "(" + sate.desc + (shade ? "，映射" : "") + ")";
     }
 }
