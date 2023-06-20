@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.github.wohaopa'
-version '0.0.2'
+version '0.1.0'
 
 repositories {
     mavenCentral()
@@ -18,7 +18,7 @@ dependencies {
 
 //    implementation 'dev.3-3:jmccc:3.1.4'
 //    implementation 'dev.3-3:jmccc-mcdownloader:3.1.4'
-    implementation 'dev.3-3:jmccc-microsoft-authenticator:3.1.4'
+//    implementation 'dev.3-3:jmccc-microsoft-authenticator:3.1.4'
 
     implementation 'org.apache.commons:commons-compress:1.21'
     implementation 'org.tukaani:xz:1.9'
