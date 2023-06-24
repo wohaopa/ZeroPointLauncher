@@ -23,6 +23,7 @@ package com.github.wohaopa.zeropointlanuch.core;
 import java.io.*;
 import java.util.*;
 
+import com.github.wohaopa.zeropointlanuch.core.filesystem.MyDirectory;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
@@ -30,8 +31,89 @@ public class Instance {
 
     private static final Map<String, Instance> instances = new HashMap<>();
 
-    public static Instance newInstance() {
-        return new Instance();
+    public static class Builder {
+
+        Information information;
+        MyDirectory myImage;
+        File versionFile;
+
+        public Builder(String name) {
+            information = new Information();
+            information.name = name;
+        }
+
+        public Builder(File versionFile) {
+            this.versionFile = versionFile;
+            information = Information.formJson(versionFile);
+        }
+
+        public Builder setVersionFile(File versionFile) {
+            this.versionFile = versionFile;
+            return this;
+        }
+
+        public Builder setMyImage(MyDirectory myImage) {
+            this.myImage = myImage;
+            return this;
+        }
+
+        public Builder setName(String name) {
+            information.name = name;
+            return this;
+        }
+
+        public Builder setVersion(String version) {
+            information.version = version;
+            return this;
+        }
+
+        public Builder setDepVersion(String depVersion) {
+            information.depVersion = depVersion;
+            return this;
+        }
+
+        public Builder setSharer(String sharer) {
+            information.sharer = sharer;
+            return this;
+        }
+
+        public Builder setLauncher(String launcher) {
+            information.launcher = launcher;
+            return this;
+        }
+
+        public Builder setUpdate(boolean update) {
+            information.update = update;
+            return this;
+        }
+
+        public Builder setIncludeMods(List<String> includeMods) {
+            information.includeMods = includeMods;
+            return this;
+        }
+
+        public Builder setExcludeMods(List<String> excludeMods) {
+            information.excludeMods = excludeMods;
+            return this;
+        }
+
+        public Builder setChecksum(String checksum) {
+            information.checksum = checksum;
+            return this;
+        }
+
+        public Builder saveConfig() {
+            Information.toJson(information, versionFile);
+            return this;
+        }
+
+        public Instance build() {
+            if (instances.containsKey(information.name)) return null;
+            Instance instance = new Instance(versionFile, information);
+            instance.myImage = myImage;
+            instances.put(information.name, instance);
+            return instance;
+        }
     }
 
     /**
@@ -42,16 +124,6 @@ public class Instance {
      */
     public static Instance get(String name) {
         return instances.get(name);
-    }
-
-    /**
-     * 安装与加载实例的时候使用，用于注册实例
-     *
-     * @param name     名
-     * @param instance 实例
-     */
-    public static void put(String name, Instance instance) {
-        instances.put(name, instance);
     }
 
     public static void clear() {
@@ -75,53 +147,30 @@ public class Instance {
     public File imageDir; // 镜像文件夹
 
     public File runDir;// 运行文件夹
+    public MyDirectory myImage;//
 
     public Information information;// 实例信息，名称版本都在这
 
-    private Mapper mapper; // 映射器，（private主要用于lazy初始化、mapper初始化会产生大量操作，单启动并不需要mapper）
+    private Instance(File versionFile, Information information) {
+        assert (versionFile != null);
 
-    private Instance() {}
+        this.versionFile = versionFile;
+        this.insDir = versionFile.getParentFile();
+        this.imageDir = FileUtil.initAndMkDir(insDir, "image");
+        this.runDir = FileUtil.initAndMkDir(insDir, ".minecraft");
+        this.information = information;
+        assert (information.name != null);
+        assert (information.version != null);
+        assert (information.depVersion != null);
+    }
 
-    /** 加载实例信息，仅在初始化阶段使用本方法来加载持久化的实例 */
-    public Information loadInformation() {
-        Log.debug("正在加载：{}", versionFile);
-        return Information.formJson(versionFile);
+    public void loadInformation() {
+        this.information = Information.formJson(versionFile);
     }
 
     /** 保存实例信息 */
     public void savaInformation() {
-        Log.debug("正在保存：{}", versionFile);
         Information.toJson(information, versionFile);
-    }
-
-    private Mapper getMapper() {
-        if (mapper == null) {
-            mapper = new Mapper(this);
-        }
-        return mapper;
-    }
-
-    public void delSymlink() {
-        for (File file : Objects.requireNonNull(this.runDir.listFiles())) {
-            if (!FileUtil.isSymLink(file) && file.isDirectory()) {
-                for (File file1 : Objects.requireNonNull(file.listFiles()))
-                    if (FileUtil.isSymLink(file1)) FileUtil.delete(file1);
-            } else if (FileUtil.isSymLink(file)) {
-                FileUtil.delete(file);
-            }
-        }
-    }
-
-    /** 生成实例的运行目录（.minecraft） 可被其他启动器直接启动 */
-    public void genRuntimeDir() {
-
-        this.delSymlink(); // 删除目录中的系统链接文件
-
-        ModMaster.refreshMods(getMapper().getLoadedMod());
-
-        this.getMapper()
-            .makeSymlink();
-
     }
 
     @Override
@@ -129,19 +178,17 @@ public class Instance {
         return information.name + "(" + information.version + ")";
     }
 
-    public void refreshMapper() {
-        getMapper().refresh(null);
-    }
-
     @SuppressWarnings("unused")
     public static class Information {
 
         public static Information formJson(File file) {
+            Log.debug("正在加载：{}", file);
             return JsonUtil.fromJson(file)
                 .toBean(Information.class);
         }
 
         public static void toJson(Information information, File file) {
+            Log.debug("正在保存：{}", file);
             FileUtil.fileWrite(file, JsonUtil.toJson(information));
         }
 
@@ -150,40 +197,81 @@ public class Instance {
         public String depVersion;
         public String sharer;
         public String launcher;
+        public boolean update;
         public List<String> includeMods;
         public List<String> excludeMods;
-        public Map<String, Long> checksum;
-
-        public String getDepVersion() {
-            return depVersion;
-        }
+        public String checksum;
 
         public String getName() {
             return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
 
         public String getVersion() {
             return version;
         }
 
-        public List<String> getIncludeMods() {
-            return includeMods;
+        public void setVersion(String version) {
+            this.version = version;
         }
 
-        public List<String> getExcludeMods() {
-            return excludeMods;
+        public String getDepVersion() {
+            return depVersion;
+        }
+
+        public void setDepVersion(String depVersion) {
+            this.depVersion = depVersion;
         }
 
         public String getSharer() {
             return sharer;
         }
 
+        public void setSharer(String sharer) {
+            this.sharer = sharer;
+        }
+
         public String getLauncher() {
             return launcher;
         }
 
-        public Map<String, Long> getChecksum() {
+        public void setLauncher(String launcher) {
+            this.launcher = launcher;
+        }
+
+        public boolean isUpdate() {
+            return update;
+        }
+
+        public void setUpdate(boolean update) {
+            this.update = update;
+        }
+
+        public List<String> getIncludeMods() {
+            return includeMods;
+        }
+
+        public void setIncludeMods(List<String> includeMods) {
+            this.includeMods = includeMods;
+        }
+
+        public List<String> getExcludeMods() {
+            return excludeMods;
+        }
+
+        public void setExcludeMods(List<String> excludeMods) {
+            this.excludeMods = excludeMods;
+        }
+
+        public String getChecksum() {
             return checksum;
+        }
+
+        public void setChecksum(String checksum) {
+            this.checksum = checksum;
         }
     }
 }

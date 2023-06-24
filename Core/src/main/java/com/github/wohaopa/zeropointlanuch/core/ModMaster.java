@@ -27,7 +27,6 @@ import java.util.concurrent.ExecutionException;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 
-import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
 import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
@@ -102,7 +101,24 @@ public class ModMaster {
         return new File(ZplDirectory.getModsDirectory(), modFullName);
     }
 
-    private static final String BASE_MOD_URL = DownloadProvider.getProvider()
-        .getModsBaseUrl();
+    private static final String BASE_MOD_URL = null;
 
+    public static List<String> coverModsList(File modsDir) {
+        List<String> mods = new ArrayList<>();
+        if (!modsDir.exists()) return mods;
+        for (File mod : Objects.requireNonNull(modsDir.listFiles())) {
+            if (mod.isFile() && !mod.getName()
+                .startsWith("MrTJPCore")) {
+                String modFileName = mod.getName();
+                String modRepo = ModMaster.getModRepo(modFileName);
+                String path = modRepo + "\\" + modFileName;
+                mods.add(path);
+                if (!FileUtil.moveFile(mod, new File(ZplDirectory.getModsDirectory(), path))) {
+                    Log.info("已在mod库中发现：{} 即将删除临时文件", modFileName);
+                    if (!mod.delete()) Log.warn("文件：{} 删除失败，可能被占用，请手动删除", mod.getPath());
+                }
+            }
+        }
+        return mods;
+    }
 }

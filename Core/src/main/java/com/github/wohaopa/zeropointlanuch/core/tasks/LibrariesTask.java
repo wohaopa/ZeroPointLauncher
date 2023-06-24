@@ -18,98 +18,91 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core;
+package com.github.wohaopa.zeropointlanuch.core.tasks;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 
+import com.github.wohaopa.zeropointlanuch.core.Log;
 import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
-import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
-import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
-import com.github.wohaopa.zeropointlanuch.core.utils.ZipUtil;
 
-public class Libraries {
+public class LibrariesTask extends Task<Boolean> {
 
-    String classpath;
-    private boolean verified;
+    private boolean verified = false;
 
-    public void verifyLibraries(File librariesDir, JSONArray librariesObj, File natives)
-        throws ExecutionException, InterruptedException {
+    private String classpath;
+    private final File librariesDir;
+    private final JSONArray librariesObj;
+    private final File natives;
+    private final String versionString;
 
-        if (verified) return;
+    public LibrariesTask(File librariesDir, JSONArray librariesObj, File natives, String versionString,
+        Consumer<String> callback) {
+        super(callback);
+        this.librariesDir = librariesDir;
+        this.librariesObj = librariesObj;
+        this.natives = natives;
+        this.versionString = versionString;
+    }
+
+    @Override
+    public Boolean call() throws Exception {
+
+        synchronized (this) {
+            if (verified) return true;
+            verifyLibraries();
+        }
+
+        return true;
+    }
+
+    private void verifyLibraries() throws ExecutionException, InterruptedException {
 
         Log.start("Libraries校验");
         List<_LibraryBase> libraries = new ArrayList<>();
 
         for (JSONObject lib : librariesObj.jsonIter()) libraries.add(new _LibraryBase(lib));
 
-        List<File> libFiles = new ArrayList<>();
-        List<_LibraryBase> failLib = new ArrayList<>();
-        List<_LibraryBase> failNativeLib = new ArrayList<>();
-
-        for (_LibraryBase lib : libraries) {
-            if (lib.enable) {
-
-                Log.debug("正在校验：{},相对路径：{}", lib.name, lib.path);
-
-                File file = new File(librariesDir, lib.path);
-                if (!FileUtil.checkSha1OfFile(file, lib.sha1)) {
-                    file.delete();
-                    failLib.add(lib);
-                }
-
-                if (lib.natives) {
-                    if (file.exists()) {
-                        Log.debug("解压natives:{}", lib.name);
-                        ZipUtil.unCompress(file, natives);
-                        if (lib.extract) lib.exclude.forEach(s -> new File(natives, s).delete());
-                    } else failNativeLib.add(lib);
-
-                } else libFiles.add(file);
+        List<Future<File>> futures = new ArrayList<>();
+        List<Future<File>> futuresNative = new ArrayList<>();
+        for (_LibraryBase libraryBase : libraries) {
+            if (libraryBase.enable) {
+                Log.debug("正在校验：{},相对路径：{}", libraryBase.name, libraryBase.path);
+                File file = new File(librariesDir, libraryBase.path);
+                DownloadProvider.addUrlToMap(libraryBase.url, file);
+                Future<File> future = Scheduler.submitTasks(new CheckoutTask(file, libraryBase.sha1, callback));
+                if (libraryBase.natives) futuresNative.add(future);
+                else futures.add(future);
 
             }
         }
 
-        if (failLib.size() != 0) {
-            Log.debug("缺失{}个文件", failLib.size());
-            File tmpDir = ZplDirectory.getTmpDirectory();
-
-            List<String> downloads = new ArrayList<>();
-            for (_LibraryBase lib : failLib) {
-                String name = lib.getFileName();
-                if (!FileUtil.checkSha1OfFile(new File(tmpDir, name), name)) {
-                    Log.debug("正在将{}文件加入下载队列", name);
-                    downloads.add(
-                        DownloadProvider.getProvider()
-                            .getLibrariesUrl(lib.url));
-                }
-            }
-
-            DownloadUtil.submitDownloadTasks(downloads, tmpDir);
-            Log.debug("正在补全缺失的{}个文件", downloads.size());
-            DownloadUtil.takeDownloadResult();
-
-            for (_LibraryBase lib : failLib) {
-                FileUtil.moveFile(new File(tmpDir, lib.getFileName()), new File(librariesDir, lib.path), true);
-            }
-
-            for (_LibraryBase lib : failNativeLib) {
-                Log.debug("解压natives:{}", lib.name);
-                ZipUtil.unCompress(new File(librariesDir, lib.path), natives);
-                if (lib.extract) lib.exclude.forEach(s -> FileUtil.delete(new File(natives, s)));
-            }
+        for (Future<File> file : futuresNative) {
+            Log.debug(
+                "解压本地库:{}",
+                file.get()
+                    .getName());
+            Scheduler.submitTasks(new DecompressTask(file.get(), natives, callback));
         }
-
         StringBuilder sb = new StringBuilder();
         String s = ";";
-        libFiles.forEach(
-            file -> sb.append(file.toString())
-                .append(s));
+        for (Future<File> file : futures) {
+            Log.debug(
+                "校验完成:{}",
+                file.get()
+                    .getName());
+            sb.append(file.get())
+                .append(s);
+
+        }
+
         classpath = sb.toString();
         verified = true;
         Log.debug("校验完成！");
@@ -117,25 +110,10 @@ public class Libraries {
 
     }
 
-    private static String transition(String name) {
-        String[] tmp = name.split(":");
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(tmp[0].replace(".", "/"));
-        sb.append('/');
-        sb.append(tmp[1]);
-        sb.append('/');
-        sb.append(tmp[2]);
-        sb.append('/');
-        sb.append(tmp[1]);
-        sb.append('-');
-        sb.append(tmp[2]);
-        if (tmp.length == 4) {
-            sb.append('-');
-            sb.append(tmp[3]);
-        }
-        sb.append(".jar");
-        return sb.toString();
+    public String getClasspath() {
+        if (verified) return classpath;
+        Log.error("未初始化：{}", versionString);
+        throw new RuntimeException("未初始化！请先执行Task");
     }
 
     private static class _LibraryBase {

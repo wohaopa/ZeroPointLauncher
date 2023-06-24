@@ -18,26 +18,30 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.utils;
+package com.github.wohaopa.zeropointlanuch.core.tasks;
 
-import java.io.File;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.extra.compress.CompressUtil;
-import cn.hutool.extra.compress.extractor.Extractor;
+public class Task<V> implements Callable<V> {
 
-/** 解压zip文件 */
-public final class ZipUtil {
+    protected final Consumer<String> callback;
 
-    /**
-     * 解压用
-     *
-     * @param zip      压缩包文件夹
-     * @param savePath 解压路径
-     */
-    public static void decompress(File zip, File savePath) {
+    public Task(Consumer<String> callback) {
+        this.callback = callback;
+    }
 
-        Extractor extractor = CompressUtil.createExtractor(CharsetUtil.CHARSET_UTF_8, zip);
-        extractor.extract(savePath);
+    @Override
+    public V call() throws Exception {
+        accept("空任务");
+        return null;
+    }
+
+    protected boolean havaCallback() {
+        return callback != null;
+    }
+
+    protected void accept(String msg) {
+        if (callback != null) callback.accept(msg);
     }
 }

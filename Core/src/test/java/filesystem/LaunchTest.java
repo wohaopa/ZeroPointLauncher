@@ -18,26 +18,22 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.utils;
+package filesystem;
 
 import java.io.File;
 
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.extra.compress.CompressUtil;
-import cn.hutool.extra.compress.extractor.Extractor;
+import com.github.wohaopa.zeropointlanuch.core.Launch;
+import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
+import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
 
-/** 解压zip文件 */
-public final class ZipUtil {
+public class LaunchTest {
 
-    /**
-     * 解压用
-     *
-     * @param zip      压缩包文件夹
-     * @param savePath 解压路径
-     */
-    public static void decompress(File zip, File savePath) {
-
-        Extractor extractor = CompressUtil.createExtractor(CharsetUtil.CHARSET_UTF_8, zip);
-        extractor.extract(savePath);
+    public static void main(String[] args) {
+        ZplDirectory.init(new File("D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"));
+        Launch.getLauncher("ZPL-Java8")
+            .launch(
+                new OfflineAuth("wohaopa"),
+                new File(
+                    "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\instances\\GTNH-2.3.3-zpl\\.minecraft"));
     }
 }

@@ -18,26 +18,38 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.utils;
+package com.github.wohaopa.zeropointlanuch.core.tasks;
 
 import java.io.File;
+import java.util.function.Consumer;
 
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.extra.compress.CompressUtil;
-import cn.hutool.extra.compress.extractor.Extractor;
+import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
+import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
-/** 解压zip文件 */
-public final class ZipUtil {
+public class CheckoutTask extends DownloadTask {
 
-    /**
-     * 解压用
-     *
-     * @param zip      压缩包文件夹
-     * @param savePath 解压路径
-     */
-    public static void decompress(File zip, File savePath) {
+    String sha1;
 
-        Extractor extractor = CompressUtil.createExtractor(CharsetUtil.CHARSET_UTF_8, zip);
-        extractor.extract(savePath);
+    public CheckoutTask(File file, String sha1, Consumer<String> callback) {
+        super(null, file, callback);
+        this.sha1 = sha1;
+    }
+
+    @Override
+    public File call() throws Exception {
+        if (!FileUtil.checkSha1OfFile(file, sha1)) {
+            if (file.exists() && !file.delete()) {
+                accept("无法删除文件：" + file);
+                Log.error("无法删除文件：{}", file);
+            }
+            Log.error("检验失败，正准备下载文件：{}", file);
+            accept("检验失败，正准备下载文件：" + file);
+            url = DownloadProvider.getUrlForFile(file);
+            return super.call();
+        }
+        Log.debug("检验成功！{}", file);
+        accept("检验成功！ " + file);
+        return file;
     }
 }

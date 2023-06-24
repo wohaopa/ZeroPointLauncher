@@ -18,35 +18,28 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.download;
+package com.github.wohaopa.zeropointlanuch.core.tasks;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.util.function.Consumer;
 
-public class ZPLDownloadProvider extends DownloadProvider {
+import com.github.wohaopa.zeropointlanuch.core.utils.ZipUtil;
 
-    List<String> librariesUrlList = new ArrayList<>();
+public class DecompressTask extends Task<File> {
 
-    public ZPLDownloadProvider() {
-        String baseUrl = "http://127.0.0.1/";
-        this.assetsBase = baseUrl;
-        this.assetsIndexJson = baseUrl + "1.7.10.json";
-        this.librariesBase = baseUrl;
-        this.modsBase = baseUrl;
+    private File file;
+    private File targetDir;
 
-        librariesUrlList.add("https://maven.minecraftforge.net/");
-        librariesUrlList.add("http://jenkins.usrv.eu:8081/nexus/content/groups/public/");
-        librariesUrlList.add("https://build.lwjgl.org/");
-        librariesUrlList.add("https://libraries.minecraft.net/");
-        librariesUrlList.add("https://files.prismlauncher.org/maven/");
-        librariesUrlList.add("https://launcher.mojang.com/");
+    public DecompressTask(File file, File targetDir, Consumer<String> callback) {
+        super(callback);
+        this.file = file;
+        this.targetDir = targetDir;
     }
 
     @Override
-    public String getLibrariesUrl(String url) {
-        for (String s : librariesUrlList) if (url.startsWith(s)) return url.replace(s, librariesBase);
+    public File call() throws Exception {
+        ZipUtil.decompress(file, targetDir);
 
-        return url;
+        return targetDir;
     }
-
 }

@@ -18,26 +18,25 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.utils;
+package filesystem;
 
 import java.io.File;
 
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.extra.compress.CompressUtil;
-import cn.hutool.extra.compress.extractor.Extractor;
+import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
+import com.github.wohaopa.zeropointlanuch.core.tasks.instances.StandardInstallTask;
 
-/** 解压zip文件 */
-public final class ZipUtil {
+public class InstallTaskTest {
 
-    /**
-     * 解压用
-     *
-     * @param zip      压缩包文件夹
-     * @param savePath 解压路径
-     */
-    public static void decompress(File zip, File savePath) {
+    public static void main(String[] args) throws Exception {
+        ZplDirectory.init(new File("D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"));
 
-        Extractor extractor = CompressUtil.createExtractor(CharsetUtil.CHARSET_UTF_8, zip);
-        extractor.extract(savePath);
+        File zip = new File(
+            "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\zip\\GT_New_Horizons_2.3.3_Client.zip");
+        File instDir = new File(
+            "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\instances\\2.3.2-Test");
+        String name = "2.3.2-Test";
+        String version = "2.3.2";
+
+        new StandardInstallTask(zip, instDir, name, version, null).call();
     }
 }
