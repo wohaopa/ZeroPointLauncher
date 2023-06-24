@@ -20,6 +20,9 @@
 
 package com.github.wohaopa.zeropointlanuch.core.filesystem;
 
+import java.io.File;
+import java.util.List;
+
 import cn.hutool.core.io.FileUtil;
 
 import com.github.wohaopa.zeropointlanuch.core.Log;
@@ -67,6 +70,14 @@ public class MyFile extends MyFileBase {
     protected Object getChecksum() {
         if (getSate() == Sate.only_other) return null; // 并不在本文件系统中
         return checksum();
+    }
+
+    @Override
+    protected void getMargeFileList(List<File> list) {
+        if (shade) {
+            if (target.file != null) list.add(target.file);
+            else throw new RuntimeException("映射文件为空！");
+        }
     }
 
     @Override

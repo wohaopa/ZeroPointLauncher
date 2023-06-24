@@ -97,6 +97,12 @@ public abstract class MyFileBase {
         return this;
     }
 
+    public List<File> getMargeFileList() {
+        List<File> files = new LinkedList<>();
+        getMargeFileList(files);
+        return files;
+    }
+
     String name; // 文件名
     String path; // 相对路径
     MyDirectory parent; // 父文件
@@ -141,6 +147,8 @@ public abstract class MyFileBase {
     public abstract boolean isDirectory();
 
     protected abstract Object getChecksum();
+
+    protected abstract void getMargeFileList(List<File> list);
 
     public static class MargeInfo {
 
