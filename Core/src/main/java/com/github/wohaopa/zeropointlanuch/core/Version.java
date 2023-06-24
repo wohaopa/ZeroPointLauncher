@@ -23,19 +23,20 @@ package com.github.wohaopa.zeropointlanuch.core;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import cn.hutool.json.JSONObject;
 
-import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
-import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
+import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
+import com.github.wohaopa.zeropointlanuch.core.tasks.AssetsTask;
+import com.github.wohaopa.zeropointlanuch.core.tasks.CheckoutTask;
+import com.github.wohaopa.zeropointlanuch.core.tasks.LibrariesTask;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
 public class Version {
 
     public final String name;
-    private Assets assets;
-    private final Libraries libraries;
+    private AssetsTask assetsTask;
+    private LibrariesTask libraries;
     private final JSONObject versionJsonObj;
 
     File versionJar;
@@ -47,42 +48,34 @@ public class Version {
         this.name = name;
         versionJsonObj = ((JSONObject) JsonUtil.fromJson(versionJsonFile));
         natives = new File(ZplDirectory.getNativesRootDirectory(), name);
-        libraries = new Libraries();
-
     }
 
-    public void verifyVersion() throws ExecutionException, InterruptedException {
+    public void verifyVersion() throws Exception {
 
         if (verified) return;
 
         Log.start("校验" + name);
         Log.debug("正在校验版本：{}", name);
 
-        {
-            JSONObject downloadsObj = versionJsonObj.getByPath("downloads.client", JSONObject.class);
+        JSONObject downloadsObj = versionJsonObj.getByPath("downloads.client", JSONObject.class);
 
-            String url = downloadsObj.getStr("url");
-            String sha1 = downloadsObj.getStr("sha1");
-            String path = "net/minecraft/client/1.7.10/client-1.7.10.jar";
+        String url = downloadsObj.getStr("url");
+        String sha1 = downloadsObj.getStr("sha1");
+        String path = "net/minecraft/client/1.7.10/client-1.7.10.jar";
 
-            versionJar = new File(ZplDirectory.getLibrariesDirectory(), path);
+        versionJar = new File(ZplDirectory.getLibrariesDirectory(), path);
+        DownloadProvider.addUrlToMap(url, versionJar);
+        new CheckoutTask(versionJar, sha1, null).call();
 
-            if (!FileUtil.checkSha1OfFile(versionJar, sha1)) {
-                versionJar.delete();
-                File file = new File(ZplDirectory.getTmpDirectory(), "client.jar");
-                if (!FileUtil.checkSha1OfFile(file, sha1)) {
-                    DownloadUtil.submitDownloadTasks(url, ZplDirectory.getTmpDirectory());
-                }
-                DownloadUtil.takeDownloadResult();
-                FileUtil.moveFile(file, versionJar);
-            }
-
-        }
-
-        Assets.verifyAssets(ZplDirectory.getAssetsDirectory(), versionJsonObj.getStr("assets"));
-
-        libraries
-            .verifyLibraries(ZplDirectory.getLibrariesDirectory(), versionJsonObj.getJSONArray("libraries"), natives);
+        assetsTask = new AssetsTask(ZplDirectory.getAssetsDirectory(), getAssetsIndexName(), null);
+        assetsTask.call();
+        libraries = new LibrariesTask(
+            ZplDirectory.getLibrariesDirectory(),
+            versionJsonObj.getJSONArray("libraries"),
+            natives,
+            getAssetsIndexName(),
+            null);
+        libraries.call();
 
         verified = true;
         Log.end();
@@ -93,7 +86,7 @@ public class Version {
     }
 
     private String getAssetsIndexName() {
-        return "1.7.10";
+        return versionJsonObj.getStr("assets");
     }
 
     private String getVersionName() {
@@ -101,7 +94,7 @@ public class Version {
     }
 
     private String getClasspath() {
-        return libraries.classpath + versionJar.toString();
+        return libraries.getClasspath() + versionJar.toString();
     }
 
     public List<String> getJvmArguments() {

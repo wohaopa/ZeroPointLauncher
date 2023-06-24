@@ -111,6 +111,8 @@ public class Launch {
             Log.warn("文件校验失败。原因：{}", e);
             Log.end();
             return;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         String[] commandLine = getLaunchArguments(auth, runDir);

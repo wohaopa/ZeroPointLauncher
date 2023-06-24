@@ -18,26 +18,25 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.utils;
+package com.github.wohaopa.zeropointlanuch.core.tasks;
 
-import java.io.File;
+import java.util.concurrent.*;
 
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.extra.compress.CompressUtil;
-import cn.hutool.extra.compress.extractor.Extractor;
+public class Scheduler {
 
-/** 解压zip文件 */
-public final class ZipUtil {
+    private static int tasksCount = 0;
 
-    /**
-     * 解压用
-     *
-     * @param zip      压缩包文件夹
-     * @param savePath 解压路径
-     */
-    public static void decompress(File zip, File savePath) {
+    private static final ExecutorService executorService = new ThreadPoolExecutor(
+        5,
+        5,
+        0L,
+        TimeUnit.MILLISECONDS,
+        new LinkedBlockingQueue<>(),
+        new ThreadPoolExecutor.AbortPolicy());
 
-        Extractor extractor = CompressUtil.createExtractor(CharsetUtil.CHARSET_UTF_8, zip);
-        extractor.extract(savePath);
+    public static <T> Future<T> submitTasks(Task<T> task) {
+        tasksCount++;
+        return executorService.submit(task);
     }
+
 }

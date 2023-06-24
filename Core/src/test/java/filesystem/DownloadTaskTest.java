@@ -18,26 +18,20 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.utils;
+package filesystem;
 
 import java.io.File;
 
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.extra.compress.CompressUtil;
-import cn.hutool.extra.compress.extractor.Extractor;
+import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.tasks.DownloadTask;
 
-/** 解压zip文件 */
-public final class ZipUtil {
+public class DownloadTaskTest {
 
-    /**
-     * 解压用
-     *
-     * @param zip      压缩包文件夹
-     * @param savePath 解压路径
-     */
-    public static void decompress(File zip, File savePath) {
-
-        Extractor extractor = CompressUtil.createExtractor(CharsetUtil.CHARSET_UTF_8, zip);
-        extractor.extract(savePath);
+    public static void main(String[] args) throws Exception {
+        File file = new File(
+            "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\GT_New_Horizons_2.3.4_Client.zip");
+        String url = "http://downloads.gtnewhorizons.com/ClientPacks/GT_New_Horizons_2.3.4_Client.zip";
+        DownloadTask downloadTask = new DownloadTask(url, file, Log::info);
+        downloadTask.call();
     }
 }
