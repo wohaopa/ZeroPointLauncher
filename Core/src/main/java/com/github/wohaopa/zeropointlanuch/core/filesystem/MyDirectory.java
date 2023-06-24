@@ -153,6 +153,15 @@ public class MyDirectory extends MyFileBase {
     }
 
     @Override
+    protected void getMargeFileList(List<File> list) {
+        if (shade) {
+            if (target.file != null) list.add(target.file);
+            else throw new RuntimeException("映射文件为空！");
+        } else subs.values()
+            .forEach(myFileBase -> myFileBase.getMargeFileList(list));
+    }
+
+    @Override
     protected MyFileBase margeWith(final MyFileBase other, final MargeInfo margeInfo) {
         MyDirectory other1 = (MyDirectory) other;
 
