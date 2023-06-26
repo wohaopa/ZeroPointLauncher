@@ -34,9 +34,9 @@ import javafx.stage.Stage;
 
 import com.github.wohaopa.zeropointlanuch.api.Core;
 import com.github.wohaopa.zeropointlanuch.core.Instance;
-import com.github.wohaopa.zeropointlanuch.core.Launch;
 import com.github.wohaopa.zeropointlanuch.core.Sharer;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
+import com.github.wohaopa.zeropointlanuch.core.launch.Launch;
 import com.github.wohaopa.zpl.ui.zeropointlaunchui.Main;
 import com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.dialog.ModDialog;
 import com.leewyatt.rxcontrols.controls.RXTextField;
