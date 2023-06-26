@@ -35,7 +35,7 @@ public class MyFile extends MyFileBase {
         super(parent, name);
     }
 
-    public long checksum() {
+    private long checksum() {
         if (CRC32 == 0) {
             if (file == null) {
                 Log.warn("文件：{}为空", path);
@@ -84,6 +84,19 @@ public class MyFile extends MyFileBase {
     protected MyFileBase margeWith(MyFileBase other, MargeInfo margeInfo) {
         if (margeInfo.include(other.path)) this.target = other;
         else if (!margeInfo.exclude(other.path)) addTarget(other);
+        return this;
+    }
+
+    @Override
+    protected MyFileBase update(File rootDir, long time) {
+        if (file == null) {
+            file = new File(rootDir, path);
+        }
+        if (file.lastModified() >= time) {
+            long t = CRC32;
+            CRC32 = FileUtil.checksumCRC32(file);
+            Log.debug("文件变更：{} -> {}", t, CRC32);
+        }
         return this;
     }
 
