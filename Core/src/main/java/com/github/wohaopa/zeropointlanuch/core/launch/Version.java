@@ -18,7 +18,7 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core;
+package com.github.wohaopa.zeropointlanuch.core.launch;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,6 +26,8 @@ import java.util.List;
 
 import cn.hutool.json.JSONObject;
 
+import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
 import com.github.wohaopa.zeropointlanuch.core.tasks.AssetsTask;
 import com.github.wohaopa.zeropointlanuch.core.tasks.CheckoutTask;
@@ -34,29 +36,30 @@ import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
 public class Version {
 
-    public final String name;
+    protected final String name;
     private AssetsTask assetsTask;
     private LibrariesTask libraries;
-    private final JSONObject versionJsonObj;
-
-    File versionJar;
-    File natives;
+    private JSONObject versionJsonObj;
+    private final File versionJsonFile;
+    private File versionJar;
+    private final File natives;
 
     private boolean verified;
 
-    public Version(String name, File versionJsonFile) {
+    protected Version(String name, File versionJsonFile) {
         this.name = name;
-        versionJsonObj = ((JSONObject) JsonUtil.fromJson(versionJsonFile));
-        natives = new File(ZplDirectory.getNativesRootDirectory(), name);
+        this.versionJsonFile = versionJsonFile;
+        this.natives = new File(ZplDirectory.getNativesRootDirectory(), name);
     }
 
-    public void verifyVersion() throws Exception {
+    protected void verifyVersion() throws Exception {
 
         if (verified) return;
 
         Log.start("校验" + name);
         Log.debug("正在校验版本：{}", name);
 
+        versionJsonObj = ((JSONObject) JsonUtil.fromJson(versionJsonFile));
         JSONObject downloadsObj = versionJsonObj.getByPath("downloads.client", JSONObject.class);
 
         String url = downloadsObj.getStr("url");
@@ -81,23 +84,14 @@ public class Version {
         Log.end();
     }
 
-    public String getMainClass() {
+    protected String getMainClass() {
+        if (verified) throw new RuntimeException("未完成版本校验");
         return versionJsonObj.getStr("mainClass");
     }
 
-    private String getAssetsIndexName() {
-        return versionJsonObj.getStr("assets");
-    }
+    protected List<String> getJvmArguments() {
+        if (verified) throw new RuntimeException("未完成版本校验");
 
-    private String getVersionName() {
-        return name;
-    }
-
-    private String getClasspath() {
-        return libraries.getClasspath() + versionJar.toString();
-    }
-
-    public List<String> getJvmArguments() {
         List<String> args = new ArrayList<>();
         args.add("-Dlog4j2.formatMsgNoLookups=true");
 
@@ -124,7 +118,8 @@ public class Version {
 
     }
 
-    public List<String> getGameArguments() {
+    protected List<String> getGameArguments() {
+        if (verified) throw new RuntimeException("未完成版本校验");
 
         List<String> args = new ArrayList<>();
 
@@ -158,4 +153,17 @@ public class Version {
         }
         return args;
     }
+
+    private String getAssetsIndexName() {
+        return versionJsonObj.getStr("assets");
+    }
+
+    private String getVersionName() {
+        return name;
+    }
+
+    private String getClasspath() {
+        return libraries.getClasspath() + versionJar.toString();
+    }
+
 }

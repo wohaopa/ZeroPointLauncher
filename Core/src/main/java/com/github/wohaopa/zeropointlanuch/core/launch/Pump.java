@@ -18,22 +18,41 @@
  * SOFTWARE.
  */
 
-package filesystem;
+package com.github.wohaopa.zeropointlanuch.core.launch;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.function.Consumer;
 
-import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
-import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
-import com.github.wohaopa.zeropointlanuch.core.launch.Launch;
+public class Pump implements Runnable {
 
-public class LaunchTest {
+    private final InputStream in;
+    private final Consumer<String> callback;
 
-    public static void main(String[] args) {
-        ZplDirectory.init(new File("D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"));
-        Launch.getLauncher("ZPL-Java8")
-            .launch(
-                new OfflineAuth("wohaopa"),
-                new File(
-                    "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\instances\\GTNH-2.3.3-zpl\\.minecraft"));
+    public Pump(InputStream in, Consumer<String> callback) {
+        this.in = in;
+        this.callback = callback;
+    }
+
+    @Override
+    public void run() {
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, Charset.defaultCharset()))) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (Thread.currentThread()
+                    .isInterrupted()) {
+                    Thread.currentThread()
+                        .interrupt();
+                    break;
+                }
+
+                callback.accept(line);
+            }
+        } catch (IOException ignored) {
+
+        }
     }
 }

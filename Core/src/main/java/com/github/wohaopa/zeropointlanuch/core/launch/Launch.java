@@ -18,20 +18,20 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core;
+package com.github.wohaopa.zeropointlanuch.core.launch;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
+import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
 
 public class Launch {
 
-    private static Map<String, Launch> inst = new HashMap<>();
+    private static final Map<String, Launch> inst = new HashMap<>();
 
     static {
         Log.debug("正在初始化Launcher");
@@ -46,22 +46,41 @@ public class Launch {
     public static Set<String> getLaunches() {
         return inst.keySet();
     }
+    // 成员属性与方法
 
-    String name;
+    private final String name;
+    private int maxMemory = 8192;
+    private int minMemory = 4096;
+    private String extraJvmArgs = "";
+    private String extraGameArgs = "";
+    private String javaPath;
 
-    int maxMemory = 8192;
-    int minMemory = 4096;
-
-    String extraJvmArgs = "";
-    String extraGameArgs = "";
-    String javaPath;
+    private final Version version;
 
     public Launch setJavaPath(String javaPath) {
         this.javaPath = javaPath;
         return this;
     }
 
-    Version version;
+    public Launch setExtraJvmArgs(String extraJvmArgs) {
+        this.extraJvmArgs = extraJvmArgs;
+        return this;
+    }
+
+    public Launch setExtraGameArgs(String extraGameArgs) {
+        this.extraGameArgs = extraGameArgs;
+        return this;
+    }
+
+    public Launch setMaxMemory(int maxMemory) {
+        this.maxMemory = maxMemory;
+        return this;
+    }
+
+    public Launch setMinMemory(int minMemory) {
+        this.minMemory = minMemory;
+        return this;
+    }
 
     private Launch(String name) {
         this.name = name;
@@ -96,23 +115,16 @@ public class Launch {
         return commandLine.toArray(new String[0]);
     }
 
-    private List<String> parseArg(List<String> commands, File runDir) {
-        commands.set(commands.indexOf("${game_directory}"), runDir.toString());
-        return commands;
-    }
-
     public void launch(Auth auth, File runDir) {
 
         Log.start("启动");
 
         try {
             version.verifyVersion();
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (Exception e) {
             Log.warn("文件校验失败。原因：{}", e);
             Log.end();
             return;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
 
         String[] commandLine = getLaunchArguments(auth, runDir);
@@ -127,9 +139,7 @@ public class Launch {
             @Override
             public void accept(String s) {
                 if (pattern.matcher(s)
-                    .find()) {
-                    resume[0] = false;
-                }
+                    .find()) resume[0] = false;
 
                 System.out.println(s);
 
@@ -160,34 +170,8 @@ public class Launch {
         Log.end();
     }
 
-}
-
-class Pump implements Runnable {
-
-    InputStream in;
-    Consumer<String> callback;
-
-    public Pump(InputStream in, Consumer<String> callback) {
-        this.in = in;
-        this.callback = callback;
-    }
-
-    @Override
-    public void run() {
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, Charset.defaultCharset()))) {
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                if (Thread.currentThread()
-                    .isInterrupted()) {
-                    Thread.currentThread()
-                        .interrupt();
-                    break;
-                }
-
-                callback.accept(line);
-            }
-        } catch (IOException ignored) {
-
-        }
+    private List<String> parseArg(List<String> commands, File runDir) {
+        commands.set(commands.indexOf("${game_directory}"), runDir.toString());
+        return commands;
     }
 }

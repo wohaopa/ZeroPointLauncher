@@ -31,8 +31,8 @@ import javafx.scene.layout.*;
 import com.github.wohaopa.zeropointlanuch.core.Account;
 import com.github.wohaopa.zeropointlanuch.core.Config;
 import com.github.wohaopa.zeropointlanuch.core.Instance;
-import com.github.wohaopa.zeropointlanuch.core.Launch;
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+import com.github.wohaopa.zeropointlanuch.core.launch.Launch;
 import com.github.wohaopa.zpl.ui.zeropointlaunchui.Main;
 
 public class HomeController extends RootController {
