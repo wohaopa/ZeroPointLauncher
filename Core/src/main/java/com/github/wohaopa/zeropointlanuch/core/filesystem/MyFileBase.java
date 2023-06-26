@@ -73,7 +73,7 @@ public abstract class MyFileBase {
 
             return new MyDirectory(null, name + separator).makeMyFileSystemInstance(json);
 
-        } else return null;
+        } else throw new RuntimeException(file + "不为文件！");
 
     }
 
@@ -85,32 +85,21 @@ public abstract class MyFileBase {
         myFileBase1.margeWith(myFileBase2, margeInfo);
     }
 
-    // 成员方法，void方法返回this指针，便于流式调用
-    public MyFileBase saveChecksumAsJson(File file) {
-        FileUtil.fileWrite(file, JsonUtil.toJson(this.getChecksum()));
-        return this;
+    public static void update(MyFileBase myFileBase1, File rootDir, File json) {
+
+        myFileBase1.update(rootDir, json.lastModified())
+            .saveChecksumAsJson(json);
+
     }
 
-    public MyFileBase saveDiffAsJson(File file, Sate... sate) {
-
-        FileUtil.fileWrite(file, JsonUtil.toJson(this.getDiff(sate)));
-        return this;
-    }
-
-    public List<File> getMargeFileList() {
-        List<File> files = new LinkedList<>();
-        getMargeFileList(files);
-        return files;
-    }
-
-    String name; // 文件名
-    String path; // 相对路径
-    MyDirectory parent; // 父文件
-    File file; // 文件对象
+    protected String name; // 文件名
+    protected String path; // 相对路径
+    protected MyDirectory parent; // 父文件
+    protected File file; // 文件对象
 
     // 映射
-    boolean shade; // 映射此文件
-    MyFileBase target; // 映射目标
+    protected boolean shade; // 映射此文件
+    protected MyFileBase target; // 映射目标
     private List<MyFileBase> targets; // 目标文件系统的同级对象
 
     // 差异
@@ -132,6 +121,24 @@ public abstract class MyFileBase {
         Sate(String desc) {
             this.desc = desc;
         }
+    }
+
+    // 成员方法，void方法返回this指针，便于流式调用
+    public MyFileBase saveChecksumAsJson(File file) {
+        FileUtil.fileWrite(file, JsonUtil.toJson(this.getChecksum()));
+        return this;
+    }
+
+    public MyFileBase saveDiffAsJson(File file, Sate... sate) {
+
+        FileUtil.fileWrite(file, JsonUtil.toJson(this.getDiff(sate)));
+        return this;
+    }
+
+    public List<File> getMargeFileList() {
+        List<File> files = new LinkedList<>();
+        getMargeFileList(files);
+        return files;
     }
 
     protected MyFileBase(MyDirectory parent, String name) {
@@ -193,6 +200,8 @@ public abstract class MyFileBase {
 
         return this;
     }
+
+    protected abstract MyFileBase update(File rootDir, long time);
 
     // 差异
     protected abstract MyFileBase diffWith(MyFileBase other);

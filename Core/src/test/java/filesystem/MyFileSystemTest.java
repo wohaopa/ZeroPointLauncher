@@ -26,15 +26,30 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 
+import com.github.wohaopa.zeropointlanuch.core.filesystem.MyDirectory;
 import com.github.wohaopa.zeropointlanuch.core.filesystem.MyFileBase;
 
 public class MyFileSystemTest {
 
     public static void main(String[] args) {
-        geneDiff();
+        // geneDiff();
+        update();
     }
 
     static Map<String, File> map = new HashMap<>();
+
+    public static void update() {
+        File file = new File(
+            "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\instances\\GTNH-2.3.0-zpl\\image");
+        File json = new File(
+            "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\instances\\GTNH-2.3.0-zpl\\checksum.json");
+
+        // MyDirectory myFileBase = (MyDirectory) MyFileBase.getMyFileSystemByFile(file, null);
+        // myFileBase.saveChecksumAsJson(json);
+        MyDirectory myDirectory = (MyDirectory) MyFileBase.getMyFileSystemByJson("", json);
+        MyFileBase.update(myDirectory, file, json);
+
+    }
 
     public static void geneDiff() {
 

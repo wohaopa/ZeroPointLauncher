@@ -73,7 +73,7 @@ public class MyDirectory extends MyFileBase {
         return this;
     }
 
-    public MyFileBase makeMyFileSystemInstance(JSONObject json) {
+    protected MyFileBase makeMyFileSystemInstance(JSONObject json) {
         fileCount = 0;
         for (String filename : json.keySet()) {
             if (filename.endsWith(separator)) {
@@ -183,6 +183,49 @@ public class MyDirectory extends MyFileBase {
                     }
                 }
             });
+
+        return this;
+    }
+
+    @Override
+    protected MyFileBase update(File rootDir, long time) {
+        if (file == null) {
+            file = new File(rootDir, path);
+        }
+
+        if (file.lastModified() >= time) {
+            Log.debug("文件夹变更：\"{}\"", name);
+            Set<String> list = new HashSet<>(list());
+            for (File file1 : Objects.requireNonNull(file.listFiles())) {
+                String name = file1.isFile() ? file1.getName() : file1.getName() + separator;
+                if (subs.containsKey(name)) {
+                    list.remove(name);
+                    subs.get(name)
+                        .update(rootDir, time);
+                } else {
+                    Log.debug("文件夹\"{}\"：新增文件：\"{}\"", this.name, name);
+                    if (file1.isFile()) {
+                        subs.put(name, new MyFile(this, name).setFile(file1));
+                        fileCount++;
+                    } else {
+                        MyDirectory tmp = (MyDirectory) new MyDirectory(this, name + separator)
+                            .makeMyFileSystemInstance(file1)
+                            .setFile(file);
+                        fileCount += tmp.fileCount;
+                        subs.put(name + separator, tmp);
+                    }
+                }
+            }
+            for (String name : list) {
+                Log.debug("文件夹\"{}\"：移除文件：\"{}\"", this.name, name);
+                subs.remove(name);
+
+            }
+        } else {
+            for (MyFileBase myFileBase : subs.values()) {
+                myFileBase.update(rootDir, time);
+            }
+        }
 
         return this;
     }
