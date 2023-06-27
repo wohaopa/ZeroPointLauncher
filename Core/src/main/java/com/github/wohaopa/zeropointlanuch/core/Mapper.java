@@ -105,13 +105,14 @@ public class Mapper {
     }
 
     public void doLink() {
-        File linkInfo = new File(instance.insDir, "linkInfo");
+        File linkInfo = new File(instance.insDir, "linkInfo.txt");
         List<Pair<String, String>> list = myDirectory.getMargeFileList();
         StringBuilder stringBuilder = new StringBuilder();
         list.forEach(
             s -> stringBuilder.append(s.getKey())
                 .append("->")
-                .append(s.getValue()));
+                .append(s.getValue())
+                .append("\n"));
         FileUtil.fileWrite(linkInfo, stringBuilder.toString());
 
         try {

@@ -46,7 +46,7 @@ public class MyFileSystemTest {
 
         // MyDirectory myFileBase = (MyDirectory) MyFileBase.getMyFileSystemByFile(file, null);
         // myFileBase.saveChecksumAsJson(json);
-        MyDirectory myDirectory = (MyDirectory) MyFileBase.getMyFileSystemByJson("", json);
+        MyDirectory myDirectory = (MyDirectory) MyFileBase.getMyFileSystemByJson("", json, file);
         MyFileBase.update(myDirectory, file, json);
 
     }
@@ -81,7 +81,7 @@ public class MyFileSystemTest {
 
             if (map.containsKey(args[1])) {
                 File file1 = map.get(args[1]);
-                my1 = MyFileBase.getMyFileSystemByJson(args[1], file1);
+                my1 = MyFileBase.getMyFileSystemByJson(args[1], file1, null);
             } else {
                 File file1 = new File(args[1]);
                 if (!file1.exists()) {
@@ -93,7 +93,7 @@ public class MyFileSystemTest {
 
             if (map.containsKey(args[2])) {
                 File file2 = map.get(args[2]);
-                my2 = MyFileBase.getMyFileSystemByJson(args[2], file2);
+                my2 = MyFileBase.getMyFileSystemByJson(args[2], file2, null);
             } else {
                 File file2 = new File(args[2]);
                 if (!file2.exists()) {

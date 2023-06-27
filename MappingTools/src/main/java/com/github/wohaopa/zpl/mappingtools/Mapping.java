@@ -31,7 +31,7 @@ import java.util.Objects;
 public class Mapping {
 
     public static void main(String[] args) {
-        if (args.length < 1) throw new RuntimeException("缺失参数：文件名");
+        if (args.length < 1 || args[0].endsWith("::")) throw new RuntimeException("缺失参数：文件名");
         String context;
         try {
             context = Objects.requireNonNull(readFileToString(args[0]))
@@ -43,18 +43,36 @@ public class Mapping {
 
         Arrays.stream(lines)
             .forEach(s -> {
-                String[] t = s.split("->", 1);
-                doLink(t[0], t[1]);
+                String[] t = s.split("->", 2);
+                if (t.length >= 2) doLink(t[0], t[1]);
+                else System.out.println("错误：" + t + "文件：" + args[0]);
             });
     }
 
     public static void doLink(String file, String link) {
         Path filePath = Path.of(file);
         Path linkPath = Path.of(link);
+        if (Files.exists(filePath)) {
+
+            try {
+                if (!filePath.equals(filePath.toRealPath())) {
+                    Files.delete(filePath); // 无法追溯源文件
+                    new File(file).delete();
+                }
+            } catch (IOException e) {
+                try {
+                    Files.delete(filePath); // 无法追溯源文件
+                    new File(file).delete();
+                } catch (IOException ignored) {}
+                if (Files.exists(filePath)) throw new RuntimeException("无法删除文件：" + filePath);
+            }
+        }
         if (Files.exists(filePath) || !Files.exists(linkPath))
             throw new RuntimeException("链接错误！" + filePath + "->" + linkPath);
         try {
+            Files.createDirectories(filePath.getParent());
             Files.createSymbolicLink(filePath, linkPath);
+            System.out.println("链接：" + filePath + "->" + linkPath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

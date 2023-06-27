@@ -20,7 +20,6 @@
 
 package com.github.wohaopa.zeropointlanuch.core.filesystem;
 
-import java.io.File;
 import java.util.List;
 
 import cn.hutool.core.io.FileUtil;
@@ -34,15 +33,6 @@ public class MyFile extends MyFileBase {
 
     protected MyFile(MyDirectory parent, String name) {
         super(parent, name);
-    }
-
-    @Override
-    protected File getFile() {
-        if (super.getFile() == null) {
-            if (parent == null) throw new RuntimeException("无法定位文件：" + path);
-            setFile(new File(parent.getRootDir(), path));
-        }
-        return super.getFile();
     }
 
     private long checksum() {

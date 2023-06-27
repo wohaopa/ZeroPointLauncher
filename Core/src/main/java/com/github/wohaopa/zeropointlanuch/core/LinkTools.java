@@ -45,29 +45,12 @@ public class LinkTools {
     public static void doLink(File file) throws IOException {
         if (!cmdFile.exists()) {
             String str = """
+                %2 mshta vbscript:CreateObject("Shell.Application").ShellExecute("cmd.exe","/c %~s0 %1 ::","","runas",1)(window.close)&&exit
                 @echo off
-                set cwd=%~dp0
+                cd /d %~dp0
                 title ZeroPointLauncher
-
-                >nul 2>&1 "%SYSTEMROOT%\\system32\\cacls.exe" "%SYSTEMROOT%\\system32\\config\\system"
-                if '%errorlevel%' NEQ '0' (
-                goto UACPrompt
-                ) else ( goto gotAdmin )
-                :UACPrompt
-                echo Set UAC = CreateObject^("Shell.Application"^) > "%temp%\\getadmin.vbs"
-                echo UAC.ShellExecute "%~s0", "", "", "runas", 1 >> "%temp%\\getadmin.vbs"
-                "%temp%\\getadmin.vbs"
-                exit /B
-                :gotAdmin
-
-
-                chcp 65001>nul
-                echo 本程序需要使用管理员权限来完成文件链接的创建。本程序完全开源，不存在其他操作行为。
-                cd /d %cwd%
-                java -Dfile.encoding=utf8 -jar """ + fileJar + """
-                 %1
-
-                echo 按任意键退出
+                java -jar MappingTools-0.2.0.jar %1
+                echo Done!
                 pause>nul
                 """;
             FileUtil.fileWrite(cmdFile, str);

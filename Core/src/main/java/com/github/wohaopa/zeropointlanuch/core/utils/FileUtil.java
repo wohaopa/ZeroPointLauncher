@@ -31,8 +31,6 @@ import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.crypto.digest.DigestUtil;
 
-import com.github.wohaopa.zeropointlanuch.core.Log;
-
 public class FileUtil {
 
     /**
@@ -91,26 +89,6 @@ public class FileUtil {
     }
 
     /**
-     * 获得文件夹及其子文件的所有校验
-     *
-     * @param dir 文件夹
-     * @return 校验
-     */
-    public static Map<String, Long> genChecksum(File dir) {
-        String parent = dir.toString() + "\\";
-        Map<String, Long> res = new HashMap<>();
-        List<File> fileList = FileUtil.fileList(dir);
-        fileList.forEach(
-            file -> res.put(
-                file.toString()
-                    .replace(parent, ""),
-                FileUtil.getChecksum(file)
-                    .getValue()));
-
-        return res;
-    }
-
-    /**
      * 获得校验
      *
      * @param file 文件对象
@@ -118,34 +96,6 @@ public class FileUtil {
      */
     public static Checksum getChecksum(File file) {
         return cn.hutool.core.io.FileUtil.checksum(file, null);
-    }
-
-    private static boolean adminFlag = false;
-
-    /**
-     * 创建symlink
-     *
-     * @param link   link文件
-     * @param target 源文件
-     */
-    public static void makeSymlink(File link, File target) {
-        if (adminFlag) return;
-
-        try {
-            if (link.exists()) {
-                Log.info("跳过文件：{} 文件已存在", link);
-                return;
-            }
-            if (!link.getParentFile()
-                .exists())
-                link.getParentFile()
-                    .mkdirs();
-            Files.createSymbolicLink(link.toPath(), target.toPath());
-        } catch (IOException e) {
-            adminFlag = true;
-            Log.info("无法创建文件链接，可能是没有管理员权限，文件：{} 目标：{}", link, target);
-            throw new RuntimeException("缺少管理员权限，无法创建系统链接");
-        }
     }
 
     /**
@@ -165,18 +115,6 @@ public class FileUtil {
             return src.renameTo(target);
         }
         return false;
-    }
-
-    /**
-     * 将src->target
-     *
-     * @param file
-     * @param file1
-     * @param cover 覆盖
-     */
-    public static void moveFile(File file, File file1, boolean cover) {
-        if (cover && file1.exists()) delete(file1);
-        moveFile(file, file1);
     }
 
     /**

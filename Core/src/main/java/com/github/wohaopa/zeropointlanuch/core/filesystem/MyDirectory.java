@@ -53,7 +53,7 @@ public class MyDirectory extends MyFileBase {
         fileCount = 0;
 
         for (File file1 : Objects.requireNonNull(file.listFiles())) {
-            if (FileUtil.isSymLink(file1) && !file1.exists()) continue;
+            if (FileUtil.isSymLink(file1) || !file1.exists()) continue;
 
             String name = file1.getName();
 
