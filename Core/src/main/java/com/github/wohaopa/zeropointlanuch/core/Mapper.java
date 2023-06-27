@@ -23,251 +23,82 @@ package com.github.wohaopa.zeropointlanuch.core;
 import java.io.File;
 import java.util.*;
 
-import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 
-import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
+import com.github.wohaopa.zeropointlanuch.core.filesystem.MyDirectory;
+import com.github.wohaopa.zeropointlanuch.core.filesystem.MyFileBase;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
 /** 用于目录映射的核心类，execute()不会递归执行映射，需要在实例方法中调用 */
 public class Mapper {
 
-    private final Map<String, List<String>> exclude = new HashMap<>();
-    private final Map<String, List<String>> include = new HashMap<>();
-
-    // 第一个String是key，第二个List是value
-    private final Map<String, _Item_Name> fileToName = new HashMap<>();
-    private final Map<String, List<String>> nameToFile = new HashMap<>();
-
-    private final List<String> loadedMod = new ArrayList<>();
-    private List<String> all_exclude;
-    private final List<String> exclude_mods;
-    // private final List<String> all_include; // 逻辑上重复
-
-    private Sharer sharer;
-
-    private final File runDir;
-    private final File mainConfig;
+    private final Map<Sharer, MyDirectory> caches = new HashMap<>();
+    private MyDirectory myDirectory;
+    private final JSONObject config;
     private final Instance instance;
 
-    public Mapper(Instance instance) {
+    public Mapper(File configFile, Instance instance) {
+        if (configFile.isFile()) config = (JSONObject) JsonUtil.fromJson(configFile);
+        else config = null;
         this.instance = instance;
-        this.runDir = instance.runDir;
-        this.mainConfig = new File(instance.imageDir, "zpl_margi_config.json");
-        this.exclude_mods = instance.information.excludeMods;
-        this.sharer = Sharer.get(instance.information.sharer);
-
-        refresh(null);
     }
 
-    public void refresh(Sharer sharer) {
+    public void update(Sharer sharer) {
+        if (caches.containsKey(sharer)) {
+            myDirectory = caches.get(sharer);
+        } else myDirectory = (MyDirectory) MyFileBase.getMyFileSystemByFile(instance.runDir, null);
+        caches.put(sharer, myDirectory);
 
-        this.exclude.clear();
-        this.include.clear();
-        this.fileToName.clear();
-        this.nameToFile.clear();
-        this.loadedMod.clear();
+        updateMods(); // 映射mod
+        updateSharer(sharer);
+        updateInstance();
 
-        Sharer oldSharer = null;
-        if (sharer != null) {
-            oldSharer = this.sharer;
-            this.sharer = sharer;
-        }
+    }
 
-        List<String> all = new ArrayList<>();
-        all.add("zpl_margi_config.json");
-        this.exclude.put("__zpl_all__", all);
-        this.loadConfigJson();
-        // this.all_include = include.getOrDefault("__zpl_all__", new ArrayList<>());
-        this.all_exclude = exclude.get("__zpl_all__");
-
-        this.genMapData();
-
-        if (oldSharer != null) {
-            this.sharer = oldSharer;
+    private void updateInstance() {
+        Instance instance1 = instance;
+        while (instance1 != null) {
+            MyDirectory instanceDirectory = instance1.getMyDirectory();
+            MyFileBase.marge(myDirectory, instanceDirectory, getMargeInfo(instance1.information.name));
+            instance1 = Instance.get(instance1.information.depVersion);
         }
     }
 
-    public List<String> getLoadedMod() {
-        return loadedMod;
+    private void updateSharer(Sharer sharer) {
+        while (sharer != null) {
+            MyDirectory sharerDirectory = sharer.getMyDirectory();
+            MyFileBase.marge(myDirectory, sharerDirectory, getMargeInfo(sharer.name));
+            sharer = Sharer.get(sharer.parent);
+        }
     }
 
-    private void genMapData() {
+    private void updateMods() {
+        String modsFileName = "mods" + MyFileBase.separator;
+        MyDirectory myMods;
+        if (!myDirectory.contains(modsFileName)) myMods = (MyDirectory) myDirectory.addSub(modsFileName);
+        else myMods = (MyDirectory) myDirectory.getSub(modsFileName);
 
-        // 先审查runDir的内容，需要清理所有symlink才可以
-        List<String> runDirFiles = new ArrayList<>();
-        String name = "__.minecraft__";
-        int index = this.runDir.toString()
-            .length() + 1;
-        for (File file : Objects.requireNonNull(this.runDir.listFiles())) {
-            if (!FileUtil.isSymLink(file)) {
-                if (file.isDirectory()) {
-                    for (File file1 : Objects.requireNonNull(file.listFiles())) {
-                        if (!FileUtil.isSymLink(file1)) {
-                            String s = file1.toString()
-                                .substring(index);
-                            runDirFiles.add(s);
-                            fileToName.put(s, new _Item_Name(name, file1));
-                        }
-                    }
-                } else {
-                    String s = file.toString()
-                        .substring(index);
-                    runDirFiles.add(s);
-                    fileToName.put(s, new _Item_Name(name, file));
+        List<String> excludeMods = instance.information.excludeMods;
+        Instance instance1 = instance;
+
+        while (instance1 != null) {
+            instance1.information.includeMods.forEach(s -> {
+                String modName = s.substring(s.lastIndexOf(MyFileBase.separator));
+                if (!excludeMods.contains(s) && !myMods.contains(modName)) {
+                    myMods.addSub(modName)
+                        .setTargetForFile(ModMaster.getModFile(s));
                 }
-            }
-        }
-        nameToFile.put(name, runDirFiles);
-        // 执行sharer映射
-        Sharer curSharer = sharer;
-        do {
-            genMapData0(curSharer.rootDir, curSharer.name);
-            curSharer = Sharer.get(curSharer.parent);
-        } while (curSharer != null);
-
-        // 执行img映射
-        String s = "null";
-        Instance curr = instance;
-        while (curr != null) {
-            genMapData0(curr.imageDir, curr.information.name);
-            genMapData1(curr.information.includeMods);
-            s = curr.information.depVersion;
-            curr = Instance.get(s);
-        }
-        if (!s.equals("null")) throw new RuntimeException("未找到实例：" + s);
-
-        // 注入mod
-        for (String mod : loadedMod) {
-            String p = "mods\\" + ModMaster.getModFileNameByFullName(mod);
-            if (fileToName.containsKey(p)) throw new RuntimeException("不应在mods文件夹中存放GTNH的mod！");
-            fileToName.put(p, new _Item_Name("__zpl_mod__", ModMaster.getModFullFileByFullName(mod)));
+            });
+            instance1 = Instance.get(instance1.information.depVersion);
         }
     }
 
-    private void genMapData0(File imgDir, String name) {
+    private MyFileBase.MargeInfo getMargeInfo(String name) {
 
-        List<String> includeList = include.get(name);
-        List<String> excludeList = exclude.get(name);
-        if (excludeList != null && excludeList.size() == 0) return;// 排除版本
-
-        File configFile = new File(imgDir, "zpl_margi_config.json");
-        List shareDirList = ((JSONObject) JsonUtil.fromJson(configFile)).get("shareDir", List.class);
-
-        List<String> runDirFiles = new ArrayList<>();
-        int index = imgDir.toString()
-            .length() + 1;
-        for (File file : Objects.requireNonNull(imgDir.listFiles())) {
-            String t = file.toString()
-                .substring(index);
-            if (all_exclude.contains(t) || (excludeList != null && excludeList.contains(t))) continue;
-
-            if (file.isDirectory() && !shareDirList.contains(t)) {
-                for (File file1 : Objects.requireNonNull(file.listFiles())) {
-                    String t1 = file1.toString()
-                        .substring(index);
-                    if (all_exclude.contains(t1) || (excludeList != null && excludeList.contains(t1))) continue;
-
-                    runDirFiles.add(t1);
-                    _Item_Name tmpItem = fileToName.get(t1);
-                    if (tmpItem == null || (includeList != null && includeList.contains(t1)))
-                        this.fileToName.put(t1, new _Item_Name(name, file1));
-                    else tmpItem.list.add(name);
-
-                }
-            } else {
-
-                runDirFiles.add(t);
-                _Item_Name tmpItem = fileToName.get(t);
-                if (tmpItem == null || (includeList != null && includeList.contains(t)))
-                    this.fileToName.put(t, new _Item_Name(name, file));
-                else tmpItem.list.add(name);
-
-            }
-        }
-        this.nameToFile.put(name, runDirFiles);
-
+        JSONObject object = config == null ? null : config.getJSONObject(name);
+        List include = object == null ? null : object.get("include", List.class);
+        List exclude = object == null ? null : object.get("exclude", List.class);
+        return new MyFileBase.MargeInfo(include, exclude);
     }
 
-    private void genMapData1(List<String> list) {
-        list.forEach(s -> {
-            if (!loadedMod.contains(s) && !exclude_mods.contains(s)) {
-                loadedMod.add(s);
-            }
-        });
-    }
-
-    public void makeSymlink() {
-
-        fileToName.forEach((s, item) -> {
-            if (!"__.minecraft__".equals(item.list.get(0))) FileUtil.makeSymlink(new File(runDir, s), item.file);
-
-        });
-
-    }
-
-    /** 用于解析json文件 */
-    public void loadConfigJson() {
-        JSONObject json = (JSONObject) JsonUtil.fromJson(mainConfig);
-        List<_Config> exclude1 = json.getBeanList("exclude", _Config.class);
-        exclude1.forEach(config -> {
-            if (config.name == null) config.name = "__zpl_all__";
-            List<String> list = exclude.computeIfAbsent(config.name, k -> new ArrayList<>());
-            if (config.file != null) list.addAll(config.file);
-        });
-
-        List<_Config> include1 = json.getBeanList("include", _Config.class);
-        include1.forEach(config -> {
-            if (config.name == null) config.name = "__zpl_all__";
-            List<String> list = include.computeIfAbsent(config.name, k -> new ArrayList<>());
-            if (config.file != null) list.addAll(config.file);
-        });
-    }
-
-    public static JSONObject defaultJson() {
-        JSONObject object = new JSONObject();
-        object.putOpt("include", new JSONArray());
-        object.putOpt("exclude", new JSONArray());
-        object.putOpt("shareDir", new ArrayList<>());
-        return object;
-    }
-
-    public static void saveConfigJson(File image, JSONObject json) {
-        File config = new File(image, "zpl_margi_config.json");
-        FileUtil.fileWrite(config, JsonUtil.toJson(json));
-    }
-
-    private static class _Item_Name {
-
-        List<String> list = new ArrayList<>();
-        File file;
-
-        public _Item_Name(String name, File file) {
-            this.list.add(name);
-            this.file = file;
-        }
-
-    }
-
-    public static class _Config {
-
-        String name;
-        List<String> file;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public List<String> getFile() {
-            return file;
-        }
-
-        public void setFile(List<String> file) {
-            this.file = file;
-        }
-    }
 }

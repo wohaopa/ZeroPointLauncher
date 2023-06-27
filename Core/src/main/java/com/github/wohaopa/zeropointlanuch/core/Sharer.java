@@ -25,43 +25,45 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
+import com.github.wohaopa.zeropointlanuch.core.filesystem.MyDirectory;
+import com.github.wohaopa.zeropointlanuch.core.filesystem.MyFileBase;
 
 public class Sharer {
 
     private static final Map<String, Sharer> inst = new HashMap<>();
 
     static {
-
-        new Sharer("Common", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "Common"), "null");
-        new Sharer("Java8", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "Java8"), "Common");
-        new Sharer("Java17", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "Java17"), "Common");
-        new Sharer("HMCL", FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), "HMCL"), "Common");
+        new Sharer("Common", "null");
+        new Sharer("Java8", "Common");
+        new Sharer("Java17", "Common");
+        new Sharer("HMCL", "Common");
     }
 
     public static Sharer get(String name) {
-        return inst.get(name);
+        if (inst.containsKey(name)) return inst.get(name);
+        throw new RuntimeException("未知分享器：" + name);
     }
 
     public static Set<String> getNames() {
         return inst.keySet();
     }
 
-    public File rootDir;
-    public String name;
-    public String parent;
+    public final File rootDir;
+    public final String name;
+    public final String parent;
+    private MyDirectory myDirectory;
 
-    private Sharer(String name, File rootDir, String parent) {
-        this.rootDir = rootDir;
+    private Sharer(String name, String parent) {
+        this.rootDir = new File(ZplDirectory.getShareDirectory(), name);
         this.name = name;
         this.parent = parent;
-        File file = new File(rootDir, "zpl_margi_config.json");
-        if (!file.exists()) {
-            Mapper.saveConfigJson(file.getParentFile(), Mapper.defaultJson());
-        }
 
         inst.put(name, this);
-
     }
 
+    public MyDirectory getMyDirectory() {
+        if (myDirectory != null) return myDirectory;
+        myDirectory = (MyDirectory) MyFileBase.getMyFileSystemByFile(rootDir, null);
+        return myDirectory;
+    }
 }
