@@ -40,8 +40,7 @@ public class Sharer {
     }
 
     public static Sharer get(String name) {
-        if (inst.containsKey(name)) return inst.get(name);
-        throw new RuntimeException("未知分享器：" + name);
+        return inst.get(name);
     }
 
     public static Set<String> getNames() {

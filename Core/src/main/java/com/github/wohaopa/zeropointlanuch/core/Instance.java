@@ -22,14 +22,16 @@ package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.wohaopa.zeropointlanuch.core.filesystem.MyDirectory;
+import com.github.wohaopa.zeropointlanuch.core.filesystem.MyFileBase;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
 public class Instance {
 
-    private static final Map<String, Instance> instances = new HashMap<>();
+    private static final Map<String, Instance> instances = new ConcurrentHashMap<>();
 
     public static class Builder {
 
@@ -97,8 +99,12 @@ public class Instance {
             return this;
         }
 
-        public Builder setChecksum(String checksum) {
-            information.checksum = checksum;
+        public Builder setChecksum(File image) {
+
+            MyDirectory myDirectory = (MyDirectory) MyFileBase.getMyFileSystemByFile(image, null);
+            File checksumFile = new File(versionFile.getParentFile(), "checksum.json");
+            myDirectory.saveChecksumAsJson(checksumFile);
+
             return this;
         }
 
@@ -113,6 +119,10 @@ public class Instance {
             instance.myImage = myImage;
             instances.put(information.name, instance);
             return instance;
+        }
+
+        public String getName() {
+            return information.name;
         }
     }
 
@@ -144,7 +154,9 @@ public class Instance {
     public File insDir;// 实例文件夹
     public File imageDir; // 镜像文件夹
     public File runDir;// 运行文件夹
+    public File checksumFile;// 校验文件
     private MyDirectory myImage;// MyFileSystem对象
+    private Mapper mapper;
     public Information information;// 实例信息，名称版本都在这
 
     private Instance(File versionFile, Information information) {
@@ -152,6 +164,7 @@ public class Instance {
 
         this.versionFile = versionFile;
         this.insDir = versionFile.getParentFile();
+        this.checksumFile = new File(insDir, "checksum.json");
         this.imageDir = FileUtil.initAndMkDir(insDir, "image");
         this.runDir = FileUtil.initAndMkDir(insDir, ".minecraft");
         this.information = information;
@@ -168,14 +181,25 @@ public class Instance {
         //
     }
 
-    private void updateMapping() {
-        // 先拿到sharer
-        // 执行sharer的合并文件夹方法
-        // 生成映射文件
+    public void updateMapping() {
+        Sharer sharer = Sharer.get(information.sharer); // 先拿到sharer
+        if (sharer == null) Log.warn("未找到Sharer：{}", information.sharer);
+        if (mapper == null) mapper = new Mapper(null, this);
+        mapper.update(sharer);// 执行合并文件夹方法
+        mapper.doLink();// 生成映射文件
+
     }
 
     public MyDirectory getMyDirectory() {
-        if (myImage == null) myImage = (MyDirectory) MyDirectory.getMyFileSystemByFile(imageDir, null);
+        if (myImage == null) {
+            File file = new File(insDir, "image.json");
+            if (file.isFile()) myImage = (MyDirectory) MyFileBase.getMyFileSystemByJson(information.name, file);
+            else {
+                myImage = (MyDirectory) MyDirectory.getMyFileSystemByFile(imageDir, null);
+                myImage.saveChecksumAsJson(file);
+            }
+        }
+
         return myImage;
     }
 
@@ -190,6 +214,11 @@ public class Instance {
      * 保存实例信息到文件
      */
     public void savaInformation() {
+        if (checksumFile != null && !checksumFile.isFile()) {
+            checksumFile.delete();
+            getMyDirectory().saveChecksumAsJson(checksumFile);
+        }
+
         Information.toJson(information, versionFile);
     }
 
@@ -220,7 +249,6 @@ public class Instance {
         public boolean update;
         public List<String> includeMods;
         public List<String> excludeMods;
-        public String checksum;
 
         public String getName() {
             return name;
@@ -286,12 +314,5 @@ public class Instance {
             this.excludeMods = excludeMods;
         }
 
-        public String getChecksum() {
-            return checksum;
-        }
-
-        public void setChecksum(String checksum) {
-            this.checksum = checksum;
-        }
     }
 }
