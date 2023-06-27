@@ -107,7 +107,7 @@ public class MyDirectory extends MyFileBase {
                 fileBase.diffWith(other1.getSub(fileBase.name));
             } else {
                 fileBase.setSate(Sate.only_me);
-                other1.putSub(fileBase.name, fileBase.isFile())
+                other1.addSub(fileBase.name)
                     .setSate(Sate.only_other);
             }
         }
@@ -115,7 +115,7 @@ public class MyDirectory extends MyFileBase {
         for (String name : list) {
             other1.getSub(name)
                 .setSate(Sate.only_me);
-            this.putSub(name, !name.endsWith(MyFileBase.separator))
+            this.addSub(name)
                 .setSate(Sate.only_other);
         }
 
@@ -177,7 +177,7 @@ public class MyDirectory extends MyFileBase {
                         }
                         fileBase.margeWith(otherFileBase, margeInfo);
                     } else {
-                        MyFileBase fileBase = putSub(otherFileBase.name, otherFileBase.isFile());
+                        MyFileBase fileBase = addSub(otherFileBase.name);
                         fileBase.addTarget(otherFileBase);
                         fileBase.shade = true;
                     }
@@ -237,7 +237,7 @@ public class MyDirectory extends MyFileBase {
      */
     private MyDirectory devolveShade() {
         for (MyFileBase otherFileBase : ((MyDirectory) target).subs.values()) {
-            MyFileBase fileBase = putSub(otherFileBase.name, otherFileBase.isFile());
+            MyFileBase fileBase = addSub(otherFileBase.name);
             fileBase.addTarget(otherFileBase);
             fileBase.shade = true;
         }
@@ -279,13 +279,6 @@ public class MyDirectory extends MyFileBase {
         return super.getSate();
     }
 
-    private MyFileBase putSub(String name, boolean isFile) {
-        MyFileBase fileBase = isFile ? new MyFile(this, name) : new MyDirectory(this, name);
-        subs.put(name, fileBase);
-
-        return fileBase;
-    }
-
     @Override
     public boolean isDirectory() {
         return true;
@@ -308,4 +301,11 @@ public class MyDirectory extends MyFileBase {
         return subs.containsKey(name);
     }
 
+    public MyFileBase addSub(String fileName) {
+        MyFileBase myFileBase = fileName.endsWith(separator) ? new MyDirectory(this, fileName)
+            : new MyFile(this, fileName);
+        subs.put(fileName, myFileBase);
+
+        return myFileBase;
+    }
 }

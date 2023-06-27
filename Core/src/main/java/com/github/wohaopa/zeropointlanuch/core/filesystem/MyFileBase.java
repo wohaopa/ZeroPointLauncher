@@ -222,6 +222,15 @@ public abstract class MyFileBase {
         return this;
     }
 
+    public MyFileBase setTargetForFile(File file) {
+        MyFileBase otherFileBase;
+        if (isFile()) otherFileBase = new MyFile(null, name);
+        else otherFileBase = new MyDirectory(null, name);
+        otherFileBase.setFile(file);
+
+        return addTarget(otherFileBase);
+    }
+
     @Override
     public String toString() {
         return path + "(" + sate.desc + (shade ? "，映射" : "") + ")";

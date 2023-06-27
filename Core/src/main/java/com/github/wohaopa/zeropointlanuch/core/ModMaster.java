@@ -61,10 +61,6 @@ public class ModMaster {
         return "_default";
     }
 
-    public static String getModFileNameByFullName(String modFullName) {
-        return modFullName.substring(modFullName.lastIndexOf("\\") + 1);
-    }
-
     public static void refreshMods(List<String> modList) {
         List<String> urls = new ArrayList<>();
         for (String mod : modList) {
@@ -87,18 +83,6 @@ public class ModMaster {
             return;
         }
 
-        files.forEach(file -> FileUtil.moveFile(file, ModMaster.getModFullFileByFileName(file.getName())));
-
-    }
-
-    public static File getModFullFileByFileName(String modFileName) {
-
-        return getModFullFileByFullName(getModRepo(modFileName) + "\\" + modFileName);
-
-    }
-
-    public static File getModFullFileByFullName(String modFullName) {
-        return new File(ZplDirectory.getModsDirectory(), modFullName);
     }
 
     private static final String BASE_MOD_URL = null;
@@ -120,5 +104,11 @@ public class ModMaster {
             }
         }
         return mods;
+    }
+
+    public static File getModFile(String modFullName) {
+        File modFile = new File(ZplDirectory.getModsDirectory(), modFullName);
+        if (!modFile.exists()) throw new RuntimeException("无法找到mod：" + modFullName);
+        return modFile;
     }
 }

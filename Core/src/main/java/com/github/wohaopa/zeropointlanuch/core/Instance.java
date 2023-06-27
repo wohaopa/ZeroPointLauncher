@@ -141,14 +141,10 @@ public class Instance {
     // 实例对象属性与方法
 
     public File versionFile;// 实例配置文件
-
     public File insDir;// 实例文件夹
-
     public File imageDir; // 镜像文件夹
-
     public File runDir;// 运行文件夹
-    public MyDirectory myImage;//
-
+    private MyDirectory myImage;// MyFileSystem对象
     public Information information;// 实例信息，名称版本都在这
 
     private Instance(File versionFile, Information information) {
@@ -159,16 +155,40 @@ public class Instance {
         this.imageDir = FileUtil.initAndMkDir(insDir, "image");
         this.runDir = FileUtil.initAndMkDir(insDir, ".minecraft");
         this.information = information;
-        assert (information.name != null);
-        assert (information.version != null);
-        assert (information.depVersion != null);
+
+        assert (information.name != null); // 名字
+        assert (information.version != null); // 版本，用于更新
+        assert (information.depVersion != null);// 父版本，空为null，特殊标记用
+        assert (information.launcher != null); // 启动器，Java8/Java17
+        assert (information.sharer != null); // 分享器
+
     }
 
+    private void launchInstance() {
+        //
+    }
+
+    private void updateMapping() {
+        // 先拿到sharer
+        // 执行sharer的合并文件夹方法
+        // 生成映射文件
+    }
+
+    public MyDirectory getMyDirectory() {
+        if (myImage == null) myImage = (MyDirectory) MyDirectory.getMyFileSystemByFile(imageDir, null);
+        return myImage;
+    }
+
+    /**
+     * 从文件重新加载实例信息
+     */
     public void loadInformation() {
         this.information = Information.formJson(versionFile);
     }
 
-    /** 保存实例信息 */
+    /**
+     * 保存实例信息到文件
+     */
     public void savaInformation() {
         Information.toJson(information, versionFile);
     }
