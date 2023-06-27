@@ -21,12 +21,15 @@
 package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
+import cn.hutool.core.lang.Pair;
 import cn.hutool.json.JSONObject;
 
 import com.github.wohaopa.zeropointlanuch.core.filesystem.MyDirectory;
 import com.github.wohaopa.zeropointlanuch.core.filesystem.MyFileBase;
+import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
 /** 用于目录映射的核心类，execute()不会递归执行映射，需要在实例方法中调用 */
@@ -38,7 +41,7 @@ public class Mapper {
     private final Instance instance;
 
     public Mapper(File configFile, Instance instance) {
-        if (configFile.isFile()) config = (JSONObject) JsonUtil.fromJson(configFile);
+        if (configFile != null && configFile.isFile()) config = (JSONObject) JsonUtil.fromJson(configFile);
         else config = null;
         this.instance = instance;
     }
@@ -84,7 +87,7 @@ public class Mapper {
         while (instance1 != null) {
             instance1.information.includeMods.forEach(s -> {
                 String modName = s.substring(s.lastIndexOf(MyFileBase.separator));
-                if (!excludeMods.contains(s) && !myMods.contains(modName)) {
+                if (excludeMods != null && !excludeMods.contains(s) && !myMods.contains(modName)) {
                     myMods.addSub(modName)
                         .setTargetForFile(ModMaster.getModFile(s));
                 }
@@ -101,4 +104,20 @@ public class Mapper {
         return new MyFileBase.MargeInfo(include, exclude);
     }
 
+    public void doLink() {
+        File linkInfo = new File(instance.insDir, "linkInfo");
+        List<Pair<String, String>> list = myDirectory.getMargeFileList();
+        StringBuilder stringBuilder = new StringBuilder();
+        list.forEach(
+            s -> stringBuilder.append(s.getKey())
+                .append("->")
+                .append(s.getValue()));
+        FileUtil.fileWrite(linkInfo, stringBuilder.toString());
+
+        try {
+            LinkTools.doLink(linkInfo);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

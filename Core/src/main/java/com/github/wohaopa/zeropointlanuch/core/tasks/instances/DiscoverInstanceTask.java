@@ -21,51 +21,40 @@
 package com.github.wohaopa.zeropointlanuch.core.tasks.instances;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.Log;
-import com.github.wohaopa.zeropointlanuch.core.ModMaster;
-import com.github.wohaopa.zeropointlanuch.core.tasks.DecompressTask;
+import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
-import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
-public class StandardInstallTask extends Task<Instance> {
+public class DiscoverInstanceTask extends Task<Boolean> {
 
-    private final File zip;
-    private final File instanceDir;
-    private final String name;
-    private final String version;
-
-    public StandardInstallTask(File zip, File instanceDir, String name, String version, Consumer<String> callback) {
+    public DiscoverInstanceTask(Consumer<String> callback) {
         super(callback);
-        this.zip = zip;
-        this.instanceDir = instanceDir;
-        this.name = name;
-        this.version = version;
     }
 
     @Override
-    public Instance call() throws Exception {
+    public Boolean call() throws Exception {
+        File dir = ZplDirectory.getInstancesDirectory();
+        for (File file : Objects.requireNonNull(dir.listFiles())) {
+            if (file.isDirectory()) {
+                File versionFile = new File(file, "version.json");
 
-        File image = FileUtil.initAndMkDir(instanceDir, "image");
+                if (versionFile.isFile()) {
+                    Instance.Builder builder;
 
-        Log.debug("开始解压：{}", zip);
-        long time1 = System.currentTimeMillis();
-        new DecompressTask(zip, image, callback).call();
-        long time2 = System.currentTimeMillis();
-        Log.debug("解压完成！用时：{}s", (time2 - time1) / 1000);
-
-        Instance.Builder builder = new Instance.Builder(name);
-        builder.setVersionFile(new File(instanceDir, "version.json"))
-            .setVersion(version)
-            .setDepVersion("null")
-            .setIncludeMods(ModMaster.coverModsList(new File(image, "mods")))
-            .setExcludeMods(null)
-            // .setMyImage(myDirectory)
-            .setChecksum(image)
-            .saveConfig();
-
-        return builder.build();
+                    try {
+                        builder = new Instance.Builder(versionFile);
+                    } catch (Exception e) {
+                        Log.error("版本加载错误：{}", e);
+                        continue;
+                    }
+                    if (builder.build() == null) Log.error("实例名重复：{}", builder.getName());
+                }
+            }
+        }
+        return true;
     }
 }

@@ -23,6 +23,7 @@ package com.github.wohaopa.zeropointlanuch.core.filesystem;
 import java.io.File;
 import java.util.*;
 
+import cn.hutool.core.lang.Pair;
 import cn.hutool.json.JSONObject;
 
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
@@ -58,7 +59,7 @@ public abstract class MyFileBase {
 
     }
 
-    public static MyFileBase getMyFileSystemByJson(String name, File file) {
+    public static MyFileBase getMyFileSystemByJson(String name, File file, File rootDir) {
         if (file.isFile()) {
 
             JSONObject json = (JSONObject) JsonUtil.fromJson(file);
@@ -66,14 +67,20 @@ public abstract class MyFileBase {
             if (json.size() < 2) {
                 for (String obj : json.keySet()) {
                     if (!obj.endsWith(separator)) {
-                        return new MyFile(null, obj).setChecksum(json.getLong(obj));
+                        return new MyFile(null, obj).setChecksum(json.getLong(obj))
+                            .setRootDir(rootDir);
                     }
                 }
             }
 
-            return new MyDirectory(null, name + separator).makeMyFileSystemInstance(json);
+            return new MyDirectory(null, name + separator).makeMyFileSystemInstance(json)
+                .setRootDir(rootDir);
 
         } else throw new RuntimeException(file + "不为文件！");
+    }
+
+    public static MyFileBase getMyFileSystemByJson(String name, File file) {
+        return getMyFileSystemByJson(name, file, null);
 
     }
 
@@ -86,8 +93,8 @@ public abstract class MyFileBase {
     }
 
     public static void update(MyFileBase myFileBase1, File rootDir, File json) {
-
-        myFileBase1.update(rootDir, json.lastModified())
+        myFileBase1.setRootDir(rootDir)
+            .update(json.lastModified())
             .saveChecksumAsJson(json);
 
     }
@@ -95,7 +102,8 @@ public abstract class MyFileBase {
     protected String name; // 文件名
     protected String path; // 相对路径
     protected MyDirectory parent; // 父文件
-    protected File file; // 文件对象
+    private File file; // 文件对象
+    private File rootDir; // 顶层文件
 
     // 映射
     protected boolean shade; // 映射此文件
@@ -104,6 +112,12 @@ public abstract class MyFileBase {
 
     // 差异
     private Sate sate; // 文件状态
+
+    protected File getRootDir() {
+        if (parent != null) return parent.getRootDir();
+        if (rootDir != null) return rootDir;
+        throw new RuntimeException("无法找到root文件夹");
+    }
 
     /** 用于差异系统的状态枚举 */
     public enum Sate {
@@ -135,8 +149,13 @@ public abstract class MyFileBase {
         return this;
     }
 
-    public List<File> getMargeFileList() {
-        List<File> files = new LinkedList<>();
+    MyFileBase setRootDir(File rootDir) {
+        this.rootDir = rootDir;
+        return this;
+    }
+
+    public List<Pair<String, String>> getMargeFileList() {
+        List<Pair<String, String>> files = new LinkedList<>();
         getMargeFileList(files);
         return files;
     }
@@ -155,7 +174,7 @@ public abstract class MyFileBase {
 
     protected abstract Object getChecksum();
 
-    protected abstract void getMargeFileList(List<File> list);
+    protected abstract void getMargeFileList(List<Pair<String, String>> list);
 
     public static class MargeInfo {
 
@@ -201,7 +220,7 @@ public abstract class MyFileBase {
         return this;
     }
 
-    protected abstract MyFileBase update(File rootDir, long time);
+    protected abstract MyFileBase update(long time);
 
     // 差异
     protected abstract MyFileBase diffWith(MyFileBase other);
@@ -215,6 +234,10 @@ public abstract class MyFileBase {
 
     protected Sate getSate() {
         return sate;
+    }
+
+    protected File getFile() {
+        return file;
     }
 
     protected MyFileBase setFile(File file) {

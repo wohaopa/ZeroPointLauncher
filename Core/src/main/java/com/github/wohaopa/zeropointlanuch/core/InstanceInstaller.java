@@ -24,24 +24,6 @@ import java.util.*;
 
 public class InstanceInstaller {
 
-    // /**
-    // * 启动时默认初始已安装的实例
-    // *
-    // * @param versionFile 找到的版本文件
-    // */
-    // public static void addInst(File versionFile) {
-    //
-    // Instance.Builder builder;
-    //
-    // try {
-    // builder = new Instance.Builder(versionFile);
-    // } catch (Exception e) {
-    // throw new RuntimeException("版本加载错误：" + e);
-    // }
-    //
-    // if (builder.build() == null) Log.error("实例名重复：{}", builder.information.name);
-    // }
-    //
     // public static void installForZip(File zip, File instanceDir, Instance.Information information) {
     // Log.start("实例安装");
     // instanceDir.mkdirs();

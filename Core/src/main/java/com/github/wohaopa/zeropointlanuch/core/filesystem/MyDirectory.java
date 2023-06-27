@@ -23,6 +23,7 @@ package com.github.wohaopa.zeropointlanuch.core.filesystem;
 import java.io.File;
 import java.util.*;
 
+import cn.hutool.core.lang.Pair;
 import cn.hutool.json.JSONObject;
 
 import com.github.wohaopa.zeropointlanuch.core.Log;
@@ -153,10 +154,16 @@ public class MyDirectory extends MyFileBase {
     }
 
     @Override
-    protected void getMargeFileList(List<File> list) {
+    protected void getMargeFileList(List<Pair<String, String>> list) {
         if (shade) {
-            if (target.file != null) list.add(target.file);
-            else throw new RuntimeException("映射文件为空！");
+
+            Log.debug("影子文件：{}", path);
+            list.add(
+                new Pair<>(
+                    getFile().toString(),
+                    target.getFile()
+                        .toString()));
+
         } else subs.values()
             .forEach(myFileBase -> myFileBase.getMargeFileList(list));
     }
@@ -188,20 +195,17 @@ public class MyDirectory extends MyFileBase {
     }
 
     @Override
-    protected MyFileBase update(File rootDir, long time) {
-        if (file == null) {
-            file = new File(rootDir, path);
-        }
+    protected MyFileBase update(long time) {
 
-        if (file.lastModified() >= time) {
+        if (getFile().lastModified() >= time) {
             Log.debug("文件夹变更：\"{}\"", name);
             Set<String> list = new HashSet<>(list());
-            for (File file1 : Objects.requireNonNull(file.listFiles())) {
+            for (File file1 : Objects.requireNonNull(getFile().listFiles())) {
                 String name = file1.isFile() ? file1.getName() : file1.getName() + separator;
                 if (subs.containsKey(name)) {
                     list.remove(name);
                     subs.get(name)
-                        .update(rootDir, time);
+                        .update(time);
                 } else {
                     Log.debug("文件夹\"{}\"：新增文件：\"{}\"", this.name, name);
                     if (file1.isFile()) {
@@ -210,7 +214,7 @@ public class MyDirectory extends MyFileBase {
                     } else {
                         MyDirectory tmp = (MyDirectory) new MyDirectory(this, name + separator)
                             .makeMyFileSystemInstance(file1)
-                            .setFile(file);
+                            .setFile(file1);
                         fileCount += tmp.fileCount;
                         subs.put(name + separator, tmp);
                     }
@@ -223,7 +227,7 @@ public class MyDirectory extends MyFileBase {
             }
         } else {
             for (MyFileBase myFileBase : subs.values()) {
-                myFileBase.update(rootDir, time);
+                myFileBase.update(time);
             }
         }
 

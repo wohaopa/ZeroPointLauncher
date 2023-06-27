@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.List;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.Pair;
 
 import com.github.wohaopa.zeropointlanuch.core.Log;
 
@@ -35,14 +36,19 @@ public class MyFile extends MyFileBase {
         super(parent, name);
     }
 
+    @Override
+    protected File getFile() {
+        if (super.getFile() == null) {
+            if (parent == null) throw new RuntimeException("无法定位文件：" + path);
+            setFile(new File(parent.getRootDir(), path));
+        }
+        return super.getFile();
+    }
+
     private long checksum() {
         if (CRC32 == 0) {
-            if (file == null) {
-                Log.warn("文件：{}为空", path);
-                return 0L;
-            }
 
-            return CRC32 = FileUtil.checksumCRC32(file);
+            return CRC32 = FileUtil.checksumCRC32(getFile());
         }
         return CRC32;
     }
@@ -73,10 +79,16 @@ public class MyFile extends MyFileBase {
     }
 
     @Override
-    protected void getMargeFileList(List<File> list) {
+    protected void getMargeFileList(List<Pair<String, String>> list) {
         if (shade) {
-            if (target.file != null) list.add(target.file);
-            else throw new RuntimeException("映射文件为空！");
+
+            Log.debug("影子文件：{}", path);
+            list.add(
+                new Pair<>(
+                    getFile().toString(),
+                    target.getFile()
+                        .toString()));
+
         }
     }
 
@@ -88,13 +100,11 @@ public class MyFile extends MyFileBase {
     }
 
     @Override
-    protected MyFileBase update(File rootDir, long time) {
-        if (file == null) {
-            file = new File(rootDir, path);
-        }
-        if (file.lastModified() >= time) {
+    protected MyFileBase update(long time) {
+
+        if (getFile().lastModified() >= time) {
             long t = CRC32;
-            CRC32 = FileUtil.checksumCRC32(file);
+            CRC32 = FileUtil.checksumCRC32(getFile());
             Log.debug("文件变更：{} -> {}", t, CRC32);
         }
         return this;
