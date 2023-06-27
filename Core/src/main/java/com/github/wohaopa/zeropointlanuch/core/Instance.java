@@ -186,14 +186,15 @@ public class Instance {
         if (sharer == null) Log.warn("未找到Sharer：{}", information.sharer);
         if (mapper == null) mapper = new Mapper(null, this);
         mapper.update(sharer);// 执行合并文件夹方法
-        mapper.doLink();// 生成映射文件
+        mapper.doLink();// 生成映射文件清单
 
     }
 
     public MyDirectory getMyDirectory() {
         if (myImage == null) {
             File file = new File(insDir, "image.json");
-            if (file.isFile()) myImage = (MyDirectory) MyFileBase.getMyFileSystemByJson(information.name, file);
+            if (file.isFile())
+                myImage = (MyDirectory) MyFileBase.getMyFileSystemByJson(information.name, file, imageDir);
             else {
                 myImage = (MyDirectory) MyDirectory.getMyFileSystemByFile(imageDir, null);
                 myImage.saveChecksumAsJson(file);

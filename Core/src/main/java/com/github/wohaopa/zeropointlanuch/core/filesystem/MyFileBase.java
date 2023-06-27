@@ -26,6 +26,7 @@ import java.util.*;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.json.JSONObject;
 
+import com.github.wohaopa.zeropointlanuch.core.Log;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
@@ -54,7 +55,8 @@ public abstract class MyFileBase {
             return new MyFile(null, file.getName()).setFile(file);
         } else {
             return new MyDirectory(null, file.getName() + separator).makeMyFileSystemInstance(file, exclude)
-                .setFile(file);
+                .setFile(file)
+                .setRootDir(file);
         }
 
     }
@@ -79,10 +81,10 @@ public abstract class MyFileBase {
         } else throw new RuntimeException(file + "不为文件！");
     }
 
-    public static MyFileBase getMyFileSystemByJson(String name, File file) {
-        return getMyFileSystemByJson(name, file, null);
-
-    }
+    // public static MyFileBase getMyFileSystemByJson(String name, File file) {
+    // return getMyFileSystemByJson(name, file, null);
+    //
+    // }
 
     public static void diff(MyFileBase myFileBase1, MyFileBase myFileBase2) {
         myFileBase1.diffWith(myFileBase2);
@@ -114,8 +116,9 @@ public abstract class MyFileBase {
     private Sate sate; // 文件状态
 
     protected File getRootDir() {
-        if (parent != null) return parent.getRootDir();
         if (rootDir != null) return rootDir;
+        if (parent != null) return rootDir = parent.getRootDir();
+        Log.error("无法找到root文件夹：{}", toString());
         throw new RuntimeException("无法找到root文件夹");
     }
 
@@ -237,6 +240,10 @@ public abstract class MyFileBase {
     }
 
     protected File getFile() {
+        if (file == null) {
+            if (parent == null) throw new RuntimeException("无法定位文件：" + path);
+            file = new File(parent.getRootDir(), path);
+        }
         return file;
     }
 
