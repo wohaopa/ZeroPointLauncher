@@ -43,6 +43,8 @@ public class LinkTools {
     }
 
     public static void doLink(File file) throws IOException {
+        File lock = new File(file.getParentFile(), "mapping.lock");
+        if (lock.exists()) lock.delete();
         if (!cmdFile.exists()) {
             String str = """
                 %2 mshta vbscript:CreateObject("Shell.Application").ShellExecute("cmd.exe","/c %~s0 %1 ::","","runas",1)(window.close)&&exit
@@ -55,10 +57,26 @@ public class LinkTools {
                 """;
             FileUtil.fileWrite(cmdFile, str);
         }
+
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.directory(ZplDirectory.getWorkDirectory());
         processBuilder.command(cmdFile.toString(), file.toString());
-        processBuilder.start();
+        Process process = processBuilder.start();
+        Log.debug("映射进程id：{}", process.pid());
+
+        byte times = 30;
+        try {
+            while (times-- > 0) {
+                Log.debug("正在等待5s，剩余等待次数：{}", times);
+                Thread.sleep(5000);
+                if (!lock.exists()) break;
+            }
+        } catch (InterruptedException e) {
+            Log.warn("链接执行错误：{}", e);
+        }
+        if (lock.exists()) Log.warn("等待时间过长，可能是映射程序出现问题！");
+
+        Log.info("映射完成！");
     }
 
 }

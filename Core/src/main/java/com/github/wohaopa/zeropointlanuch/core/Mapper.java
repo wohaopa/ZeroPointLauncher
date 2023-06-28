@@ -110,6 +110,7 @@ public class Mapper {
     }
 
     public void doLink() {
+        Log.start("链接");
         File linkInfo = new File(instance.insDir, "linkInfo.txt");
         List<Pair<String, String>> list = myDirectory.getMargeFileList();
         StringBuilder stringBuilder = new StringBuilder();
@@ -119,11 +120,14 @@ public class Mapper {
                 .append(s.getValue())
                 .append("\n"));
         FileUtil.fileWrite(linkInfo, stringBuilder.toString());
+        Log.info("链接文件：{}", linkInfo);
 
         try {
             LinkTools.doLink(linkInfo);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        Log.info("完成！");
+        Log.end();
     }
 }
