@@ -257,7 +257,7 @@ public abstract class MyFileBase {
         if (isFile()) otherFileBase = new MyFile(null, name);
         else otherFileBase = new MyDirectory(null, name);
         otherFileBase.setFile(file);
-
+        this.shade = true;
         return addTarget(otherFileBase);
     }
 
