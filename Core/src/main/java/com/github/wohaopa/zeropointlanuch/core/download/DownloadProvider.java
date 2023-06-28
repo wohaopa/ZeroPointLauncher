@@ -36,11 +36,20 @@ public class DownloadProvider {
     private final String url;
 
     public DownloadProvider() {
-        this.url = "https:\\downloads.wohaopa.cn";
+        this.url = "https://downloads.wohaopa.cn";
 
     }
 
-    private String getUrlForPath(String path) {
+    private String getUrlForPath0(String path) {
+        if (path.endsWith("/assets/indexes/1.7.10.json"))//使用BMCL API
+            return "https://bmclapi2.bangbang93.com/v1/packages/1863782e33ce7b584fc45b037325a1964e095d3e/1.7.10.json";
+        if (path.startsWith("/assets/objects/"))
+            return "https://bmclapi2.bangbang93.com/assets/" + path.substring("/assets/objects/".length());
+        if (path.startsWith("/libraries/net/minecraft/client/1.7.10/client-1.7.10.jar"))
+            return "https://bmclapi2.bangbang93.com/version/1.7.10/client.jar";
+        if (path.startsWith("/libraries/")&&!path.startsWith("/libraries/org/lwjgl/"))
+            return "https://bmclapi2.bangbang93.com/maven/" + path.substring("/libraries/".length());
+
         return url + path;
     }
 
@@ -52,20 +61,16 @@ public class DownloadProvider {
 
         if (map.containsKey(file)) return map.get(file);
 
-        if (file.getName()
-            .equals("1.7.10.json"))
-            return "https://piston-meta.mojang.com/v1/packages/1863782e33ce7b584fc45b037325a1964e095d3e/1.7.10.json";
-
         if (file.toString()
             .startsWith(
                 ZplDirectory.getWorkDirectory()
                     .toString()))
-            return getUrlForPath(
+            return getUrlForPath0(
                 file.toString()
                     .substring(
                         ZplDirectory.getWorkDirectory()
                             .toString()
-                            .length()));
+                            .length()).replace("\\","/"));
         return null;
 
     }
@@ -80,6 +85,5 @@ public class DownloadProvider {
 
     public static String getUrlForFile(File file) {
         return provider.getUrlForFile0(file);
-
     }
 }
