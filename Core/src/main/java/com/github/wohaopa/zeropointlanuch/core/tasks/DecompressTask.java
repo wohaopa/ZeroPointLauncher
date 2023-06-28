@@ -23,22 +23,32 @@ package com.github.wohaopa.zeropointlanuch.core.tasks;
 import java.io.File;
 import java.util.function.Consumer;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+
+import cn.hutool.core.lang.Filter;
+
 import com.github.wohaopa.zeropointlanuch.core.utils.ZipUtil;
 
 public class DecompressTask extends Task<File> {
 
-    private File file;
-    private File targetDir;
+    private final File file;
+    private final File targetDir;
+    private final Filter<ArchiveEntry> filter;
 
     public DecompressTask(File file, File targetDir, Consumer<String> callback) {
+        this(file, targetDir, null, callback);
+    }
+
+    public DecompressTask(File file, File targetDir, Filter<ArchiveEntry> filter, Consumer<String> callback) {
         super(callback);
         this.file = file;
         this.targetDir = targetDir;
+        this.filter = filter;
     }
 
     @Override
     public File call() throws Exception {
-        ZipUtil.decompress(file, targetDir);
+        ZipUtil.decompress(file, targetDir, filter);
 
         return targetDir;
     }

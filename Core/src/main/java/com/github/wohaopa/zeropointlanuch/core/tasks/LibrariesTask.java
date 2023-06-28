@@ -89,7 +89,13 @@ public class LibrariesTask extends Task<Boolean> {
                 "解压本地库:{}",
                 file.get()
                     .getName());
-            Scheduler.submitTasks(new DecompressTask(file.get(), natives, callback));
+            Scheduler.submitTasks(
+                new DecompressTask(
+                    file.get(),
+                    natives,
+                    archiveEntry -> archiveEntry.getName()
+                        .equals("META-INF"),
+                    callback));
         }
         StringBuilder sb = new StringBuilder();
         String s = ";";
