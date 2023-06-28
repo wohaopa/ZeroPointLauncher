@@ -241,8 +241,8 @@ public abstract class MyFileBase {
 
     protected File getFile() {
         if (file == null) {
-            if (parent == null) throw new RuntimeException("无法定位文件：" + path);
-            file = new File(parent.getRootDir(), path);
+            if (parent == null) file = getRootDir();// 根目录
+            else file = new File(parent.getRootDir(), path);
         }
         return file;
     }

@@ -20,11 +20,11 @@
 
 package filesystem;
 
+import java.io.File;
+
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.DiscoverInstanceTask;
-
-import java.io.File;
 
 public class InstanceTest {
 
