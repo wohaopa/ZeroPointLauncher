@@ -4,5 +4,4 @@
 /.GTNH/
 /build/
 /TestResources/
-/Wrapper/build/
-/Core/build/
+/*/build/
