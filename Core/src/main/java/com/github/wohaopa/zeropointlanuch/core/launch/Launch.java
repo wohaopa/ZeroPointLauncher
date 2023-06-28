@@ -24,7 +24,9 @@ import java.io.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import com.github.wohaopa.zeropointlanuch.core.Config;
 import com.github.wohaopa.zeropointlanuch.core.Log;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
@@ -86,11 +88,17 @@ public class Launch {
         this.name = name;
         this.version = new Version(name, new File(ZplDirectory.getVersionsDirectory(), name + ".json"));
         inst.put(name, this);
+        if (name.endsWith("Java8")) javaPath = Config.getConfig()
+            .getJava8Path();
+        else javaPath = Config.getConfig()
+            .getJava17Path();
     }
 
-    public String[] getLaunchArguments(Auth auth, File runDir) {
+    private String[] getLaunchArguments(Auth auth, File runDir) {
 
-        if (javaPath == null || javaPath.isEmpty()) throw new RuntimeException("java配置错误！");
+        if (javaPath == null || javaPath.isEmpty()) {
+            throw new RuntimeException("无效Java路径，启动器：" + name);
+        }
         List<String> commandLine = new ArrayList<>();
 
         commandLine.add(javaPath);
@@ -128,7 +136,7 @@ public class Launch {
         }
 
         String[] commandLine = getLaunchArguments(auth, runDir);
-        Log.debug("启动指令：{}", commandLine);
+        Log.info("启动指令：['{}']", String.join("' '", commandLine));
 
         final boolean[] resume = { true };
 

@@ -24,8 +24,10 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
 import com.github.wohaopa.zeropointlanuch.core.filesystem.MyDirectory;
 import com.github.wohaopa.zeropointlanuch.core.filesystem.MyFileBase;
+import com.github.wohaopa.zeropointlanuch.core.launch.Launch;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
@@ -170,15 +172,19 @@ public class Instance {
         this.information = information;
 
         assert (information.name != null); // 名字
-        assert (information.version != null); // 版本，用于更新
-        assert (information.depVersion != null);// 父版本，空为null，特殊标记用
-        assert (information.launcher != null); // 启动器，Java8/Java17
-        assert (information.sharer != null); // 分享器
+
+        if (information.version == null) information.version = information.name;// 版本，用于更新
+        if (information.depVersion == null) information.depVersion = "null";// 父版本，空为null，特殊标记用
+        if (information.launcher == null) information.launcher = "ZPL-Java8"; // 启动器，Java8/Java17
+        if (information.sharer == null) information.sharer = "Common"; // 分享器
 
     }
 
-    private void launchInstance() {
-        //
+    public void launchInstance(Auth auth) {
+        Launch launch = Launch.getLauncher(information.launcher);
+        if (launch != null) {
+            launch.launch(auth, runDir);
+        } else throw new RuntimeException("无法找到启动器：" + information.launcher);
     }
 
     public void updateMapping() {
