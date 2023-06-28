@@ -30,11 +30,16 @@ import java.util.Objects;
 
 public class Mapping {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (args.length < 1 || args[0].endsWith("::")) throw new RuntimeException("缺失参数：文件名");
+
+        File file = new File(args[0]);
+        File lock = new File(file.getParentFile(), "mapping.lock");
+        if (!lock.exists()) lock.createNewFile();
+
         String context;
         try {
-            context = Objects.requireNonNull(readFileToString(args[0]))
+            context = Objects.requireNonNull(readFileToString(file))
                 .replace("\r", "");
         } catch (Exception e) {
             throw new RuntimeException("无效文件：" + e);
@@ -47,6 +52,8 @@ public class Mapping {
                 if (t.length >= 2) doLink(t[0], t[1]);
                 else System.out.println("错误：" + t + "文件：" + args[0]);
             });
+        if (lock.delete()) System.out.println("[警告]无法通知启动器映射情况！请手动删除文件：" + lock);
+        System.out.println("链接完成！按任意键退出");
     }
 
     public static void doLink(String file, String link) {
@@ -78,9 +85,9 @@ public class Mapping {
         }
     }
 
-    public static String readFileToString(String fileName) {
+    private static String readFileToString(File file) {
         String encoding = "UTF-8";
-        File file = new File(fileName);
+
         long filelength = file.length();
         byte[] filecontent = new byte[(int) filelength];
 

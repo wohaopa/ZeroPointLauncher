@@ -157,7 +157,7 @@ public class MyDirectory extends MyFileBase {
     protected void getMargeFileList(List<Pair<String, String>> list) {
         if (shade) {
 
-            Log.debug("影子文件：{}", path);
+            Log.debug("影子目录：{}", path);
             list.add(
                 new Pair<>(
                     getFile().toString(),
