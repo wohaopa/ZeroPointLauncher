@@ -85,12 +85,12 @@ public class Version {
     }
 
     protected String getMainClass() {
-        if (verified) throw new RuntimeException("未完成版本校验");
+        if (!verified) throw new RuntimeException("未完成版本校验");
         return versionJsonObj.getStr("mainClass");
     }
 
     protected List<String> getJvmArguments() {
-        if (verified) throw new RuntimeException("未完成版本校验");
+        if (!verified) throw new RuntimeException("未完成版本校验");
 
         List<String> args = new ArrayList<>();
         args.add("-Dlog4j2.formatMsgNoLookups=true");
@@ -119,7 +119,7 @@ public class Version {
     }
 
     protected List<String> getGameArguments() {
-        if (verified) throw new RuntimeException("未完成版本校验");
+        if (!verified) throw new RuntimeException("未完成版本校验");
 
         List<String> args = new ArrayList<>();
 

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.zip.Checksum;
 
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
@@ -48,25 +47,6 @@ public class FileUtil {
     }
 
     /**
-     * 获得所有子文件夹的文件对象
-     *
-     * @param file 目标文件夹
-     * @return 子文件
-     */
-    public static List<File> fileList(File file) {
-        List<File> res = new ArrayList<>();
-        if (file.isFile()) {
-            res.add(file);
-            return res;
-        }
-        for (File file1 : Objects.requireNonNull(file.listFiles())) {
-            if (file1.isFile()) res.add(file1);
-            else res.addAll(fileList(file1));
-        }
-        return res;
-    }
-
-    /**
      * 读取文件
      *
      * @param file 文件对象
@@ -86,16 +66,6 @@ public class FileUtil {
     public static void fileWrite(File file, String content) {
         FileWriter fw = new FileWriter(file);
         fw.write(content);
-    }
-
-    /**
-     * 获得校验
-     *
-     * @param file 文件对象
-     * @return 校验
-     */
-    public static Checksum getChecksum(File file) {
-        return cn.hutool.core.io.FileUtil.checksum(file, null);
     }
 
     /**
@@ -134,14 +104,6 @@ public class FileUtil {
             if (Files.exists(path)) throw new RuntimeException("无法删除文件：" + path);
             return false;
         }
-    }
-
-    public static void delete(File file) {
-        cn.hutool.core.io.FileUtil.del(file);
-    }
-
-    public static void copyDir(File src, File target) {
-        cn.hutool.core.io.FileUtil.copy(src, target, false);
     }
 
     /**

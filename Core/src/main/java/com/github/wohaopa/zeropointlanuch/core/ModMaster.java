@@ -23,11 +23,11 @@ package com.github.wohaopa.zeropointlanuch.core;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 
-import com.github.wohaopa.zeropointlanuch.core.utils.DownloadUtil;
+import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
+import com.github.wohaopa.zeropointlanuch.core.tasks.DownloadTask;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class ModMaster {
@@ -61,32 +61,6 @@ public class ModMaster {
         return "_default";
     }
 
-    public static void refreshMods(List<String> modList) {
-        List<String> urls = new ArrayList<>();
-        for (String mod : modList) {
-            if (!FileUtil.exists(ZplDirectory.getModsDirectory(), mod)) {
-                urls.add(BASE_MOD_URL + mod);
-                Log.info("缺失：{}", mod);
-            }
-        }
-
-        DownloadUtil.submitDownloadTasks(urls, ZplDirectory.getTmpDirectory());
-        List<File> files = null;
-
-        try {
-            files = DownloadUtil.takeDownloadResult();
-        } catch (ExecutionException | InterruptedException e) {
-            // throw new RuntimeException(e);
-        }
-        if (files == null) {
-            Log.error("MOD下载失败！缺失mod请查看日志");
-            return;
-        }
-
-    }
-
-    private static final String BASE_MOD_URL = null;
-
     public static List<String> coverModsList(File modsDir) {
         List<String> mods = new ArrayList<>();
         if (!modsDir.exists()) return mods;
@@ -106,9 +80,13 @@ public class ModMaster {
         return mods;
     }
 
-    public static File getModFile(String modFullName) {
+    public static File getModFile(String modFullName) throws Exception {
         File modFile = new File(ZplDirectory.getModsDirectory(), modFullName);
-        if (!modFile.exists()) throw new RuntimeException("无法找到mod：" + modFullName);
+        if (!modFile.exists()) return getRemoteMod(modFile);
         return modFile;
+    }
+
+    private static File getRemoteMod(File modFile) throws Exception {
+        return new DownloadTask(DownloadProvider.getUrlForFile(modFile), modFile, null).call();
     }
 }

@@ -41,13 +41,13 @@ public class DownloadProvider {
     }
 
     private String getUrlForPath0(String path) {
-        if (path.endsWith("/assets/indexes/1.7.10.json"))//使用BMCL API
+        if (path.endsWith("/assets/indexes/1.7.10.json"))// 使用BMCL API
             return "https://bmclapi2.bangbang93.com/v1/packages/1863782e33ce7b584fc45b037325a1964e095d3e/1.7.10.json";
         if (path.startsWith("/assets/objects/"))
             return "https://bmclapi2.bangbang93.com/assets/" + path.substring("/assets/objects/".length());
         if (path.startsWith("/libraries/net/minecraft/client/1.7.10/client-1.7.10.jar"))
             return "https://bmclapi2.bangbang93.com/version/1.7.10/client.jar";
-        if (path.startsWith("/libraries/")&&!path.startsWith("/libraries/org/lwjgl/"))
+        if (path.startsWith("/libraries/") && !path.startsWith("/libraries/org/lwjgl/"))
             return "https://bmclapi2.bangbang93.com/maven/" + path.substring("/libraries/".length());
 
         return url + path;
@@ -70,7 +70,8 @@ public class DownloadProvider {
                     .substring(
                         ZplDirectory.getWorkDirectory()
                             .toString()
-                            .length()).replace("\\","/"));
+                            .length())
+                    .replace("\\", "/"));
         return null;
 
     }

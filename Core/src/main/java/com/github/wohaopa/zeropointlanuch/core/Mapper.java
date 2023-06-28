@@ -84,16 +84,21 @@ public class Mapper {
         List<String> excludeMods = instance.information.excludeMods;
         Instance instance1 = instance;
 
-        while (instance1 != null) {
-            instance1.information.includeMods.forEach(s -> {
-                String modName = s.substring(s.lastIndexOf(MyFileBase.separator));
-                if (excludeMods != null && !excludeMods.contains(s) && !myMods.contains(modName)) {
-                    myMods.addSub(modName)
-                        .setTargetForFile(ModMaster.getModFile(s));
+        try {
+            while (instance1 != null) {
+                for (String s : instance1.information.includeMods) {
+                    String modName = s.substring(s.lastIndexOf(MyFileBase.separator));
+                    if (excludeMods != null && !excludeMods.contains(s) && !myMods.contains(modName)) {
+                        myMods.addSub(modName)
+                            .setTargetForFile(ModMaster.getModFile(s));
+                    }
                 }
-            });
-            instance1 = Instance.get(instance1.information.depVersion);
+                instance1 = Instance.get(instance1.information.depVersion);
+            }
+        } catch (Exception e) {
+            Log.error("无法刷新mods，可能无法下载mod：{}", e);
         }
+
     }
 
     private MyFileBase.MargeInfo getMargeInfo(String name) {
