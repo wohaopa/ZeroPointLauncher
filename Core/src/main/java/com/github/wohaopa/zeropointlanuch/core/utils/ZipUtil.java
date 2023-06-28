@@ -22,6 +22,9 @@ package com.github.wohaopa.zeropointlanuch.core.utils;
 
 import java.io.File;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+
+import cn.hutool.core.lang.Filter;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.extra.compress.CompressUtil;
 import cn.hutool.extra.compress.extractor.Extractor;
@@ -35,9 +38,9 @@ public final class ZipUtil {
      * @param zip      压缩包文件夹
      * @param savePath 解压路径
      */
-    public static void decompress(File zip, File savePath) {
+    public static void decompress(File zip, File savePath, Filter<ArchiveEntry> filter) {
 
         Extractor extractor = CompressUtil.createExtractor(CharsetUtil.CHARSET_UTF_8, zip);
-        extractor.extract(savePath);
+        extractor.extract(savePath, filter);
     }
 }
