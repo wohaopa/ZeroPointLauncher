@@ -87,7 +87,7 @@ public class Mapper {
         try {
             while (instance1 != null) {
                 for (String s : instance1.information.includeMods) {
-                    String modName = s.substring(s.lastIndexOf(MyFileBase.separator));
+                    String modName = s.substring(s.lastIndexOf(MyFileBase.separator + 1));
                     if ((excludeMods == null || !excludeMods.contains(s)) && !myMods.contains(modName)) {
                         myMods.addSub(modName)
                             .setTargetForFile(ModMaster.getModFile(s));

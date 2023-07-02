@@ -28,33 +28,26 @@ import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 
 public class DownloadProvider {
 
-    private static final DownloadProvider defaultProvider = new DownloadProvider();
+    private static DownloadProvider provider;
 
-    private static DownloadProvider provider = defaultProvider;
-
-    private final Map<File, String> map = new HashMap<>();
-    private final String url;
-
-    public DownloadProvider() {
-        this.url = "https://downloads.wohaopa.cn";
-
+    public static void setProvider(DownloadProvider provider) {
+        DownloadProvider.provider = provider;
     }
 
-    private String getUrlForPath0(String path) {
-        if (path.endsWith("/assets/indexes/1.7.10.json"))// 使用BMCL API
-            return "https://bmclapi2.bangbang93.com/v1/packages/1863782e33ce7b584fc45b037325a1964e095d3e/1.7.10.json";
-        if (path.startsWith("/assets/objects/"))
-            return "https://bmclapi2.bangbang93.com/assets/" + path.substring("/assets/objects/".length());
-        if (path.startsWith("/libraries/net/minecraft/client/1.7.10/client-1.7.10.jar"))
-            return "https://bmclapi2.bangbang93.com/version/1.7.10/client.jar";
-        if (path.startsWith("/libraries/") && !path.startsWith("/libraries/org/lwjgl/"))
-            return "https://bmclapi2.bangbang93.com/maven/" + path.substring("/libraries/".length());
+    protected final Map<File, String> map = new HashMap<>();
 
-        return url + path;
+    protected final String url;
+
+    protected DownloadProvider(String baseUrl) {
+        this.url = baseUrl;
     }
 
-    private void addUrlToMap0(String url, File file) {
+    protected void addUrlToMap0(String url, File file) {
         map.put(file, url);
+    }
+
+    protected String getUrlForPath0(String path) {
+        return url + path;
     }
 
     private String getUrlForFile0(File file) {
@@ -76,15 +69,21 @@ public class DownloadProvider {
 
     }
 
-    public static void setProvider(DownloadProvider provider) {
-        DownloadProvider.provider = provider;
+    private static DownloadProvider getProvider() {
+        if (provider == null) {
+            String mirrorUrl = System.getProperty("zpl.url");
+            if (mirrorUrl != null && mirrorUrl.startsWith("http")) provider = new DownloadProvider(mirrorUrl);
+            else provider = new DefaultDownloadProvider();
+        }
+
+        return provider;
     }
 
     public static void addUrlToMap(String url, File file) {
-        provider.addUrlToMap0(url, file);
+        getProvider().addUrlToMap0(url, file);
     }
 
     public static String getUrlForFile(File file) {
-        return provider.getUrlForFile0(file);
+        return getProvider().getUrlForFile0(file);
     }
 }
