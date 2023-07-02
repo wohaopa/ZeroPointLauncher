@@ -22,21 +22,26 @@ package filesystem;
 
 import java.io.File;
 
+import com.github.wohaopa.zeropointlanuch.core.Log;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
-import com.github.wohaopa.zeropointlanuch.core.tasks.instances.StandardInstallTask;
+import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
+import com.github.wohaopa.zeropointlanuch.core.tasks.instances.OnlineInstallTask;
 
 public class InstallTaskTest {
 
     public static void main(String[] args) throws Exception {
         ZplDirectory.init(new File("D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"));
+        DownloadProvider.setProvider(new DownloadProvider("http://127.0.0.1"));
 
         File zip = new File(
             "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\zip\\GT_New_Horizons_2.3.3_Client.zip");
         File instDir = new File(
             "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\instances\\2.3.2-Test");
-        String name = "2.3.2-Test";
+        String name = "2.3.2-webTest";
         String version = "2.3.2";
 
-        new StandardInstallTask(zip, instDir, name, version, null).call();
+        // new StandardInstallTask(zip, instDir, name, version, null).call();
+        new OnlineInstallTask(new File(ZplDirectory.getInstancesDirectory(), name), name, Log::info).call();
     }
+
 }

@@ -24,42 +24,21 @@ import java.io.File;
 import java.util.function.Consumer;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
-import com.github.wohaopa.zeropointlanuch.core.Log;
-import com.github.wohaopa.zeropointlanuch.core.ModMaster;
-import com.github.wohaopa.zeropointlanuch.core.tasks.DecompressTask;
-import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
+import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
+import com.github.wohaopa.zeropointlanuch.core.tasks.DownloadTask;
 
-public class StandardInstallTask extends ZplInstallTask {
+public class OnlineInstallTask extends ZplInstallTask {
 
-    private String version;
+    public OnlineInstallTask(File instanceDir, String name, Consumer<String> callback) {
+        super(null, instanceDir, name, callback);
 
-    public StandardInstallTask(File zip, File instanceDir, String name, String version, Consumer<String> callback) {
-        super(zip, instanceDir, name, callback);
-
-        this.version = version;
     }
 
     @Override
     public Instance call() throws Exception {
+        File file = new File(instanceDir, name + ".zip");
+        zip = new DownloadTask(DownloadProvider.getUrlForFile(file), file, callback).call(); // 过于复杂的逻辑，懒得分开写了
 
-        File image = FileUtil.initAndMkDir(instanceDir, "image");
-
-        Log.debug("开始解压：{}", zip);
-        long time1 = System.currentTimeMillis();
-        new DecompressTask(zip, image, callback).call();
-        long time2 = System.currentTimeMillis();
-        Log.debug("解压完成！用时：{}s", (time2 - time1) / 1000);
-
-        Instance.Builder builder = new Instance.Builder(name);
-        builder.setVersionFile(new File(instanceDir, "version.json"))
-            .setVersion(version)
-            .setDepVersion("null")
-            .setIncludeMods(ModMaster.coverModsList(new File(instanceDir, "image/mods")))
-            .setExcludeMods(null)
-            // .setMyImage(myDirectory)
-            .setChecksum(new File(instanceDir, "image"))
-            .saveConfig();
-
-        return builder.build();
+        return super.call();
     }
 }

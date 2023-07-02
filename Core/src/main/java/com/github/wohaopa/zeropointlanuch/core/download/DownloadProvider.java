@@ -38,7 +38,7 @@ public class DownloadProvider {
 
     protected final String url;
 
-    protected DownloadProvider(String baseUrl) {
+    public DownloadProvider(String baseUrl) {
         this.url = baseUrl;
     }
 
