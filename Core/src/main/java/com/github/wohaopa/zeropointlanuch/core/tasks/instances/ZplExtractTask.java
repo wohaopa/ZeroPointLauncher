@@ -18,32 +18,43 @@
  * SOFTWARE.
  */
 
-package filesystem;
+package com.github.wohaopa.zeropointlanuch.core.tasks.instances;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 import com.github.wohaopa.zeropointlanuch.core.Log;
-import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
-import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
-import com.github.wohaopa.zeropointlanuch.core.tasks.instances.OnlineInstallTask;
-import com.github.wohaopa.zeropointlanuch.core.tasks.instances.ZplExtractTask;
+import com.github.wohaopa.zeropointlanuch.core.tasks.CompressTask;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
 
-public class InstallTaskTest {
+public class ZplExtractTask extends Task<File> {
 
-    public static void main(String[] args) throws Exception {
-        ZplDirectory.init(new File("D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"));
-        DownloadProvider.setProvider(new DownloadProvider("http://127.0.0.1"));
-
-        File zip = new File(
-            "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\zip\\GT_New_Horizons_2.3.3_Client.zip");
-        File instDir = new File(
-            "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\instances\\2.3.2-Test");
-        String name = "2.3.2-webTest";
-        String version = "2.3.2";
-
-        // new StandardInstallTask(zip, instDir, name, version, null).call();
-//        new OnlineInstallTask(new File(ZplDirectory.getInstancesDirectory(), name), name, Log::info).call();
-        new ZplExtractTask(instDir,Log::info).call();
+    private static final List<String> include = new ArrayList<>();
+    static {
+        include.add("image");
+        include.add("checksum.json");
+        include.add("version.json");
     }
 
+    private final File instanceDir;
+
+    public ZplExtractTask(File instanceDir, Consumer<String> callback) {
+        super(callback);
+        this.instanceDir = instanceDir;
+    }
+
+    @Override
+    public File call() throws Exception {
+        File zip = new File(instanceDir, instanceDir.getName() + ".zip");
+
+        Log.debug("开始压缩：{}", zip);
+        long time1 = System.currentTimeMillis();
+        new CompressTask(zip, instanceDir, file -> !include.contains(file.getName()), callback).call();
+        long time2 = System.currentTimeMillis();
+        Log.debug("压缩完成！用时：{}s", (time2 - time1) / 1000);
+
+        return zip;
+    }
 }
