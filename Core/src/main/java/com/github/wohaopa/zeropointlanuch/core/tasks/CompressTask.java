@@ -18,39 +18,44 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.utils;
+package com.github.wohaopa.zeropointlanuch.core.tasks;
 
 import java.io.File;
-
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 import cn.hutool.core.lang.Filter;
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.extra.compress.CompressUtil;
-import cn.hutool.extra.compress.archiver.Archiver;
-import cn.hutool.extra.compress.extractor.Extractor;
 
-/** 解压zip文件 */
-public final class ZipUtil {
+import com.github.wohaopa.zeropointlanuch.core.utils.ZipUtil;
 
-    /**
-     * 解压用
-     *
-     * @param zip      压缩包文件夹
-     * @param savePath 解压路径
-     */
-    public static void decompress(File zip, File savePath, Filter<ArchiveEntry> filter) {
+public class CompressTask extends Task<File> {
 
-        Extractor extractor = CompressUtil.createExtractor(CharsetUtil.CHARSET_UTF_8, zip);
-        extractor.extract(savePath, filter);
+    private final File file;
+    private final File targetDir;
+    private final Filter<File> filter;
+
+    public CompressTask(File file, File targetDir, Consumer<String> callback) {
+        this(file, targetDir, null, callback);
     }
 
-    public static void compress(File zip, File... files) {
+    public CompressTask(File file, File targetDir, Filter<File> filter, Consumer<String> callback) {
+        super(callback);
+        this.file = file;
+        this.targetDir = targetDir;
+        this.filter = filter;
+    }
 
-        Archiver archiver = CompressUtil.createArchiver(CharsetUtil.CHARSET_UTF_8, ArchiveStreamFactory.ZIP, zip);
-        for (File file : files) archiver.add(file);
-        archiver.finish()
-            .close();
+    @Override
+    public File call() throws Exception {
+
+        List<File> files = new ArrayList<>();
+        Arrays.stream(Objects.requireNonNull(targetDir.listFiles()))
+            .forEach(file -> { if (!filter.accept(file)) files.add(file); });
+        ZipUtil.compress(file, files.toArray(new File[0]));
+
+        return file;
     }
 }
