@@ -25,41 +25,33 @@ import java.util.function.Consumer;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.Log;
-import com.github.wohaopa.zeropointlanuch.core.ModMaster;
 import com.github.wohaopa.zeropointlanuch.core.tasks.DecompressTask;
-import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
 
-public class StandardInstallTask extends ZplInstallTask {
+public class ZplInstallTask extends Task<Instance> {
 
-    private String version;
+    protected File zip;
+    protected File instanceDir;
+    protected String name;
 
-    public StandardInstallTask(File zip, File instanceDir, String name, String version, Consumer<String> callback) {
-        super(zip, instanceDir, name, callback);
-
-        this.version = version;
+    public ZplInstallTask(File zip, File instanceDir, String name, Consumer<String> callback) {
+        super(callback);
+        this.zip = zip;
+        this.instanceDir = instanceDir;
+        this.name = name;
     }
 
     @Override
     public Instance call() throws Exception {
 
-        File image = FileUtil.initAndMkDir(instanceDir, "image");
-
         Log.debug("开始解压：{}", zip);
         long time1 = System.currentTimeMillis();
-        new DecompressTask(zip, image, callback).call();
+        new DecompressTask(zip, instanceDir, callback).call();
         long time2 = System.currentTimeMillis();
         Log.debug("解压完成！用时：{}s", (time2 - time1) / 1000);
 
-        Instance.Builder builder = new Instance.Builder(name);
-        builder.setVersionFile(new File(instanceDir, "version.json"))
-            .setVersion(version)
-            .setDepVersion("null")
-            .setIncludeMods(ModMaster.coverModsList(new File(instanceDir, "image/mods")))
-            .setExcludeMods(null)
-            // .setMyImage(myDirectory)
-            .setChecksum(new File(instanceDir, "image"))
-            .saveConfig();
-
+        Instance.Builder builder = new Instance.Builder(new File(instanceDir, "version.json"));
+        builder.setName(name);
         return builder.build();
     }
 }
