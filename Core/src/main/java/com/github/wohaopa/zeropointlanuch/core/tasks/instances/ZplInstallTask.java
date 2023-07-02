@@ -25,6 +25,7 @@ import java.util.function.Consumer;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zeropointlanuch.core.tasks.DecompressTask;
 import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
 
@@ -52,6 +53,13 @@ public class ZplInstallTask extends Task<Instance> {
 
         Instance.Builder builder = new Instance.Builder(new File(instanceDir, "version.json"));
         builder.setName(name);
-        return builder.build();
+        Instance instance = builder.build();
+        String dep = instance.information.depVersion;
+        if (dep != null && !dep.equals("null")) {
+            File dir = new File(ZplDirectory.getInstancesDirectory(), dep);
+            new OnlineInstallTask(dir, dep, callback).call();
+        }
+
+        return instance;
     }
 }
