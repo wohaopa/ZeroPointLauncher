@@ -43,7 +43,7 @@ public class DownloadTask extends Task<File> {
     public File call() throws Exception {
 
         if (url != null) try {
-            Log.debug("开始下载：{}", url);
+            Log.debug("正在准备下载：{}", url);
             return HttpUtil.downloadFileFromUrl(url, file, havaCallback() ? new StreamProgress() {
 
                 byte timer = 0;
@@ -52,7 +52,7 @@ public class DownloadTask extends Task<File> {
 
                 @Override
                 public void start() {
-                    accept("开始下载");
+                    accept("下载开始");
                 }
 
                 @Override
@@ -68,11 +68,12 @@ public class DownloadTask extends Task<File> {
 
                 @Override
                 public void finish() {
-                    accept("开始完成");
+                    accept("下载完成");
                 }
             } : null);
         } catch (Exception e) {
             Log.error("无法下载链接：{}", url);
+            throw new Exception("无法下载链接：" + url);
         }
         return null;
     }

@@ -41,7 +41,6 @@ public final class ZipUtil {
      * @param savePath 解压路径
      */
     public static void decompress(File zip, File savePath, Filter<ArchiveEntry> filter) {
-
         Extractor extractor = CompressUtil.createExtractor(CharsetUtil.CHARSET_UTF_8, zip);
         extractor.extract(savePath, filter);
     }

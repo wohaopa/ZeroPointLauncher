@@ -22,17 +22,19 @@ package filesystem;
 
 import java.io.File;
 
+import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.Log;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
+import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
 import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
+import com.github.wohaopa.zeropointlanuch.core.tasks.instances.DiscoverInstanceTask;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.OnlineInstallTask;
-import com.github.wohaopa.zeropointlanuch.core.tasks.instances.ZplExtractTask;
 
 public class InstallTaskTest {
 
     public static void main(String[] args) throws Exception {
-        ZplDirectory.init(new File("D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"));
-        DownloadProvider.setProvider(new DownloadProvider("http://127.0.0.1"));
+        // ZplDirectory.init(new File("D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"));
+        DownloadProvider.setProvider(new DownloadProvider("http://127.0.0.1", false));
 
         File zip = new File(
             "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\zip\\GT_New_Horizons_2.3.3_Client.zip");
@@ -41,9 +43,14 @@ public class InstallTaskTest {
         String name = "2.3.2-webTest";
         String version = "2.3.2";
 
+        new DiscoverInstanceTask(Log::info).call();
+
         // new StandardInstallTask(zip, instDir, name, version, null).call();
-//        new OnlineInstallTask(new File(ZplDirectory.getInstancesDirectory(), name), name, Log::info).call();
-        new ZplExtractTask(instDir,Log::info).call();
+        Instance instance = new OnlineInstallTask(new File(ZplDirectory.getInstancesDirectory(), name), name, Log::info)
+            .call();
+        instance.updateMapping();
+        instance.launchInstance(new OfflineAuth("wohaopa"));
+        // new ZplExtractTask(instDir, Log::info).call();
     }
 
 }

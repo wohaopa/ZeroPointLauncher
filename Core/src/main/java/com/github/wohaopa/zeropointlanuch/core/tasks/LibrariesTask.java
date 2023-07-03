@@ -93,7 +93,7 @@ public class LibrariesTask extends Task<Boolean> {
                 new DecompressTask(
                     file.get(),
                     natives,
-                    archiveEntry -> archiveEntry.getName()
+                    archiveEntry -> !archiveEntry.getName()
                         .equals("META-INF"),
                     callback));
         }

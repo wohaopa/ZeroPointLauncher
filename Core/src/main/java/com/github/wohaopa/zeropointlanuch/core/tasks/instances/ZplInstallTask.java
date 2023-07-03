@@ -45,17 +45,26 @@ public class ZplInstallTask extends Task<Instance> {
     @Override
     public Instance call() throws Exception {
 
+        if (Instance.containsKey(name)) {
+            accept("存在实例：" + name);
+            Log.info("存在实例：{}", name);
+            return Instance.get(name);
+        }
+
         Log.debug("开始解压：{}", zip);
+        accept("正在解压：" + zip.getName());
         long time1 = System.currentTimeMillis();
         new DecompressTask(zip, instanceDir, callback).call();
         long time2 = System.currentTimeMillis();
         Log.debug("解压完成！用时：{}s", (time2 - time1) / 1000);
 
         Instance.Builder builder = new Instance.Builder(new File(instanceDir, "version.json"));
-        builder.setName(name);
+        builder.setName(name)
+            .saveConfig();
         Instance instance = builder.build();
         String dep = instance.information.depVersion;
         if (dep != null && !dep.equals("null")) {
+            accept("正在处理依赖：" + dep);
             File dir = new File(ZplDirectory.getInstancesDirectory(), dep);
             new OnlineInstallTask(dir, dep, callback).call();
         }
