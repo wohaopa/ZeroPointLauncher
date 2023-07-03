@@ -24,27 +24,31 @@ import java.io.File;
 import java.util.function.Consumer;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
-import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
-import com.github.wohaopa.zeropointlanuch.core.tasks.DownloadTask;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
 
-public class OnlineInstallTask extends ZplInstallTask {
+public class NewSubInstanceTask extends Task<Instance> {
 
-    public OnlineInstallTask(File instanceDir, String name, Consumer<String> callback) {
-        super(null, instanceDir, name, callback);
+    private File instanceDir;
+    private String name;
+    private Instance instance;
 
+    public NewSubInstanceTask(File instanceDir, String name, Instance instance, Consumer<String> callback) {
+        super(callback);
+        this.instance = instance;
+        this.name = name;
+        this.instanceDir = instanceDir;
     }
 
     @Override
     public Instance call() throws Exception {
-        zip = new File(instanceDir, name + ".zip");
-        if (!zip.exists()) {
-            try {
-                new DownloadTask(DownloadProvider.getUrlForFile(zip), zip, callback).call(); // 过于复杂的逻辑，懒得分开写了
-            } catch (Exception e) {
-                accept("无法下载实例："+name);
-            }
-        }
-        return super.call();
 
+        if (Instance.containsKey(name)) return Instance.get(name);
+        Instance.Builder builder = new Instance.Builder(name);
+        builder.setVersionFile(new File(instanceDir, "version.json"))
+            .setDepVersion(instance.information.name)
+            .setLauncher(instance.information.launcher)
+            .setSharer(instance.information.sharer)
+            .saveConfig();
+        return builder.build();
     }
 }
