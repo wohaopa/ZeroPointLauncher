@@ -10,4 +10,5 @@ module ZeroPointLaunch.Core {
     exports com.github.wohaopa.zeropointlanuch.core.auth;
     exports com.github.wohaopa.zeropointlanuch.core.tasks;
     exports com.github.wohaopa.zeropointlanuch.core.launch;
+    exports com.github.wohaopa.zeropointlanuch.core.tasks.instances;
 }

@@ -18,33 +18,16 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.tasks.instances;
+package com.github.wohaopa.zpl.ui.scene;
 
-import java.io.File;
-import java.util.function.Consumer;
+import io.vproxy.vfx.ui.scene.VScene;
+import io.vproxy.vfx.ui.scene.VSceneRole;
 
-import com.github.wohaopa.zeropointlanuch.core.Instance;
-import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
-import com.github.wohaopa.zeropointlanuch.core.tasks.DownloadTask;
+public abstract class BaseVScene extends VScene {
 
-public class OnlineInstallTask extends ZplInstallTask {
-
-    public OnlineInstallTask(File instanceDir, String name, Consumer<String> callback) {
-        super(null, instanceDir, name, callback);
-
+    public BaseVScene(VSceneRole role) {
+        super(role);
     }
 
-    @Override
-    public Instance call() throws Exception {
-        zip = new File(instanceDir, name + ".zip");
-        if (!zip.exists()) {
-            try {
-                new DownloadTask(DownloadProvider.getUrlForFile(zip), zip, callback).call(); // 过于复杂的逻辑，懒得分开写了
-            } catch (Exception e) {
-                accept("无法下载实例：" + name);
-            }
-        }
-        return super.call();
-
-    }
+    public abstract String title();
 }

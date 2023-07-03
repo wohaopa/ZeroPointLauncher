@@ -18,25 +18,33 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
+package com.github.wohaopa.zpl.ui;
 
-import java.io.File;
-import java.io.IOException;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.Account;
+import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
 
-public class Util {
+public class AccountMaster {
 
-    public static void openFileLocation(File path) {
+    private static ObservableList<Auth> accounts;
+    private static Auth cur;
 
-        try {
+    static {
+        accounts = FXCollections.observableArrayList(Account.getAuths());
+        cur = accounts.size() == 0 ? null : accounts.get(0);
+    }
 
-            Runtime.getRuntime()
-                .exec("explorer.exe /e," + path.toString() + "\\");
+    public static ObservableList<Auth> getAccounts() {
+        return accounts;
+    }
 
-        } catch (IOException ex) {
+    public static void change(Auth instance) {
+        cur = instance;
+    }
 
-            Log.warn(ex.getMessage());
-        }
+    public static Auth getCur() {
+        return cur;
     }
 }

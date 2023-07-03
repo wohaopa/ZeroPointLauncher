@@ -18,23 +18,34 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller.dialog;
+package com.github.wohaopa.zpl.ui.scene;
 
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
+import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.manager.image.ImageManager;
+import io.vproxy.vfx.ui.scene.VSceneRole;
+import io.vproxy.vfx.ui.wrapper.ThemeLabel;
+import io.vproxy.vfx.util.FXUtils;
 
-public class ModDialog extends Dialog<String> {
+public class HomeScene extends BaseVScene {
 
-    public ModDialog(String modString) {
+    public HomeScene() {
+        super(VSceneRole.MAIN);
+        enableAutoContentWidthHeight();
+        var label = new ThemeLabel("ZPL GTNH启动器") {
 
-        this.setTitle("修改MOD版本");
+            {
+                FontManager.get()
+                    .setFont(this, settings -> settings.setSize(40));
+            }
+        };
+        getContentPane().getChildren()
+            .add(label);
+        FXUtils.observeWidthHeightCenter(getContentPane(), label);
+        setBackgroundImage(ImageManager.get().load("images/bg.jpg"));
+    }
 
-        this.setHeaderText("选择一个版本，ZPL会自动下载相应的mod");
-        this.setContentText("标准仓库：");
-
-        final DialogPane dialogPane = getDialogPane();
-        dialogPane.getButtonTypes()
-            .addAll(ButtonType.OK, ButtonType.CANCEL);
+    @Override
+    public String title() {
+        return "主页";
     }
 }
