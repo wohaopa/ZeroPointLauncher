@@ -35,6 +35,7 @@ public abstract class MyFileBase {
     public static final String separator = File.separator;
 
     public static final Map<String, List<String>> DEFAULT_FI = new HashMap<>();
+    public static final Map<String, List<String>> RUNTIME_FI = new HashMap<>();
 
     static {
         ArrayList<String> list = new ArrayList<>();
@@ -43,9 +44,10 @@ public abstract class MyFileBase {
         list.add("assets");
         list.add("libraries");
         list.add("crash-reports");
-        list.add("saves");
         list.add("logs");
         list.add("versions");
+        RUNTIME_FI.put("\\", list);
+        list.add("saves");
         DEFAULT_FI.put("\\", list);
     }
 

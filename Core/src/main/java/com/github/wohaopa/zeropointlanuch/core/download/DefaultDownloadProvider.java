@@ -23,7 +23,7 @@ package com.github.wohaopa.zeropointlanuch.core.download;
 public class DefaultDownloadProvider extends DownloadProvider {
 
     public DefaultDownloadProvider() {
-        super("https://downloads.wohaopa.cn");
+        super("https://downloads.wohaopa.cn", true);
     }
 
     protected String getUrlForPath0(String path) {

@@ -31,6 +31,7 @@ import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
 import com.github.wohaopa.zeropointlanuch.core.tasks.AssetsTask;
 import com.github.wohaopa.zeropointlanuch.core.tasks.CheckoutTask;
+import com.github.wohaopa.zeropointlanuch.core.tasks.DownloadTask;
 import com.github.wohaopa.zeropointlanuch.core.tasks.LibrariesTask;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
@@ -58,6 +59,10 @@ public class Version {
 
         Log.start("校验" + name);
         Log.debug("正在校验版本：{}", name);
+
+        if (!versionJsonFile.exists()) {
+            new DownloadTask(DownloadProvider.getUrlForFile(versionJsonFile), versionJsonFile, null).call();
+        }
 
         versionJsonObj = ((JSONObject) JsonUtil.fromJson(versionJsonFile));
         JSONObject downloadsObj = versionJsonObj.getByPath("downloads.client", JSONObject.class);

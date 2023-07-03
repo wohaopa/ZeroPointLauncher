@@ -27,6 +27,7 @@ import java.util.Set;
 
 import com.github.wohaopa.zeropointlanuch.core.filesystem.MyDirectory;
 import com.github.wohaopa.zeropointlanuch.core.filesystem.MyFileBase;
+import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class Sharer {
 
@@ -53,7 +54,7 @@ public class Sharer {
     private MyDirectory myDirectory;
 
     private Sharer(String name, String parent) {
-        this.rootDir = new File(ZplDirectory.getShareDirectory(), name);
+        this.rootDir = FileUtil.initAndMkDir(ZplDirectory.getShareDirectory(), name);
         this.name = name;
         this.parent = parent;
 

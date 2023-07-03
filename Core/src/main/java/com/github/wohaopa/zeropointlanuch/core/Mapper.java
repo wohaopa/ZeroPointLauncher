@@ -49,7 +49,7 @@ public class Mapper {
     public void update(Sharer sharer) {
         if (caches.containsKey(sharer)) {
             myDirectory = caches.get(sharer);
-        } else myDirectory = (MyDirectory) MyFileBase.getMyFileSystemByFile(instance.runDir, null);
+        } else myDirectory = (MyDirectory) MyFileBase.getMyFileSystemByFile(instance.runDir, MyFileBase.RUNTIME_FI);
         caches.put(sharer, myDirectory);
 
         updateMods(); // 映射mod
@@ -87,7 +87,7 @@ public class Mapper {
         try {
             while (instance1 != null) {
                 for (String s : instance1.information.includeMods) {
-                    String modName = s.substring(s.lastIndexOf(MyFileBase.separator + 1));
+                    String modName = s.substring(s.lastIndexOf(MyFileBase.separator) + 1);
                     if ((excludeMods == null || !excludeMods.contains(s)) && !myMods.contains(modName)) {
                         myMods.addSub(modName)
                             .setTargetForFile(ModMaster.getModFile(s));
@@ -97,6 +97,7 @@ public class Mapper {
             }
         } catch (Exception e) {
             Log.error("无法刷新mods，可能无法下载mod：{}", e);
+            throw new RuntimeException(e);
         }
 
     }

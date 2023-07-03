@@ -35,11 +35,13 @@ public class DownloadProvider {
     }
 
     protected final Map<File, String> map = new HashMap<>();
+    protected boolean useMap = false;
 
     protected final String url;
 
-    public DownloadProvider(String baseUrl) {
+    public DownloadProvider(String baseUrl, boolean useMap) {
         this.url = baseUrl;
+        this.useMap = useMap;
     }
 
     protected void addUrlToMap0(String url, File file) {
@@ -47,12 +49,12 @@ public class DownloadProvider {
     }
 
     protected String getUrlForPath0(String path) {
-        return url + path;
+        return url + path.replace("%", "%25");
     }
 
     private String getUrlForFile0(File file) {
 
-        if (map.containsKey(file)) return map.get(file);
+        if (useMap && map.containsKey(file)) return map.get(file);
 
         if (file.toString()
             .startsWith(
@@ -72,7 +74,7 @@ public class DownloadProvider {
     private static DownloadProvider getProvider() {
         if (provider == null) {
             String mirrorUrl = System.getProperty("zpl.url");
-            if (mirrorUrl != null && mirrorUrl.startsWith("http")) provider = new DownloadProvider(mirrorUrl);
+            if (mirrorUrl != null && mirrorUrl.startsWith("http")) provider = new DownloadProvider(mirrorUrl, true);
             else provider = new DefaultDownloadProvider();
         }
 

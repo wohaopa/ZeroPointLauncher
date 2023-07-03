@@ -36,9 +36,11 @@ public class OnlineInstallTask extends ZplInstallTask {
 
     @Override
     public Instance call() throws Exception {
-        File file = new File(instanceDir, name + ".zip");
-        zip = new DownloadTask(DownloadProvider.getUrlForFile(file), file, callback).call(); // 过于复杂的逻辑，懒得分开写了
-
+        zip = new File(instanceDir, name + ".zip");
+        if (!zip.exists()) {
+            new DownloadTask(DownloadProvider.getUrlForFile(zip), zip, callback).call(); // 过于复杂的逻辑，懒得分开写了
+        }
         return super.call();
+
     }
 }
