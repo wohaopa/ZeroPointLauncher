@@ -18,33 +18,27 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.tasks.instances;
+package com.github.wohaopa.zpl.ui;
 
-import java.io.File;
-import java.util.function.Consumer;
+import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.manager.font.FontProvider;
+import io.vproxy.vfx.manager.font.FontSettings;
+import io.vproxy.vfx.theme.impl.DarkTheme;
+import io.vproxy.vfx.theme.impl.DarkThemeFontProvider;
 
-import com.github.wohaopa.zeropointlanuch.core.Instance;
-import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
-import com.github.wohaopa.zeropointlanuch.core.tasks.DownloadTask;
-
-public class OnlineInstallTask extends ZplInstallTask {
-
-    public OnlineInstallTask(File instanceDir, String name, Consumer<String> callback) {
-        super(null, instanceDir, name, callback);
-
-    }
+public class ZplTheme extends DarkTheme {
 
     @Override
-    public Instance call() throws Exception {
-        zip = new File(instanceDir, name + ".zip");
-        if (!zip.exists()) {
-            try {
-                new DownloadTask(DownloadProvider.getUrlForFile(zip), zip, callback).call(); // 过于复杂的逻辑，懒得分开写了
-            } catch (Exception e) {
-                accept("无法下载实例：" + name);
-            }
-        }
-        return super.call();
+    public FontProvider fontProvider() {
+        return new ZplFontProvider();
+    }
 
+    public static class ZplFontProvider extends DarkThemeFontProvider {
+
+        @Override
+        protected void defaultFont(FontSettings settings) {
+            super.defaultFont(settings);
+            settings.setFamily(FontManager.FONT_NAME_JetBrainsMono);
+        }
     }
 }

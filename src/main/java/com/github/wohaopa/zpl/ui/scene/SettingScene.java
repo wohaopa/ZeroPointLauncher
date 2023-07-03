@@ -18,20 +18,33 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zeropointlaunchui.controller;
+package com.github.wohaopa.zpl.ui.scene;
 
-import java.util.HashMap;
-import java.util.Map;
+import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.ui.scene.VSceneRole;
+import io.vproxy.vfx.ui.wrapper.ThemeLabel;
+import io.vproxy.vfx.util.FXUtils;
 
-public class RootController {
+public class SettingScene extends BaseVScene {
 
-    private static final Map<String, RootController> map = new HashMap<>();
+    public SettingScene() {
+        super(VSceneRole.MAIN);
+        enableAutoContentWidthHeight();
 
-    public RootController() {
-        map.put(getClass().getSimpleName(), this);
+        var label = new ThemeLabel("设置") {
+
+            {
+                FontManager.get()
+                    .setFont(this, settings -> settings.setSize(40));
+            }
+        };
+        getContentPane().getChildren()
+            .add(label);
+        FXUtils.observeWidthHeightCenter(getContentPane(), label);
     }
 
-    protected static RootController getController(String name) {
-        return map.get(name);
+    @Override
+    public String title() {
+        return "设置";
     }
 }

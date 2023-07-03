@@ -35,6 +35,12 @@ public class Instance {
 
     private static final Map<String, Instance> instances = new ConcurrentHashMap<>();
 
+    public static void rename(String oV, String nV) {
+        Instance instance = instances.remove(oV);
+        instance.information.name = nV;
+        instances.put(nV, instance);
+    }
+
     public static class Builder {
 
         Information information;
