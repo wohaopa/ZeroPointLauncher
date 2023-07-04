@@ -38,17 +38,18 @@ public abstract class MyFileBase {
     public static final Map<String, List<String>> RUNTIME_FI = new HashMap<>();
 
     static {
-        ArrayList<String> list = new ArrayList<>();
-        list.add(".asm");
-        list.add(".mixin.out");
-        list.add("assets");
-        list.add("libraries");
-        list.add("crash-reports");
-        list.add("logs");
-        list.add("versions");
-        RUNTIME_FI.put("\\", list);
-        list.add("saves");
-        DEFAULT_FI.put("\\", list);
+        ArrayList<String> list1 = new ArrayList<>();
+        list1.add(".asm");
+        list1.add(".mixin.out");
+        list1.add("assets");
+        list1.add("libraries");
+        list1.add("crash-reports");
+        list1.add("logs");
+        list1.add("versions");
+        RUNTIME_FI.put("\\", list1);
+        ArrayList<String> list2 = new ArrayList<String>(list1);
+        list2.add("saves");
+        DEFAULT_FI.put("\\", list2);
     }
 
     public static MyFileBase getMyFileSystemByFile(File file, Map<String, List<String>> exclude) {

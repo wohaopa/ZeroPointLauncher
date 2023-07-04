@@ -20,15 +20,17 @@
 
 package com.github.wohaopa.zpl.ui.scene;
 
+import java.util.*;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 
+import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zpl.ui.InstanceMaster;
 
 import io.vproxy.vfx.manager.font.FontManager;
@@ -37,6 +39,7 @@ import io.vproxy.vfx.ui.scene.VSceneRole;
 import io.vproxy.vfx.ui.toggle.ToggleSwitch;
 import io.vproxy.vfx.ui.wrapper.FusionW;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
+import io.vproxy.vfx.util.FXUtils;
 
 public class InstanceScene extends BaseVScene {
 
@@ -48,6 +51,13 @@ public class InstanceScene extends BaseVScene {
         {
             infoPane.setAlignment(Pos.CENTER);
             infoPane.setGridLinesVisible(true);
+            ColumnConstraints column1 = new ColumnConstraints(100);
+            ColumnConstraints column2 = new ColumnConstraints(50, 150, 300);
+            column2.setHgrow(Priority.ALWAYS);
+
+            infoPane.getColumnConstraints()
+                .addAll(column1, column2);
+
             infoPane.add(new ThemeLabel("名："), 0, 0);
             infoPane.add(new ThemeLabel("版本："), 0, 1);
             infoPane.add(new ThemeLabel("继承："), 0, 2);
@@ -60,7 +70,7 @@ public class InstanceScene extends BaseVScene {
             infoPane.add(getTextObj(InstanceMaster.depInstanceProperty()), 1, 2);
             infoPane.add(getTextObj(InstanceMaster.launcherProperty()), 1, 3);
             infoPane.add(getTextObj(InstanceMaster.sharerProperty()), 1, 4);
-            var toggleSwitch = new ToggleSwitch(5,20);
+            var toggleSwitch = new ToggleSwitch(5, 20);
             toggleSwitch.selectedProperty()
                 .bindBidirectional(InstanceMaster.updateProperty());
             toggleSwitch.selectedProperty()
@@ -69,15 +79,65 @@ public class InstanceScene extends BaseVScene {
                     if (oldValue == !newValue) InstanceMaster.hasChange();
                 });
 
-
             infoPane.add(toggleSwitch.getNode(), 1, 5);
         }
+        var fileTreePane = new TreeView<String>();
         {
-            var treePane = new TreeView<>();
+            fileTreePane.rootProperty()
+                .bind(InstanceMaster.rootProperty());
+            fileTreePane.setPrefWidth(200);
+        }
+        var treePane = new TreeView<String>();
+        {
+            var root = new TreeItem<>("继承图");
+            Map<String, String> nameToDep = new HashMap<>();
+            Map<String, TreeItem<String>> nameToItem = new HashMap<>();
+
+            nameToItem.put("null", root);
+
+            for (Instance instance : Instance.list()) {
+                nameToItem.put(instance.information.name, new TreeItem<>(instance.information.name));
+                nameToDep.put(instance.information.name, instance.information.depVersion);
+            }
+            nameToItem.forEach((s, stringTreeItem) -> {
+                if (s.equals("null")) return;
+                var dep = nameToItem.get(nameToDep.get(s));
+                dep.getChildren()
+                    .add(stringTreeItem);
+            });
+
+            treePane.setRoot(root);
+            treePane.setPrefHeight(100);
         }
 
         getContentPane().getChildren()
             .add(infoPane);
+        getContentPane().getChildren()
+            .add(treePane);
+        getContentPane().getChildren()
+            .add(fileTreePane);
+        getContentPane().widthProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                if (oldValue == null || newValue == null) return;
+                double width = newValue.doubleValue() * 0.3;
+                double x1 = width + newValue.doubleValue() * 0.05;
+                double x2 = x1 + newValue.doubleValue() * 0.05;
+
+                infoPane.setPrefWidth(width);
+
+                treePane.setPrefWidth(width);
+
+                fileTreePane.setPrefWidth(width);
+                fileTreePane.setLayoutX(x1);
+            });
+        getContentPane().heightProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                if (oldValue == null || newValue == null) return;
+
+                treePane.setPrefHeight(newValue.doubleValue() * 0.5);
+                treePane.setLayoutY(newValue.doubleValue() - treePane.getPrefHeight());
+            });
+        FXUtils.observeHeight(getContentPane(), fileTreePane);
     }
 
     @Override
