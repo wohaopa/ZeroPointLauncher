@@ -6,6 +6,7 @@ module ZeroPointLaunch.Core {
 
     exports com.github.wohaopa.zeropointlanuch.api;
     exports com.github.wohaopa.zeropointlanuch.core;
+    exports com.github.wohaopa.zeropointlanuch.core.filesystem;
     exports com.github.wohaopa.zeropointlanuch.core.download;
     exports com.github.wohaopa.zeropointlanuch.core.auth;
     exports com.github.wohaopa.zeropointlanuch.core.tasks;

@@ -41,7 +41,9 @@ public class HomeScene extends BaseVScene {
         getContentPane().getChildren()
             .add(label);
         FXUtils.observeWidthHeightCenter(getContentPane(), label);
-        setBackgroundImage(ImageManager.get().load("images/bg.jpg"));
+        setBackgroundImage(
+            ImageManager.get()
+                .load("images/bg.jpg"));
     }
 
     @Override

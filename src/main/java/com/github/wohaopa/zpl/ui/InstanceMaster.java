@@ -20,12 +20,20 @@
 
 package com.github.wohaopa.zpl.ui;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.filesystem.MyDirectory;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Scheduler;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.DiscoverInstanceTask;
 
 public class InstanceMaster {
@@ -39,6 +47,7 @@ public class InstanceMaster {
     private static StringProperty launcher = new SimpleStringProperty();
     private static StringProperty sharer = new SimpleStringProperty();
     private static BooleanProperty update = new SimpleBooleanProperty();
+    private static ObjectProperty<TreeItem<String>> root = new SimpleObjectProperty<>();
 
     static {
         try {
@@ -63,6 +72,8 @@ public class InstanceMaster {
         sharer.setValue(cur.information.sharer);
         launcher.setValue(cur.information.launcher);
         update.setValue(cur.information.update);
+
+        root.setValue(fillFileTree(instance, false));
     }
 
     public static Instance getCur() {
@@ -91,6 +102,10 @@ public class InstanceMaster {
 
     public static BooleanProperty updateProperty() {
         return update;
+    }
+
+    public static ObjectProperty<TreeItem<String>> rootProperty() {
+        return root;
     }
 
     public static void hasChange() {
@@ -128,5 +143,41 @@ public class InstanceMaster {
         }
 
         if (flag) cur.savaInformation();
+    }
+
+    private static Map<Instance, TreeItem<String>> cache = new HashMap<>();
+
+    private static TreeItem<String> fillFileTree(Instance instance, boolean update) {
+
+        if (!update && cache.containsKey(instance)) return cache.get(instance);
+        var root = new TreeItem<>("根："+instance.information.name);
+
+        Scheduler.submitTasks(new Task<Boolean>(null) {
+
+            @Override
+            public Boolean call() throws Exception {
+                var myDirectory = instance.getMapper()
+                    .getMyDirectory();
+                fillFileTree0(myDirectory, root);
+                return true;
+            }
+        });
+
+        return root;
+    }
+
+    private static void fillFileTree0(MyDirectory myDirectory, TreeItem<String> treeItem) {
+
+        var list = new LinkedList<TreeItem<String>>();
+
+        for (var name : myDirectory.list()) {
+            var obj = myDirectory.getSub(name);
+            var item = new TreeItem<>(obj.toString());
+            if (obj.isDirectory()) fillFileTree0((MyDirectory) obj, item);
+            list.add(item);
+        }
+        list.sort(Comparator.comparing(TreeItem::getValue));
+        treeItem.getChildren()
+            .addAll(list);
     }
 }

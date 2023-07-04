@@ -131,4 +131,8 @@ public class Mapper {
         Log.info("完成！");
         Log.end();
     }
+
+    public MyDirectory getMyDirectory() {
+        return myDirectory;
+    }
 }
