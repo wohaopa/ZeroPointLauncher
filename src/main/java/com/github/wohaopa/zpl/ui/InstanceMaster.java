@@ -55,10 +55,7 @@ public class InstanceMaster {
             throw new RuntimeException(e);
         }
         instances.setValue(FXCollections.observableArrayList(Instance.list()));
-        cur = instances.getValue()
-            .size() == 0 ? null
-                : (Instance) instances.getValue()
-                    .get(0);
+        cur = instances.getValue().size() == 0 ? null : (Instance) instances.getValue().get(0);
     }
 
     public static void change(Instance instance) {
@@ -102,11 +99,9 @@ public class InstanceMaster {
                         cache2.put(tmp[i], item);
                         if (i != 0) {
                             TreeItem<ModItem> pItem = cache2.get(tmp[i - 1]);
-                            pItem.getChildren()
-                                .add(item);
+                            pItem.getChildren().add(item);
                         } else {
-                            root.getChildren()
-                                .add(item);
+                            root.getChildren().add(item);
                         }
                     }
                 }
@@ -121,11 +116,8 @@ public class InstanceMaster {
             var modName = name.substring(name.lastIndexOf("\\") + 1);
             var item = cache2.get(modName);
             if (item != null) {
-                item.getValue()
-                    .setDisable(true);
-                item.getParent()
-                    .getValue()
-                    .setDisable(true);
+                item.getValue().setDisable(true);
+                item.getParent().getValue().setDisable(true);
             } else {
                 it.remove();
                 hasChange();
@@ -134,13 +126,9 @@ public class InstanceMaster {
 
         Comparator<TreeItem<ModItem>> cmp = (modItemTreeItem, t1) -> modItemTreeItem.getValue()
             .compareTo(t1.getValue());
-        root.getChildren()
-            .sort(cmp);
+        root.getChildren().sort(cmp);
         for (var item : cache2.values()) {
-            if (item.getChildren()
-                .size() != 0)
-                item.getChildren()
-                    .sort(cmp);
+            if (item.getChildren().size() != 0) item.getChildren().sort(cmp);
         }
         return root;
     }
@@ -217,8 +205,7 @@ public class InstanceMaster {
 
             @Override
             public Boolean call() {
-                var myDirectory = instance.getMapper()
-                    .getMyDirectory();
+                var myDirectory = instance.getMapper().getMyDirectory();
                 fillFileTree0(myDirectory, root);
                 return true;
             }
@@ -238,7 +225,6 @@ public class InstanceMaster {
             list.add(item);
         }
         list.sort(Comparator.comparing(TreeItem::getValue));
-        treeItem.getChildren()
-            .addAll(list);
+        treeItem.getChildren().addAll(list);
     }
 }

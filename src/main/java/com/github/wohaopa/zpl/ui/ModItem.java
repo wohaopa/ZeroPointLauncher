@@ -68,8 +68,7 @@ public class ModItem {
     }
 
     public int compareTo(ModItem value) {
-        return this.name.getValue()
-            .compareTo(value.name.getValue());
+        return this.name.getValue().compareTo(value.name.getValue());
     }
 
     public boolean getDisable() {

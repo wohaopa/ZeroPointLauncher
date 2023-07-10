@@ -42,10 +42,8 @@ public class Pump implements Runnable {
         try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, Charset.defaultCharset()))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                if (Thread.currentThread()
-                    .isInterrupted()) {
-                    Thread.currentThread()
-                        .interrupt();
+                if (Thread.currentThread().isInterrupted()) {
+                    Thread.currentThread().interrupt();
                     break;
                 }
 

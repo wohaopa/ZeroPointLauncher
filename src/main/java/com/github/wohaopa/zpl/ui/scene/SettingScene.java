@@ -34,12 +34,10 @@ public class SettingScene extends BaseVScene {
         var label = new ThemeLabel("设置") {
 
             {
-                FontManager.get()
-                    .setFont(this, settings -> settings.setSize(40));
+                FontManager.get().setFont(this, settings -> settings.setSize(40));
             }
         };
-        getContentPane().getChildren()
-            .add(label);
+        getContentPane().getChildren().add(label);
         FXUtils.observeWidthHeightCenter(getContentPane(), label);
     }
 

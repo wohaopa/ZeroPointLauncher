@@ -89,8 +89,7 @@ public class Mapper {
                 for (String s : instance1.information.includeMods) {
                     String modName = s.substring(s.lastIndexOf(MyFileBase.separator) + 1);
                     if ((excludeMods == null || !excludeMods.contains(s)) && !myMods.contains(modName)) {
-                        myMods.addSub(modName)
-                            .setTargetForFile(ModMaster.getModFile(s));
+                        myMods.addSub(modName).setTargetForFile(ModMaster.getModFile(s));
                     }
                 }
                 instance1 = Instance.get(instance1.information.depVersion);
@@ -115,11 +114,7 @@ public class Mapper {
         File linkInfo = new File(instance.insDir, "linkInfo.txt");
         List<Pair<String, String>> list = myDirectory.getMargeFileList();
         StringBuilder stringBuilder = new StringBuilder();
-        list.forEach(
-            s -> stringBuilder.append(s.getKey())
-                .append("->")
-                .append(s.getValue())
-                .append("\n"));
+        list.forEach(s -> stringBuilder.append(s.getKey()).append("->").append(s.getValue()).append("\n"));
         FileUtil.fileWrite(linkInfo, stringBuilder.toString());
         Log.info("链接文件：{}", linkInfo);
 

@@ -64,8 +64,7 @@ public class AssetsTask extends Task<Boolean> {
 
         new CheckoutTask(mcAssetsFile, "", callback).call();
 
-        JSONObject mcAssetsJsonObj = (JSONObject) JsonUtil.fromJson(mcAssetsFile)
-            .getByPath("objects");
+        JSONObject mcAssetsJsonObj = (JSONObject) JsonUtil.fromJson(mcAssetsFile).getByPath("objects");
 
         Set<File> files = new HashSet<>();
 

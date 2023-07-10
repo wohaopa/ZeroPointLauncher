@@ -65,8 +65,7 @@ public class InstanceScene extends BaseVScene {
             ColumnConstraints column2 = new ColumnConstraints(50, 150, 300);
             column2.setHgrow(Priority.ALWAYS);
 
-            infoPane.getColumnConstraints()
-                .addAll(column1, column2);
+            infoPane.getColumnConstraints().addAll(column1, column2);
 
             infoPane.add(new ThemeLabel("名："), 0, 0);
             infoPane.add(new ThemeLabel("版本："), 0, 1);
@@ -81,20 +80,17 @@ public class InstanceScene extends BaseVScene {
             infoPane.add(getTextObj(InstanceMaster.launcherProperty()), 1, 3);
             infoPane.add(getTextObj(InstanceMaster.sharerProperty()), 1, 4);
             var toggleSwitch = new ToggleSwitch(5, 20);
-            toggleSwitch.selectedProperty()
-                .bindBidirectional(InstanceMaster.updateProperty());
-            toggleSwitch.selectedProperty()
-                .addListener((observable, oldValue, newValue) -> {
-                    if (oldValue == null || newValue == null) return;;
-                    if (oldValue == !newValue) InstanceMaster.hasChange();
-                });
+            toggleSwitch.selectedProperty().bindBidirectional(InstanceMaster.updateProperty());
+            toggleSwitch.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                if (oldValue == null || newValue == null) return;;
+                if (oldValue == !newValue) InstanceMaster.hasChange();
+            });
 
             infoPane.add(toggleSwitch.getNode(), 1, 5);
         }
         var fileTreePane = new TreeView<String>();
         {
-            fileTreePane.rootProperty()
-                .bind(InstanceMaster.rootProperty());
+            fileTreePane.rootProperty().bind(InstanceMaster.rootProperty());
             fileTreePane.setPrefWidth(200);
         }
         var treePane = new TreeView<String>();
@@ -112,8 +108,7 @@ public class InstanceScene extends BaseVScene {
             nameToItem.forEach((s, stringTreeItem) -> {
                 if (s.equals("null")) return;
                 var dep = nameToItem.get(nameToDep.get(s));
-                dep.getChildren()
-                    .add(stringTreeItem);
+                dep.getChildren().add(stringTreeItem);
             });
 
             treePane.setRoot(root);
@@ -121,11 +116,9 @@ public class InstanceScene extends BaseVScene {
         }
         var modsPane = new TreeView<ModItem>();
         {
-            modsPane.rootProperty()
-                .bind(InstanceMaster.modsProperty());
+            modsPane.rootProperty().bind(InstanceMaster.modsProperty());
 
-            modsPane.getSelectionModel()
-                .setSelectionMode(SelectionMode.SINGLE);
+            modsPane.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             modsPane.setCellFactory(new Callback<>() {
 
                 @Override
@@ -141,8 +134,7 @@ public class InstanceScene extends BaseVScene {
                         {
                             hbox = new HBox();
                             label = new Label();
-                            hbox.getChildren()
-                                .add(label);
+                            hbox.getChildren().add(label);
                             normal = Background.EMPTY;
                             disabled = new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY));
                         }
@@ -152,8 +144,7 @@ public class InstanceScene extends BaseVScene {
                             super.updateItem(item, empty);
                             if (!empty) {
                                 this.setGraphic(hbox);
-                                label.textProperty()
-                                    .bind(item.nameProperty());
+                                label.textProperty().bind(item.nameProperty());
                                 if (item.getDisable()) {
                                     hbox.setBackground(disabled);
                                 } else hbox.setBackground(normal);
@@ -178,22 +169,15 @@ public class InstanceScene extends BaseVScene {
                     menuItem1.setOnAction(
                         event -> {
                             Main.openFileLocation(
-                                new File(
-                                    ZplDirectory.getModsDirectory(),
-                                    modItem.fullNameProperty()
-                                        .get()));
+                                new File(ZplDirectory.getModsDirectory(), modItem.fullNameProperty().get()));
                         });
                     menuItem2.setOnAction(event -> {
                         if (modItem.getDisable()) {
                             modItem.setDisable(false);
-                            InstanceMaster.getCur().information.excludeMods.remove(
-                                modItem.fullNameProperty()
-                                    .get());
+                            InstanceMaster.getCur().information.excludeMods.remove(modItem.fullNameProperty().get());
                         } else {
                             modItem.setDisable(true);
-                            InstanceMaster.getCur().information.excludeMods.add(
-                                modItem.fullNameProperty()
-                                    .get());
+                            InstanceMaster.getCur().information.excludeMods.add(modItem.fullNameProperty().get());
                         }
                         modsPane.refresh();
                     });
@@ -202,17 +186,12 @@ public class InstanceScene extends BaseVScene {
 
                         @Override
                         public void handle(ActionEvent event) {
-                            if (!InstanceMaster.getCur().information.name.equals(
-                                modItem.instanceProperty()
-                                    .get())) {
+                            if (!InstanceMaster.getCur().information.name.equals(modItem.instanceProperty().get())) {
                                 modItem.setDisable(true);
-                                InstanceMaster.getCur().information.excludeMods.add(
-                                    modItem.fullNameProperty()
-                                        .get());
+                                InstanceMaster.getCur().information.excludeMods.add(modItem.fullNameProperty().get());
                             } else {
-                                InstanceMaster.getCur().information.includeMods.remove(
-                                    modItem.fullNameProperty()
-                                        .get());
+                                InstanceMaster.getCur().information.includeMods
+                                    .remove(modItem.fullNameProperty().get());
                             }
                             InstanceMaster.refresh();
                         }
@@ -223,11 +202,8 @@ public class InstanceScene extends BaseVScene {
 
                 @Override
                 public void show(Node anchor, double screenX, double screenY) {
-                    modItem = modsPane.getSelectionModel()
-                        .getSelectedItem()
-                        .getValue();
-                    if (modItem.fullNameProperty()
-                        .get() == null) {
+                    modItem = modsPane.getSelectionModel().getSelectedItem().getValue();
+                    if (modItem.fullNameProperty().get() == null) {
                         menuItem1.setDisable(true);
                         menuItem2.setDisable(true);
                         menuItem3.setDisable(true);
@@ -262,22 +238,14 @@ public class InstanceScene extends BaseVScene {
             Instance instance;
 
             {
-                menuItem2.disableProperty()
-                    .bind(menuItem1.disableProperty());
-                menuItem2.disableProperty()
-                    .bind(menuItem1.disableProperty());
-                menuItem3.disableProperty()
-                    .bind(menuItem1.disableProperty());
-                menuItem4.disableProperty()
-                    .bind(menuItem1.disableProperty());
-                menuItem5.disableProperty()
-                    .bind(menuItem1.disableProperty());
-                menuItem6.disableProperty()
-                    .bind(menuItem1.disableProperty());
-                menuItem7.disableProperty()
-                    .bind(menuItem1.disableProperty());
-                menuItem8.disableProperty()
-                    .bind(menuItem1.disableProperty());
+                menuItem2.disableProperty().bind(menuItem1.disableProperty());
+                menuItem2.disableProperty().bind(menuItem1.disableProperty());
+                menuItem3.disableProperty().bind(menuItem1.disableProperty());
+                menuItem4.disableProperty().bind(menuItem1.disableProperty());
+                menuItem5.disableProperty().bind(menuItem1.disableProperty());
+                menuItem6.disableProperty().bind(menuItem1.disableProperty());
+                menuItem7.disableProperty().bind(menuItem1.disableProperty());
+                menuItem8.disableProperty().bind(menuItem1.disableProperty());
 
                 menuItem1.setOnAction(event -> Main.openFileLocation(instance.insDir));
                 menuItem2.setOnAction(event -> Main.openFileLocation(instance.runDir));
@@ -309,10 +277,7 @@ public class InstanceScene extends BaseVScene {
 
             @Override
             public void show(Node anchor, double screenX, double screenY) {
-                instance = Instance.get(
-                    treePane.getSelectionModel()
-                        .getSelectedItem()
-                        .getValue());
+                instance = Instance.get(treePane.getSelectionModel().getSelectedItem().getValue());
                 menuItem1.setDisable(instance == null);
                 super.show(anchor, screenX, screenY);
             }
@@ -331,44 +296,37 @@ public class InstanceScene extends BaseVScene {
 
         treePane.setContextMenu(menuInstance);
 
-        getContentPane().getChildren()
-            .add(infoPane);
-        getContentPane().getChildren()
-            .add(menuBtn);
-        getContentPane().getChildren()
-            .add(treePane);
-        getContentPane().getChildren()
-            .add(fileTreePane);
-        getContentPane().getChildren()
-            .add(modsPane);
+        getContentPane().getChildren().add(infoPane);
+        getContentPane().getChildren().add(menuBtn);
+        getContentPane().getChildren().add(treePane);
+        getContentPane().getChildren().add(fileTreePane);
+        getContentPane().getChildren().add(modsPane);
 
-        getContentPane().widthProperty()
-            .addListener((observable, oldValue, newValue) -> {
-                if (oldValue == null || newValue == null) return;
+        getContentPane().widthProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue == null || newValue == null) return;
 
-                double allWidth = newValue.doubleValue() - 20;
-                double width = allWidth * 0.33333;
-                double x1 = width + 10;
-                double x2 = x1 + width + 10;
+            double allWidth = newValue.doubleValue() - 20;
+            double width = allWidth * 0.33333;
+            double x1 = width + 10;
+            double x2 = x1 + width + 10;
 
-                infoPane.setPrefWidth(width);
-                treePane.setPrefWidth(width);
+            infoPane.setPrefWidth(width);
+            treePane.setPrefWidth(width);
 
-                fileTreePane.setPrefWidth(width);
-                fileTreePane.setLayoutX(x1);
+            fileTreePane.setPrefWidth(width);
+            fileTreePane.setLayoutX(x1);
 
-                modsPane.setPrefWidth(width);
-                modsPane.setLayoutX(x2);
-            });
-        getContentPane().heightProperty()
-            .addListener((observable, oldValue, newValue) -> {
-                if (oldValue == null || newValue == null) return;
+            modsPane.setPrefWidth(width);
+            modsPane.setLayoutX(x2);
+        });
+        getContentPane().heightProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue == null || newValue == null) return;
 
-                treePane.setPrefHeight(newValue.doubleValue() * 0.5);
-                treePane.setLayoutY(newValue.doubleValue() - treePane.getPrefHeight());
+            treePane.setPrefHeight(newValue.doubleValue() * 0.5);
+            treePane.setLayoutY(newValue.doubleValue() - treePane.getPrefHeight());
 
-                menuBtn.setLayoutY(treePane.getLayoutY() - menuBtn.getPrefHeight() - 5);
-            });
+            menuBtn.setLayoutY(treePane.getLayoutY() - menuBtn.getPrefHeight() - 5);
+        });
         FXUtils.observeHeight(getContentPane(), fileTreePane);
         FXUtils.observeHeight(getContentPane(), modsPane);
     }
@@ -389,22 +347,19 @@ public class InstanceScene extends BaseVScene {
         var text = new FusionW(textField) {
 
             {
-                FontManager.get()
-                    .setFont(FontUsages.tableCellText, getLabel());
+                FontManager.get().setFont(FontUsages.tableCellText, getLabel());
             }
         };
 
-        textField.textProperty()
-            .bindBidirectional(property);
+        textField.textProperty().bindBidirectional(property);
         textField.setPadding(new Insets(0, 10, 0, 0));
-        textField.focusedProperty()
-            .addListener((ob, old, now) -> {
-                if (old == null || now == null) return;
-                if (old && !now) {
-                    property.setValue(textField.getText());
-                    InstanceMaster.hasChange();
-                }
-            });
+        textField.focusedProperty().addListener((ob, old, now) -> {
+            if (old == null || now == null) return;
+            if (old && !now) {
+                property.setValue(textField.getText());
+                InstanceMaster.hasChange();
+            }
+        });
 
         return text;
     }

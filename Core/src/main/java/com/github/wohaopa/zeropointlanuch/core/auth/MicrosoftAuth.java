@@ -18,45 +18,12 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.utils;
+package com.github.wohaopa.zeropointlanuch.core.auth;
 
-import java.io.File;
-import java.nio.charset.Charset;
+public class MicrosoftAuth extends Auth {
 
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONUtil;
+    @Override
+    protected void login() {
 
-public class JsonUtil {
-
-    /**
-     * 对象->字符串
-     *
-     * @param obj 对象
-     * @return json字符串
-     * @param <T> json对象类型
-     */
-    public static <T> String toJson(T obj) {
-        if (obj == null) throw new RuntimeException("obj is null");
-        return JSONUtil.parse(obj).toJSONString(4);
-    }
-
-    /**
-     * 字符串->对象
-     *
-     * @param json json字符串
-     * @return json对象
-     */
-    public static JSON fromJson(String json) {
-        return JSONUtil.parse(json);
-    }
-
-    /**
-     * 加载json文件
-     *
-     * @param jsonFile json文件
-     * @return JSON对象
-     */
-    public static JSON fromJson(File jsonFile) {
-        return JSONUtil.readJSON(jsonFile, Charset.defaultCharset());
     }
 }

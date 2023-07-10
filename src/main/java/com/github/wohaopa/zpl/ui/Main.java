@@ -56,8 +56,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        ImageManager.get()
-            .loadBlackAndChangeColor("/images/menu.png", Map.of("white", 0xffffffff));
+        ImageManager.get().loadBlackAndChangeColor("/images/menu.png", Map.of("white", 0xffffffff));
         // ImageManager.get().loadBlackAndChangeColor("/images/up-arrow.png", Map.of("white",
         // 0xffffffff));
 
@@ -66,15 +65,13 @@ public class Main extends Application {
             @Override
             public void close() {
                 super.close();
-                TaskManager.get()
-                    .terminate();
+                TaskManager.get().terminate();
                 GlobalScreenUtils.unregister();
                 Platform.exit();
                 System.exit(0);
             }
         };
-        stage.getInitialScene()
-            .enableAutoContentWidthHeight();
+        stage.getInitialScene().enableAutoContentWidthHeight();
 
         stage.setTitle("ZeroPointLauncher - A GTNH Launcher");
 
@@ -94,89 +91,68 @@ public class Main extends Application {
         // 启动栏
         var launchPane = new FusionPane();
         {
-            launchPane.getNode()
-                .setPrefHeight(60);
+            launchPane.getNode().setPrefHeight(60);
 
             var accountButton = new ChoiceBox<>(AccountMaster.getAccounts());
 
             {
                 accountButton.setPrefWidth(200);
-                accountButton.setPrefHeight(
-                    launchPane.getNode()
-                        .getPrefHeight() - FusionPane.PADDING_V * 2);
+                accountButton.setPrefHeight(launchPane.getNode().getPrefHeight() - FusionPane.PADDING_V * 2);
 
                 accountButton.setBackground(
                     new Background(
                         new BackgroundFill(
-                            Theme.current()
-                                .subSceneBackgroundColor(),
+                            Theme.current().subSceneBackgroundColor(),
                             CornerRadii.EMPTY,
                             Insets.EMPTY)));
                 accountButton.getSelectionModel()
                     .selectedItemProperty()
                     .addListener(
                         (observable, oldValue, newValue) -> { if (newValue != null) AccountMaster.change(newValue); });
-                accountButton.getSelectionModel()
-                    .select(AccountMaster.getCur());
+                accountButton.getSelectionModel().select(AccountMaster.getCur());
             }
 
             var instanceButton = new ChoiceBox<>();
 
             {
                 instanceButton.setPrefWidth(200);
-                instanceButton.setPrefHeight(
-                    launchPane.getNode()
-                        .getPrefHeight() - FusionPane.PADDING_V * 2);
+                instanceButton.setPrefHeight(launchPane.getNode().getPrefHeight() - FusionPane.PADDING_V * 2);
 
                 instanceButton.setBackground(
                     new Background(
                         new BackgroundFill(
-                            Theme.current()
-                                .subSceneBackgroundColor(),
+                            Theme.current().subSceneBackgroundColor(),
                             CornerRadii.EMPTY,
                             Insets.EMPTY)));
-                instanceButton.getStylesheets()
-                    .add("css/choice-box.css");
+                instanceButton.getStylesheets().add("css/choice-box.css");
 
-                instanceButton.itemsProperty()
-                    .bind(InstanceMaster.instancesProperty());
+                instanceButton.itemsProperty().bind(InstanceMaster.instancesProperty());
                 instanceButton.getSelectionModel()
                     .selectedItemProperty()
                     .addListener(
                         (observable, oldValue, newValue) -> {
                             if (newValue != null) InstanceMaster.change((Instance) newValue);
                         });
-                instanceButton.getSelectionModel()
-                    .select(InstanceMaster.getCur());
+                instanceButton.getSelectionModel().select(InstanceMaster.getCur());
             }
 
             var launchButton = new FusionButton("启动");
             {
                 launchButton.setPrefWidth(200);
-                launchButton.setPrefHeight(
-                    launchPane.getNode()
-                        .getPrefHeight() - FusionPane.PADDING_V * 2);
+                launchButton.setPrefHeight(launchPane.getNode().getPrefHeight() - FusionPane.PADDING_V * 2);
                 launchButton.setOnlyAnimateWhenNotClicked(true);
             }
 
-            launchPane.getContentPane()
-                .getChildren()
-                .add(accountButton);
-            launchPane.getContentPane()
-                .getChildren()
-                .add(instanceButton);
-            launchPane.getContentPane()
-                .getChildren()
-                .add(launchButton);
+            launchPane.getContentPane().getChildren().add(accountButton);
+            launchPane.getContentPane().getChildren().add(instanceButton);
+            launchPane.getContentPane().getChildren().add(launchButton);
 
-            launchPane.getContentPane()
-                .widthProperty()
-                .addListener((ob, old, now) -> {
-                    if (now == null) return;
-                    var v = now.doubleValue();
-                    instanceButton.setLayoutX((v - instanceButton.getPrefWidth()) / 2);
-                    launchButton.setLayoutX(v - launchButton.getPrefWidth());
-                });
+            launchPane.getContentPane().widthProperty().addListener((ob, old, now) -> {
+                if (now == null) return;
+                var v = now.doubleValue();
+                instanceButton.setLayoutX((v - instanceButton.getPrefWidth()) / 2);
+                launchButton.setLayoutX(v - launchButton.getPrefWidth());
+            });
         }
 
         var box = new HBox(
@@ -184,44 +160,26 @@ public class Main extends Application {
             new VBox(new VPadding(10), sceneGroup.getNode(), new VPadding(5), launchPane.getNode()),
             new HPadding(10));
 
-        stage.getInitialScene()
-            .getContentPane()
-            .getChildren()
-            .add(box);
+        stage.getInitialScene().getContentPane().getChildren().add(box);
 
-        FXUtils.observeHeight(
-            stage.getInitialScene()
-                .getContentPane(),
-            sceneGroup.getNode(),
-            -10 - 60 - 5 - 10);
-        FXUtils.observeWidth(
-            stage.getInitialScene()
-                .getContentPane(),
-            sceneGroup.getNode(),
-            -20);
-        FXUtils.observeWidth(
-            stage.getInitialScene()
-                .getContentPane(),
-            launchPane.getNode(),
-            -20);
+        FXUtils.observeHeight(stage.getInitialScene().getContentPane(), sceneGroup.getNode(), -10 - 60 - 5 - 10);
+        FXUtils.observeWidth(stage.getInitialScene().getContentPane(), sceneGroup.getNode(), -20);
+        FXUtils.observeWidth(stage.getInitialScene().getContentPane(), launchPane.getNode(), -20);
 
         // 菜单
         var menuScene = new VScene(VSceneRole.DRAWER_VERTICAL);
         {
-            menuScene.getNode()
-                .setPrefWidth(150);
+            menuScene.getNode().setPrefWidth(150);
             // menuScene.enableAutoContentWidth();
             menuScene.enableAutoContentWidth();
             menuScene.getNode()
                 .setBackground(
                     new Background(
                         new BackgroundFill(
-                            Theme.current()
-                                .subSceneBackgroundColor(),
+                            Theme.current().subSceneBackgroundColor(),
                             CornerRadii.EMPTY,
                             Insets.EMPTY)));
-            stage.getRootSceneGroup()
-                .addScene(menuScene, VSceneHideMethod.TO_LEFT);
+            stage.getRootSceneGroup().addScene(menuScene, VSceneHideMethod.TO_LEFT);
             var menuVBox = new VBox() {
 
                 {
@@ -230,9 +188,7 @@ public class Main extends Application {
                     getChildren().add(new VPadding(5));
                 }
             };
-            menuScene.getContentPane()
-                .getChildren()
-                .add(menuVBox);
+            menuScene.getContentPane().getChildren().add(menuVBox);
             for (int i = 0; i < mainScenes.size(); ++i) {
                 final var fi = i;
                 var s = mainScenes.get(i);
@@ -246,25 +202,19 @@ public class Main extends Application {
                         sceneGroup
                             .show(s, currentIndex < fi ? VSceneShowMethod.FROM_RIGHT : VSceneShowMethod.FROM_LEFT);
                     }
-                    stage.getRootSceneGroup()
-                        .hide(menuScene, VSceneHideMethod.TO_LEFT);
+                    stage.getRootSceneGroup().hide(menuScene, VSceneHideMethod.TO_LEFT);
                 });
                 button.setPrefWidth(100);
                 button.setPrefHeight(40);
                 if (i != 0) {
-                    menuVBox.getChildren()
-                        .add(new VPadding(5));
+                    menuVBox.getChildren().add(new VPadding(5));
                 }
-                menuVBox.getChildren()
-                    .add(button);
+                menuVBox.getChildren().add(button);
             }
-            menuVBox.getChildren()
-                .add(new VPadding(5));
+            menuVBox.getChildren().add(new VPadding(5));
         }
 
-        var menuBtn = new FusionImageButton(
-            ImageManager.get()
-                .load("images/menu.png:white")) {
+        var menuBtn = new FusionImageButton(ImageManager.get().load("images/menu.png:white")) {
 
             {
                 setPrefWidth(40);
@@ -274,38 +224,24 @@ public class Main extends Application {
                 setLayoutY(-1);
             }
         };
-        menuBtn.setOnAction(
-            e -> stage.getRootSceneGroup()
-                .show(menuScene, VSceneShowMethod.FROM_LEFT));
-        stage.getRoot()
-            .getContentPane()
-            .getChildren()
-            .add(menuBtn);
+        menuBtn.setOnAction(e -> stage.getRootSceneGroup().show(menuScene, VSceneShowMethod.FROM_LEFT));
+        stage.getRoot().getContentPane().getChildren().add(menuBtn);
 
-        stage.getStage()
-            .setWidth(768);
-        stage.getStage()
-            .setHeight(480);
-        stage.getStage()
-            .centerOnScreen();
-        stage.getStage()
-            .show();
+        stage.getStage().setWidth(768);
+        stage.getStage().setHeight(480);
+        stage.getStage().centerOnScreen();
+        stage.getStage().show();
     }
 
     public static void launch(String[] args) {
         Theme.setTheme(new ZplTheme());
         Application.launch(Main.class, args);
-        var file = Main.class.getClassLoader()
-            .getResource("css/choice-box.css");
-        System.out.println(file);
     }
 
     public static void openFileLocation(File path) {
         try {
-            if (path.isFile()) Runtime.getRuntime()
-                .exec("explorer.exe /e,/select," + path);
-            else Runtime.getRuntime()
-                .exec("explorer.exe /e," + path + "\\");
+            if (path.isFile()) Runtime.getRuntime().exec("explorer.exe /e,/select," + path);
+            else Runtime.getRuntime().exec("explorer.exe /e," + path + "\\");
         } catch (IOException ex) {
             Log.warn(ex.getMessage());
         }

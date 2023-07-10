@@ -85,27 +85,19 @@ public class LibrariesTask extends Task<Boolean> {
         }
 
         for (Future<File> file : futuresNative) {
-            Log.debug(
-                "解压本地库:{}",
-                file.get()
-                    .getName());
+            Log.debug("解压本地库:{}", file.get().getName());
             Scheduler.submitTasks(
                 new DecompressTask(
                     file.get(),
                     natives,
-                    archiveEntry -> !archiveEntry.getName()
-                        .equals("META-INF"),
+                    archiveEntry -> !archiveEntry.getName().equals("META-INF"),
                     callback));
         }
         StringBuilder sb = new StringBuilder();
         String s = ";";
         for (Future<File> file : futures) {
-            Log.debug(
-                "校验完成:{}",
-                file.get()
-                    .getName());
-            sb.append(file.get())
-                .append(s);
+            Log.debug("校验完成:{}", file.get().getName());
+            sb.append(file.get()).append(s);
 
         }
 
@@ -148,8 +140,7 @@ public class LibrariesTask extends Task<Boolean> {
                 nativesStr = object.getByPath("natives.windows", String.class);
                 if (nativesStr != null) {
 
-                    if (object.containsKey("rules")) for (JSONObject rule : object.getJSONArray("rules")
-                        .jsonIter())
+                    if (object.containsKey("rules")) for (JSONObject rule : object.getJSONArray("rules").jsonIter())
                         if ("allow".equals(rule.get("action")) && rule.containsKey("os"))
                             enable = "windows".equals(rule.getByPath("os.name"));
                         else if ("disallow".equals(rule.get("action")) && rule.containsKey("os"))
@@ -170,8 +161,7 @@ public class LibrariesTask extends Task<Boolean> {
                     sha1 = jsonObject.getStr("sha1");
                 } else enable = false;
             } else {
-                if (object.containsKey("rules")) for (JSONObject rule : object.getJSONArray("rules")
-                    .jsonIter())
+                if (object.containsKey("rules")) for (JSONObject rule : object.getJSONArray("rules").jsonIter())
                     if ("allow".equals(rule.get("action")) && rule.containsKey("os"))
                         enable = "windows".equals(rule.get("os.name"));
                     else if ("disallow".equals(rule.get("action")) && rule.containsKey("os"))

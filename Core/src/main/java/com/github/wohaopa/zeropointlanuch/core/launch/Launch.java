@@ -87,10 +87,8 @@ public class Launch {
         this.name = name;
         this.version = new Version(name, new File(ZplDirectory.getVersionsDirectory(), name + ".json"));
         inst.put(name, this);
-        if (name.endsWith("Java8")) javaPath = Config.getConfig()
-            .getJava8Path();
-        else javaPath = Config.getConfig()
-            .getJava17Path();
+        if (name.endsWith("Java8")) javaPath = Config.getConfig().getJava8Path();
+        else javaPath = Config.getConfig().getJava17Path();
     }
 
     private String[] getLaunchArguments(Auth auth, File runDir) {
@@ -145,8 +143,7 @@ public class Launch {
 
             @Override
             public void accept(String s) {
-                if (pattern.matcher(s)
-                    .find()) resume[0] = false;
+                if (pattern.matcher(s).find()) resume[0] = false;
 
                 System.out.println(s);
 

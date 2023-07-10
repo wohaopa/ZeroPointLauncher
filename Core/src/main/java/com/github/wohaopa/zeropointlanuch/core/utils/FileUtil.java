@@ -78,10 +78,8 @@ public class FileUtil {
     public static boolean moveFile(File src, File target) {
         if (src.isFile()) {
             if (target.exists()) return false;
-            if (!target.getParentFile()
-                .exists())
-                if (!target.getParentFile()
-                    .mkdirs()) throw new RuntimeException("无法创建文件夹：" + target.getParentFile());
+            if (!target.getParentFile().exists())
+                if (!target.getParentFile().mkdirs()) throw new RuntimeException("无法创建文件夹：" + target.getParentFile());
             return src.renameTo(target);
         }
         return false;

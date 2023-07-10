@@ -56,17 +56,8 @@ public class DownloadProvider {
 
         if (useMap && map.containsKey(file)) return map.get(file);
 
-        if (file.toString()
-            .startsWith(
-                ZplDirectory.getWorkDirectory()
-                    .toString()))
-            return getUrlForPath0(
-                file.toString()
-                    .substring(
-                        ZplDirectory.getWorkDirectory()
-                            .toString()
-                            .length())
-                    .replace("\\", "/"));
+        if (file.toString().startsWith(ZplDirectory.getWorkDirectory().toString())) return getUrlForPath0(
+            file.toString().substring(ZplDirectory.getWorkDirectory().toString().length()).replace("\\", "/"));
         return null;
 
     }

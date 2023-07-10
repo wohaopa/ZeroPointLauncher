@@ -73,11 +73,7 @@ public class MyFile extends MyFileBase {
         if (shade) {
 
             Log.debug("影子文件：{}", path);
-            list.add(
-                new Pair<>(
-                    getFile().toString(),
-                    target.getFile()
-                        .toString()));
+            list.add(new Pair<>(getFile().toString(), target.getFile().toString()));
 
         }
     }
