@@ -72,14 +72,12 @@ public abstract class MyFileBase {
             if (json.size() < 2) {
                 for (String obj : json.keySet()) {
                     if (!obj.endsWith(separator)) {
-                        return new MyFile(null, obj).setChecksum(json.getLong(obj))
-                            .setRootDir(rootDir);
+                        return new MyFile(null, obj).setChecksum(json.getLong(obj)).setRootDir(rootDir);
                     }
                 }
             }
 
-            return new MyDirectory(null, name + separator).makeMyFileSystemInstance(json)
-                .setRootDir(rootDir);
+            return new MyDirectory(null, name + separator).makeMyFileSystemInstance(json).setRootDir(rootDir);
 
         } else throw new RuntimeException(file + "不为文件！");
     }
@@ -98,9 +96,7 @@ public abstract class MyFileBase {
     }
 
     public static void update(MyFileBase myFileBase1, File rootDir, File json) {
-        myFileBase1.setRootDir(rootDir)
-            .update(json.lastModified())
-            .saveChecksumAsJson(json);
+        myFileBase1.setRootDir(rootDir).update(json.lastModified()).saveChecksumAsJson(json);
 
     }
 
@@ -195,8 +191,7 @@ public abstract class MyFileBase {
         }
 
         public List<String> getFails() {
-            return (List<String>) fails.stream()
-                .map(myFileBase -> myFileBase.path);
+            return (List<String>) fails.stream().map(myFileBase -> myFileBase.path);
         }
 
         public void addFail(MyFileBase myFileBase) {

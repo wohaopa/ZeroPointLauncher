@@ -37,15 +37,13 @@ public class ModMaster {
 
     static {
         modiMap = new HashMap<>();
-        String mapStr = ResourceUtil.readStr("zpl-mod-repo.map", Charset.defaultCharset())
-            .replace("\r", "");
+        String mapStr = ResourceUtil.readStr("zpl-mod-repo.map", Charset.defaultCharset()).replace("\r", "");
 
         String[] mapStrLine = mapStr.split("\n");
-        Arrays.stream(mapStrLine)
-            .forEach(line -> {
-                String[] tmp = line.split("->");
-                modiMap.put(tmp[0], tmp[1]);
-            });
+        Arrays.stream(mapStrLine).forEach(line -> {
+            String[] tmp = line.split("->");
+            modiMap.put(tmp[0], tmp[1]);
+        });
     }
 
     public static String getModRepo(String modFileName) {
@@ -65,8 +63,7 @@ public class ModMaster {
         List<String> mods = new LinkedList<>();
         if (!modsDir.exists()) return mods;
         for (File mod : Objects.requireNonNull(modsDir.listFiles())) {
-            if (mod.isFile() && !mod.getName()
-                .startsWith("MrTJPCore")) {
+            if (mod.isFile() && !mod.getName().startsWith("MrTJPCore")) {
                 String modFileName = mod.getName();
                 String modRepo = ModMaster.getModRepo(modFileName);
                 String path = modRepo + "\\" + modFileName;

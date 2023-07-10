@@ -29,12 +29,10 @@ public class LinkTools {
 
     private static boolean enable;
     private static final File fileJar = new File(
-        ZplDirectory.getWorkDirectory()
-            .getParentFile(),
+        ZplDirectory.getWorkDirectory().getParentFile(),
         "lib\\MappingTools.jar");
     private static final File cmdFile = new File(
-        ZplDirectory.getWorkDirectory()
-            .getParentFile(),
+        ZplDirectory.getWorkDirectory().getParentFile(),
         "lib\\MappingTools.bat");
 
     static {

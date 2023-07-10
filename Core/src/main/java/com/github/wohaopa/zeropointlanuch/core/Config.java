@@ -29,15 +29,11 @@ import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 public class Config {
 
     private static Config config;
-    private static final File configFile = new File(
-        ZplDirectory.getWorkDirectory()
-            .getParentFile(),
-        "config.json");
+    private static final File configFile = new File(ZplDirectory.getWorkDirectory().getParentFile(), "config.json");
 
     static {
         loadConfig();
-        Runtime.getRuntime()
-            .addShutdownHook(new Thread(Config::saveConfig));
+        Runtime.getRuntime().addShutdownHook(new Thread(Config::saveConfig));
     }
 
     public static Config getConfig() {
@@ -48,8 +44,7 @@ public class Config {
         Log.debug("正在加载设置文件：{}", configFile.toString());
         if (!configFile.exists()) config = new Config();
         else try {
-            config = JsonUtil.fromJson(configFile)
-                .toBean(Config.class);
+            config = JsonUtil.fromJson(configFile).toBean(Config.class);
         } catch (Exception e) {
             Log.warn("配置文件错误：{}", configFile.toString());
             configFile.delete();

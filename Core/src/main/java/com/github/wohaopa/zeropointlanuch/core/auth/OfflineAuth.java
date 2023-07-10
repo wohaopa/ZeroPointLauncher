@@ -37,9 +37,7 @@ public class OfflineAuth extends Auth {
     @Override
     protected void login() {
 
-        auth_access_token = UUID.randomUUID()
-            .toString()
-            .replace("-", "");
+        auth_access_token = UUID.randomUUID().toString().replace("-", "");
 
     }
 

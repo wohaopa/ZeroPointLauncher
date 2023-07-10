@@ -108,16 +108,13 @@ public class MyDirectory extends MyFileBase {
                 fileBase.diffWith(other1.getSub(fileBase.name));
             } else {
                 fileBase.setSate(Sate.only_me);
-                other1.addSub(fileBase.name)
-                    .setSate(Sate.only_other);
+                other1.addSub(fileBase.name).setSate(Sate.only_other);
             }
         }
 
         for (String name : list) {
-            other1.getSub(name)
-                .setSate(Sate.only_me);
-            this.addSub(name)
-                .setSate(Sate.only_other);
+            other1.getSub(name).setSate(Sate.only_me);
+            this.addSub(name).setSate(Sate.only_other);
         }
 
         Sate tmpSate = Sate.equal;
@@ -158,14 +155,9 @@ public class MyDirectory extends MyFileBase {
         if (shade) {
 
             Log.debug("影子目录：{}", path);
-            list.add(
-                new Pair<>(
-                    getFile().toString(),
-                    target.getFile()
-                        .toString()));
+            list.add(new Pair<>(getFile().toString(), target.getFile().toString()));
 
-        } else subs.values()
-            .forEach(myFileBase -> myFileBase.getMargeFileList(list));
+        } else subs.values().forEach(myFileBase -> myFileBase.getMargeFileList(list));
     }
 
     @Override
@@ -173,23 +165,22 @@ public class MyDirectory extends MyFileBase {
         MyDirectory other1 = (MyDirectory) other;
 
         if (margeInfo.include(other1.path)) this.target = other1;
-        else if (!margeInfo.exclude(other1.path)) other1.list()
-            .forEach(s -> {
-                MyFileBase otherFileBase = other1.getSub(s);
-                if (!otherFileBase.shade) {
-                    if (contains(s)) {
-                        MyFileBase fileBase = getSub(s);
-                        if (fileBase.isDirectory() && fileBase.shade) {
-                            ((MyDirectory) fileBase).devolveShade().shade = false;
-                        }
-                        fileBase.margeWith(otherFileBase, margeInfo);
-                    } else {
-                        MyFileBase fileBase = addSub(otherFileBase.name);
-                        fileBase.addTarget(otherFileBase);
-                        fileBase.shade = true;
+        else if (!margeInfo.exclude(other1.path)) other1.list().forEach(s -> {
+            MyFileBase otherFileBase = other1.getSub(s);
+            if (!otherFileBase.shade) {
+                if (contains(s)) {
+                    MyFileBase fileBase = getSub(s);
+                    if (fileBase.isDirectory() && fileBase.shade) {
+                        ((MyDirectory) fileBase).devolveShade().shade = false;
                     }
+                    fileBase.margeWith(otherFileBase, margeInfo);
+                } else {
+                    MyFileBase fileBase = addSub(otherFileBase.name);
+                    fileBase.addTarget(otherFileBase);
+                    fileBase.shade = true;
                 }
-            });
+            }
+        });
 
         return this;
     }
@@ -204,8 +195,7 @@ public class MyDirectory extends MyFileBase {
                 String name = file1.isFile() ? file1.getName() : file1.getName() + separator;
                 if (subs.containsKey(name)) {
                     list.remove(name);
-                    subs.get(name)
-                        .update(time);
+                    subs.get(name).update(time);
                 } else {
                     Log.debug("文件夹\"{}\"：新增文件：\"{}\"", this.name, name);
                     if (file1.isFile()) {

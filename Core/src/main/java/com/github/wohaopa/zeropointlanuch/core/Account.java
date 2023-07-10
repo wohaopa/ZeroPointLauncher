@@ -33,11 +33,9 @@ public class Account {
     private static Auth cur;
 
     static {
-        List<String> list = Config.getConfig()
-            .getAccounts();
+        List<String> list = Config.getConfig().getAccounts();
         if (list == null) {
-            Config.getConfig()
-                .setAccounts(new ArrayList<>());
+            Config.getConfig().setAccounts(new ArrayList<>());
 
         } else if (!list.isEmpty()) {
             list.forEach(s -> auths.add(new OfflineAuth(s)));
@@ -50,9 +48,7 @@ public class Account {
 
     public static void add(Auth auth) {
         auths.add(auth);
-        Config.getConfig()
-            .getAccounts()
-            .add(auth.getName());
+        Config.getConfig().getAccounts().add(auth.getName());
     }
 
     public static void select(Auth value) {

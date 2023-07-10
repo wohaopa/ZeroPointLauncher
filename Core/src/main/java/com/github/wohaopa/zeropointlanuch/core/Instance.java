@@ -254,8 +254,7 @@ public class Instance {
 
         public static Information formJson(File file) {
             Log.debug("正在加载：{}", file);
-            return JsonUtil.fromJson(file)
-                .toBean(Information.class);
+            return JsonUtil.fromJson(file).toBean(Information.class);
         }
 
         public static void toJson(Information information, File file) {

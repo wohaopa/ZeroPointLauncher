@@ -57,10 +57,7 @@ public class MyFileSystemTest {
         Scanner scanner = new Scanner(System.in);
 
         for (File file : Objects.requireNonNull(new File(root + File.separator + "versions").listFiles())) {
-            map.put(
-                file.getName()
-                    .replace(".json", ""),
-                file);
+            map.put(file.getName().replace(".json", ""), file);
         }
         while (true) {
             System.out

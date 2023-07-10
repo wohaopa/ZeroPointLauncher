@@ -39,19 +39,17 @@ public class Mapping {
 
         String context;
         try {
-            context = Objects.requireNonNull(readFileToString(file))
-                .replace("\r", "");
+            context = Objects.requireNonNull(readFileToString(file)).replace("\r", "");
         } catch (Exception e) {
             throw new RuntimeException("无效文件：" + e);
         }
         String[] lines = context.split("\n");
 
-        Arrays.stream(lines)
-            .forEach(s -> {
-                String[] t = s.split("->", 2);
-                if (t.length >= 2) doLink(t[0], t[1]);
-                else System.out.println("错误：" + t + "文件：" + args[0]);
-            });
+        Arrays.stream(lines).forEach(s -> {
+            String[] t = s.split("->", 2);
+            if (t.length >= 2) doLink(t[0], t[1]);
+            else System.out.println("错误：" + t + "文件：" + args[0]);
+        });
         if (lock.delete()) System.out.println("[警告]无法通知启动器映射情况！请手动删除文件：" + lock);
         System.out.println("链接完成！按任意键退出");
     }

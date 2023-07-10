@@ -34,16 +34,12 @@ public class HomeScene extends BaseVScene {
         var label = new ThemeLabel("ZPL GTNH启动器") {
 
             {
-                FontManager.get()
-                    .setFont(this, settings -> settings.setSize(40));
+                FontManager.get().setFont(this, settings -> settings.setSize(40));
             }
         };
-        getContentPane().getChildren()
-            .add(label);
+        getContentPane().getChildren().add(label);
         FXUtils.observeWidthHeightCenter(getContentPane(), label);
-        setBackgroundImage(
-            ImageManager.get()
-                .load("images/bg.jpg"));
+        setBackgroundImage(ImageManager.get().load("images/bg.jpg"));
     }
 
     @Override

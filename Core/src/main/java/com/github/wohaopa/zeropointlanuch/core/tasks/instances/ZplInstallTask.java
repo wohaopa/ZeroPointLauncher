@@ -59,8 +59,7 @@ public class ZplInstallTask extends Task<Instance> {
         Log.debug("解压完成！用时：{}s", (time2 - time1) / 1000);
 
         Instance.Builder builder = new Instance.Builder(new File(instanceDir, "version.json"));
-        builder.setName(name)
-            .saveConfig();
+        builder.setName(name).saveConfig();
         Instance instance = builder.build();
         String dep = instance.information.depVersion;
         if (dep != null && !dep.equals("null")) {

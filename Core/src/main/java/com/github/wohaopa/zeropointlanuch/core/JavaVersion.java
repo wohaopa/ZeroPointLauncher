@@ -81,10 +81,8 @@ public class JavaVersion {
             new InputStreamReader(process.getErrorStream(), Charset.defaultCharset()))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                if (Thread.currentThread()
-                    .isInterrupted()) {
-                    Thread.currentThread()
-                        .interrupt();
+                if (Thread.currentThread().isInterrupted()) {
+                    Thread.currentThread().interrupt();
                     break;
                 }
 

@@ -27,10 +27,8 @@ public class OSUtil {
     private static boolean arch;
 
     static {
-        arch = System.getProperty("os.arch")
-            .contains("64");
-        OSName = System.getProperty("os.name")
-            .toLowerCase();
+        arch = System.getProperty("os.arch").contains("64");
+        OSName = System.getProperty("os.name").toLowerCase();
         if (OSName.startsWith("windows")) os = OS.WINDOWS;
     }
 

@@ -133,9 +133,7 @@ public class Version {
             for (Object obj : as) {
                 if (obj instanceof String) {
                     if (obj.equals("${version_name}")) args.add(getVersionName());
-                    else if (obj.equals("${assets_root}")) args.add(
-                        ZplDirectory.getAssetsDirectory()
-                            .toString());
+                    else if (obj.equals("${assets_root}")) args.add(ZplDirectory.getAssetsDirectory().toString());
                     else if (obj.equals("${assets_index_name}")) args.add(getAssetsIndexName());
                     else args.add((String) obj);
                 }
@@ -147,9 +145,7 @@ public class Version {
                 if (!cmd.isEmpty()) {
                     switch (cmd) {
                         case "${version_name}" -> args.add(getVersionName());
-                        case "${assets_root}" -> args.add(
-                            ZplDirectory.getAssetsDirectory()
-                                .toString());
+                        case "${assets_root}" -> args.add(ZplDirectory.getAssetsDirectory().toString());
                         case "${assets_index_name}" -> args.add(getAssetsIndexName());
                         default -> args.add(cmd);
                     }

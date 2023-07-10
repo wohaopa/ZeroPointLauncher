@@ -49,7 +49,6 @@ public final class ZipUtil {
 
         Archiver archiver = CompressUtil.createArchiver(CharsetUtil.CHARSET_UTF_8, ArchiveStreamFactory.ZIP, zip);
         for (File file : files) archiver.add(file);
-        archiver.finish()
-            .close();
+        archiver.finish().close();
     }
 }
