@@ -62,7 +62,7 @@ public class ModMaster {
     }
 
     public static List<String> coverModsList(File modsDir) {
-        List<String> mods = new ArrayList<>();
+        List<String> mods = new LinkedList<>();
         if (!modsDir.exists()) return mods;
         for (File mod : Objects.requireNonNull(modsDir.listFiles())) {
             if (mod.isFile() && !mod.getName()

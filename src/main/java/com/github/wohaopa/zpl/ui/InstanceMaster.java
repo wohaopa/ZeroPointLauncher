@@ -20,10 +20,7 @@
 
 package com.github.wohaopa.zpl.ui;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,16 +35,17 @@ import com.github.wohaopa.zeropointlanuch.core.tasks.instances.DiscoverInstanceT
 
 public class InstanceMaster {
 
-    private static ObservableList<Instance> instances;
     private static Instance cur;
 
-    private static StringProperty name = new SimpleStringProperty();
-    private static StringProperty version = new SimpleStringProperty();
-    private static StringProperty depInstance = new SimpleStringProperty();
-    private static StringProperty launcher = new SimpleStringProperty();
-    private static StringProperty sharer = new SimpleStringProperty();
-    private static BooleanProperty update = new SimpleBooleanProperty();
-    private static ObjectProperty<TreeItem<String>> root = new SimpleObjectProperty<>();
+    private static final ObjectProperty<ObservableList<Object>> instances = new SimpleObjectProperty<>();
+    private static final StringProperty name = new SimpleStringProperty();
+    private static final StringProperty version = new SimpleStringProperty();
+    private static final StringProperty depInstance = new SimpleStringProperty();
+    private static final StringProperty launcher = new SimpleStringProperty();
+    private static final StringProperty sharer = new SimpleStringProperty();
+    private static final BooleanProperty update = new SimpleBooleanProperty();
+    private static final ObjectProperty<TreeItem<String>> root = new SimpleObjectProperty<>();
+    private static final ObjectProperty<TreeItem<ModItem>> mods = new SimpleObjectProperty<>();
 
     static {
         try {
@@ -56,12 +54,11 @@ public class InstanceMaster {
             Log.error("搜索错误：{}", e);
             throw new RuntimeException(e);
         }
-        instances = FXCollections.observableArrayList(Instance.list());
-        cur = instances.size() == 0 ? null : instances.get(0);
-    }
-
-    public static ObservableList<Instance> getInstances() {
-        return instances;
+        instances.setValue(FXCollections.observableArrayList(Instance.list()));
+        cur = instances.getValue()
+            .size() == 0 ? null
+                : (Instance) instances.getValue()
+                    .get(0);
     }
 
     public static void change(Instance instance) {
@@ -74,6 +71,78 @@ public class InstanceMaster {
         update.setValue(cur.information.update);
 
         root.setValue(fillFileTree(instance, false));
+        mods.setValue(fillModsTree(instance, false));
+    }
+
+    public static void refresh() {
+        mods.setValue(fillModsTree(cur, true));
+    }
+
+    private static final Map<Instance, TreeItem<ModItem>> cache1 = new HashMap<>();
+
+    private static TreeItem<ModItem> fillModsTree(Instance instance, boolean update) {
+
+        if (!update && cache1.containsKey(instance)) return cache1.get(instance);
+        var root = new TreeItem<>(new ModItem("全部Mods（" + instance.information.name + "）"));
+        cache1.put(instance, root);
+
+        var cache2 = new HashMap<String, TreeItem<ModItem>>();
+
+        Instance instance1 = instance;
+
+        while (instance1 != null) {
+            var list = instance1.information.includeMods;
+            var instanceName = instance1.information.name;
+            for (var mod : list) {
+                var tmp = mod.split("\\\\");
+                for (int i = 0; i < tmp.length; i++) {
+                    TreeItem<ModItem> item = cache2.get(tmp[i]);
+                    if (item == null) {
+                        item = new TreeItem<>(new ModItem(tmp[i], i == tmp.length - 1 ? mod : null, instanceName));
+                        cache2.put(tmp[i], item);
+                        if (i != 0) {
+                            TreeItem<ModItem> pItem = cache2.get(tmp[i - 1]);
+                            pItem.getChildren()
+                                .add(item);
+                        } else {
+                            root.getChildren()
+                                .add(item);
+                        }
+                    }
+                }
+            }
+
+            instance1 = Instance.get(instance.information.depVersion);
+        }
+
+        var it = instance.information.excludeMods.iterator();
+        while (it.hasNext()) {
+            var name = it.next();
+            var modName = name.substring(name.lastIndexOf("\\") + 1);
+            var item = cache2.get(modName);
+            if (item != null) {
+                item.getValue()
+                    .setDisable(true);
+                item.getParent()
+                    .getValue()
+                    .setDisable(true);
+            } else {
+                it.remove();
+                hasChange();
+            }
+        }
+
+        Comparator<TreeItem<ModItem>> cmp = (modItemTreeItem, t1) -> modItemTreeItem.getValue()
+            .compareTo(t1.getValue());
+        root.getChildren()
+            .sort(cmp);
+        for (var item : cache2.values()) {
+            if (item.getChildren()
+                .size() != 0)
+                item.getChildren()
+                    .sort(cmp);
+        }
+        return root;
     }
 
     public static Instance getCur() {
@@ -108,54 +177,46 @@ public class InstanceMaster {
         return root;
     }
 
+    public static ObjectProperty<TreeItem<ModItem>> modsProperty() {
+        return mods;
+    }
+
+    public static ObjectProperty<ObservableList<Object>> instancesProperty() {
+        return instances;
+    }
+
     public static void hasChange() {
-        boolean flag = false;
+
         if (!cur.information.name.equals(name.getValue())) {
             String oV = cur.information.name;
             String nV = name.getValue();
             if (!Instance.containsKey(nV)) {
                 Instance.rename(oV, nV);
-                instances = FXCollections.observableArrayList(Instance.list());
-                flag = true;
+                instances.setValue(FXCollections.observableArrayList(Instance.list()));
             }
         }
 
-        if (!cur.information.version.equals(version.getValue())) {
-            cur.information.version = version.getValue();
-            flag = true;
-        }
-        if (!cur.information.depVersion.equals(depInstance.getValue())) {
-            cur.information.depVersion = depInstance.getValue();
-            flag = true;
-        }
+        cur.information.version = version.getValue();
+        cur.information.depVersion = depInstance.getValue();
+        cur.information.sharer = sharer.getValue();
+        cur.information.launcher = launcher.getValue();
+        cur.information.update = update.getValue();
 
-        if (!cur.information.sharer.equals(sharer.getValue())) {
-            cur.information.sharer = sharer.getValue();
-            flag = true;
-        }
-        if (!cur.information.launcher.equals(launcher.getValue())) {
-            cur.information.launcher = launcher.getValue();
-            flag = true;
-        }
-        if (!cur.information.update == update.getValue()) {
-            cur.information.update = update.getValue();
-            flag = true;
-        }
-
-        if (flag) cur.savaInformation();
+        cur.savaInformation();
     }
 
-    private static Map<Instance, TreeItem<String>> cache = new HashMap<>();
+    private static final Map<Instance, TreeItem<String>> cache0 = new HashMap<>();
 
     private static TreeItem<String> fillFileTree(Instance instance, boolean update) {
 
-        if (!update && cache.containsKey(instance)) return cache.get(instance);
-        var root = new TreeItem<>("根："+instance.information.name);
+        if (!update && cache0.containsKey(instance)) return cache0.get(instance);
+        var root = new TreeItem<>("运行目录（" + instance.information.name + "）");
+        cache0.put(instance, root);
 
         Scheduler.submitTasks(new Task<Boolean>(null) {
 
             @Override
-            public Boolean call() throws Exception {
+            public Boolean call() {
                 var myDirectory = instance.getMapper()
                     .getMyDirectory();
                 fillFileTree0(myDirectory, root);
