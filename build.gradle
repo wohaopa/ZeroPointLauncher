@@ -2,27 +2,16 @@
 
 plugins {
     id 'java'
-    id 'application'
+    id 'java-library'
     id 'edu.sc.seis.launch4j' version '2.5.4'
     id 'com.diffplug.spotless' version '6.7.2'
     id 'org.javamodularity.moduleplugin' version '1.8.12'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'org.openjfx.javafxplugin' version '0.0.13'
 }
 
 group 'com.github.wohaopa'
-version '0.1.0'
+version '0.2.0'
 
-
-application {
-    mainModule = 'com.github.wohaopa.zpl.ui'
-    mainClass = 'com.github.wohaopa.zpl.ui.Main'
-    applicationDefaultJvmArgs = [
-            "-Dzpl.rootDir=D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH",
-            "-Dzpl.url=http://127.0.0.1"
-    ]
-
-}
 
 javafx {
     version = '17.0.2'
@@ -42,7 +31,7 @@ spotless {
 }
 
 launch4j {
-    mainClassName = 'com.github.wohaopa.zpl.ui.Main'
+    mainClassName = 'boot.Main'
     outfile = 'ZPL.exe'
     language = 'SIMPLIFIED_CHINESE'
     fileDescription = 'ZeroPointLaunch, a dedicated starter for GTNH.'
@@ -58,7 +47,7 @@ launch4j {
 
 dependencies {
 //    implementation('com.github.leewyatt:rxcontrols:11.0.3')
-    implementation 'io.vproxy:vfx:1.3.2'
+    implementation 'io.vproxy:vfx:1.3.3'
     implementation 'cn.hutool:hutool-all:5.8.19'
     implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
     implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
@@ -84,15 +73,12 @@ test {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'com.github.wohaopa.zpl.ui.Main'
+                'Main-Class': 'boot.Main'
 
         )
     }
 }
 
-shadowJar {
-    mainClassName='com.github.wohaopa.zpl.ui.Main'
-}
 
 spotless {
     encoding 'UTF-8'
@@ -119,7 +105,12 @@ spotless {
 }
 
 
-tasks.register('copyLib', Copy) {
-    from configurations.compileClasspath
-    into "$buildDir/libs"
+task runZPL(type: JavaExec) {
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'boot.Main'
+
+    systemProperty("zpl.rootDir","D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH")
+    systemProperty("zpl.url","http://127.0.0.1")
+
 }
