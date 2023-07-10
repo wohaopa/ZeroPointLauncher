@@ -20,18 +20,24 @@
 
 package com.github.wohaopa.zpl.ui.scene;
 
+import java.io.File;
 import java.util.*;
 import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.util.Callback;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zpl.ui.InstanceMaster;
+import com.github.wohaopa.zpl.ui.Main;
+import com.github.wohaopa.zpl.ui.ModItem;
 
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.font.FontUsages;
@@ -109,26 +115,174 @@ public class InstanceScene extends BaseVScene {
             treePane.setRoot(root);
             treePane.setPrefHeight(100);
         }
+        var modsPane = new TreeView<ModItem>();
+        {
+            modsPane.rootProperty()
+                .bind(InstanceMaster.modsProperty());
+
+            modsPane.getSelectionModel()
+                .setSelectionMode(SelectionMode.SINGLE);
+            modsPane.setCellFactory(new Callback<>() {
+
+                @Override
+                public TreeCell<ModItem> call(TreeView<ModItem> param) {
+                    return new TreeCell<>() {
+
+                        final HBox hbox;
+                        final Label label;
+
+                        final Background normal;
+                        final Background disabled;
+
+                        {
+                            hbox = new HBox();
+                            label = new Label();
+                            hbox.getChildren()
+                                .add(label);
+                            normal = Background.EMPTY;
+                            disabled = new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY));
+                        }
+
+                        @Override
+                        protected void updateItem(ModItem item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (!empty) {
+                                this.setGraphic(hbox);
+                                label.textProperty()
+                                    .bind(item.nameProperty());
+                                if (item.getDisable()) {
+                                    hbox.setBackground(disabled);
+                                } else hbox.setBackground(normal);
+                            } else {
+                                this.setGraphic(null);
+                            }
+                        }
+                    };
+                }
+            });
+
+            var menu = new ContextMenu() {
+
+                MenuItem menuItem1 = new MenuItem("打开文件位置");
+                MenuItem menuItem2 = new MenuItem("禁用");
+                MenuItem menuItem3 = new MenuItem("版本管理");
+                MenuItem menuItem4 = new MenuItem("删除");
+
+                ModItem modItem;
+
+                {
+                    menuItem1.setOnAction(
+                        event -> {
+                            Main.openFileLocation(
+                                new File(
+                                    ZplDirectory.getModsDirectory(),
+                                    modItem.fullNameProperty()
+                                        .get()));
+                        });
+                    menuItem2.setOnAction(event -> {
+                        if (modItem.getDisable()) {
+                            modItem.setDisable(false);
+                            InstanceMaster.getCur().information.excludeMods.remove(
+                                modItem.fullNameProperty()
+                                    .get());
+                        } else {
+                            modItem.setDisable(true);
+                            InstanceMaster.getCur().information.excludeMods.add(
+                                modItem.fullNameProperty()
+                                    .get());
+                        }
+                        modsPane.refresh();
+                    });
+                    menuItem3.setDisable(true); // 还没写
+                    menuItem4.setOnAction(new EventHandler<ActionEvent>() {
+
+                        @Override
+                        public void handle(ActionEvent event) {
+                            if (InstanceMaster.getCur().information.name != modItem.instanceProperty()
+                                .get()) {
+                                modItem.setDisable(true);
+                                InstanceMaster.getCur().information.excludeMods.add(
+                                    modItem.fullNameProperty()
+                                        .get());
+                            } else {
+                                InstanceMaster.getCur().information.includeMods.remove(
+                                    modItem.fullNameProperty()
+                                        .get());
+                            }
+                            InstanceMaster.refresh();
+                        }
+                    });
+
+                    getItems().addAll(menuItem1, menuItem2, menuItem3, menuItem4);
+                }
+
+                @Override
+                public void show(Node anchor, double screenX, double screenY) {
+                    modItem = modsPane.getSelectionModel()
+                        .getSelectedItem()
+                        .getValue();
+                    if (modItem.fullNameProperty()
+                        .get() == null) {
+                        menuItem1.setDisable(true);
+                        menuItem2.setDisable(true);
+                        menuItem3.setDisable(true);
+                        menuItem4.setDisable(true);
+                    } else {
+                        menuItem1.setDisable(false);
+                        menuItem2.setDisable(false);
+                        menuItem3.setDisable(true); // 还没写
+                        menuItem4.setDisable(false);
+                    }
+
+                    if (modItem.getDisable()) menuItem2.setText("启用");
+                    else menuItem2.setText("禁用");
+
+                    super.show(anchor, screenX, screenY);
+                }
+            };
+
+            modsPane.setContextMenu(menu);
+        }
+        var menuBtn = new MenuButton("选项");
+        {
+            var menuItem1 = new MenuItem("打开实例目录");
+            menuItem1.setOnAction(event -> Main.openFileLocation(InstanceMaster.getCur().insDir));
+
+            menuBtn.getItems()
+                .addAll(menuItem1);
+
+            menuBtn.setPrefHeight(40);
+            menuBtn.setPrefWidth(80);
+        }
 
         getContentPane().getChildren()
             .add(infoPane);
         getContentPane().getChildren()
+            .add(menuBtn);
+        getContentPane().getChildren()
             .add(treePane);
         getContentPane().getChildren()
             .add(fileTreePane);
+        getContentPane().getChildren()
+            .add(modsPane);
+
         getContentPane().widthProperty()
             .addListener((observable, oldValue, newValue) -> {
                 if (oldValue == null || newValue == null) return;
-                double width = newValue.doubleValue() * 0.3;
-                double x1 = width + newValue.doubleValue() * 0.05;
-                double x2 = x1 + newValue.doubleValue() * 0.05;
+
+                double allWidth = newValue.doubleValue() - 20;
+                double width = allWidth * 0.33333;
+                double x1 = width + 10;
+                double x2 = x1 + width + 10;
 
                 infoPane.setPrefWidth(width);
-
                 treePane.setPrefWidth(width);
 
                 fileTreePane.setPrefWidth(width);
                 fileTreePane.setLayoutX(x1);
+
+                modsPane.setPrefWidth(width);
+                modsPane.setLayoutX(x2);
             });
         getContentPane().heightProperty()
             .addListener((observable, oldValue, newValue) -> {
@@ -136,13 +290,22 @@ public class InstanceScene extends BaseVScene {
 
                 treePane.setPrefHeight(newValue.doubleValue() * 0.5);
                 treePane.setLayoutY(newValue.doubleValue() - treePane.getPrefHeight());
+
+                menuBtn.setLayoutY(treePane.getLayoutY() - menuBtn.getPrefHeight() - 5);
             });
         FXUtils.observeHeight(getContentPane(), fileTreePane);
+        FXUtils.observeHeight(getContentPane(), modsPane);
     }
 
     @Override
     public String title() {
         return "实例";
+    }
+
+    @Override
+    protected void onShown() {
+        getContentPane().setDisable(InstanceMaster.getCur() == null);
+        super.onShown();
     }
 
     private static Node getTextObj(StringProperty property) {

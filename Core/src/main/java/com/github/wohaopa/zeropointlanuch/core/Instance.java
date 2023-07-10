@@ -183,6 +183,8 @@ public class Instance {
         if (information.depVersion == null) information.depVersion = "null";// 父版本，空为null，特殊标记用
         if (information.launcher == null) information.launcher = "ZPL-Java8"; // 启动器，Java8/Java17
         if (information.sharer == null) information.sharer = "Common"; // 分享器
+        if (information.excludeMods == null) information.excludeMods = new LinkedList<>(); // 排除mod
+        if (information.includeMods == null) information.includeMods = new LinkedList<>(); // 包含mod
 
     }
 

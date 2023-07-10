@@ -20,17 +20,20 @@
 
 package com.github.wohaopa.zpl.ui;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.Log;
 import com.github.wohaopa.zpl.ui.scene.*;
 
 import io.vproxy.vfx.control.globalscreen.GlobalScreenUtils;
@@ -66,6 +69,8 @@ public class Main extends Application {
                 TaskManager.get()
                     .terminate();
                 GlobalScreenUtils.unregister();
+                Platform.exit();
+                System.exit(0);
             }
         };
         stage.getInitialScene()
@@ -114,7 +119,7 @@ public class Main extends Application {
                     (observable, oldValue, newValue) -> { if (newValue != null) AccountMaster.change(newValue); });
             accountButton.getSelectionModel()
                 .select(AccountMaster.getCur());
-            var instanceButton = new ChoiceBox<>(InstanceMaster.getInstances()) {
+            var instanceButton = new ChoiceBox<>() {
 
                 {
                     setPrefWidth(200);
@@ -131,6 +136,8 @@ public class Main extends Application {
                                 Insets.EMPTY)));
                 }
             };
+            instanceButton.itemsProperty()
+                .bind(InstanceMaster.instancesProperty());
             instanceButton.getSelectionModel()
                 .selectedItemProperty()
                 .addListener(
@@ -287,5 +294,16 @@ public class Main extends Application {
     public static void main(String[] args) {
         Theme.setTheme(new ZplTheme());
         Application.launch(Main.class, args);
+    }
+
+    public static void openFileLocation(File path) {
+        try {
+            if (path.isFile()) Runtime.getRuntime()
+                .exec("explorer.exe /e,/select," + path);
+            else Runtime.getRuntime()
+                .exec("explorer.exe /e," + path + "\\");
+        } catch (IOException ex) {
+            Log.warn(ex.getMessage());
+        }
     }
 }
