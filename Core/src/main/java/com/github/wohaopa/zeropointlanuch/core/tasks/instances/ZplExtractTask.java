@@ -39,22 +39,24 @@ public class ZplExtractTask extends Task<File> {
     }
 
     private final File instanceDir;
+    private final File zip;
 
-    public ZplExtractTask(File instanceDir, Consumer<String> callback) {
+    public ZplExtractTask(File zip, File instanceDir, Consumer<String> callback) {
         super(callback);
         this.instanceDir = instanceDir;
+        this.zip = zip;
     }
 
     @Override
     public File call() throws Exception {
-        File zip = new File(instanceDir, instanceDir.getName() + ".zip");
 
+        accept("正在导出");
         Log.debug("开始压缩：{}", zip);
         long time1 = System.currentTimeMillis();
         new CompressTask(zip, instanceDir, file -> !include.contains(file.getName()), callback).call();
         long time2 = System.currentTimeMillis();
         Log.debug("压缩完成！用时：{}s", (time2 - time1) / 1000);
-
+        accept("导出完成");
         return zip;
     }
 }

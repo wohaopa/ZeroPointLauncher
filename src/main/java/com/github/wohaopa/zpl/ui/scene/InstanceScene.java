@@ -27,14 +27,18 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Scheduler;
+import com.github.wohaopa.zeropointlanuch.core.tasks.instances.ZplExtractTask;
 import com.github.wohaopa.zpl.ui.InstanceMaster;
 import com.github.wohaopa.zpl.ui.Main;
 import com.github.wohaopa.zpl.ui.ModItem;
@@ -163,10 +167,10 @@ public class InstanceScene extends BaseVScene {
 
             var menu = new ContextMenu() {
 
-                MenuItem menuItem1 = new MenuItem("打开文件位置");
-                MenuItem menuItem2 = new MenuItem("禁用");
-                MenuItem menuItem3 = new MenuItem("版本管理");
-                MenuItem menuItem4 = new MenuItem("删除");
+                final MenuItem menuItem1 = new MenuItem("打开文件位置");
+                final MenuItem menuItem2 = new MenuItem("禁用");
+                final MenuItem menuItem3 = new MenuItem("版本管理");
+                final MenuItem menuItem4 = new MenuItem("删除");
 
                 ModItem modItem;
 
@@ -194,12 +198,13 @@ public class InstanceScene extends BaseVScene {
                         modsPane.refresh();
                     });
                     menuItem3.setDisable(true); // 还没写
-                    menuItem4.setOnAction(new EventHandler<ActionEvent>() {
+                    menuItem4.setOnAction(new EventHandler<>() {
 
                         @Override
                         public void handle(ActionEvent event) {
-                            if (InstanceMaster.getCur().information.name != modItem.instanceProperty()
-                                .get()) {
+                            if (!InstanceMaster.getCur().information.name.equals(
+                                modItem.instanceProperty()
+                                    .get())) {
                                 modItem.setDisable(true);
                                 InstanceMaster.getCur().information.excludeMods.add(
                                     modItem.fullNameProperty()
@@ -243,17 +248,85 @@ public class InstanceScene extends BaseVScene {
 
             modsPane.setContextMenu(menu);
         }
-        var menuBtn = new MenuButton("选项");
+        var menuInstance = new ContextMenu() {
+
+            final MenuItem menuItem1 = new MenuItem("打开实例目录");
+            final MenuItem menuItem2 = new MenuItem("打开运行目录");
+            final MenuItem menuItem3 = new MenuItem("保存实例配置");
+            final MenuItem menuItem4 = new MenuItem("刷新实例配置");
+            final MenuItem menuItem5 = new MenuItem("刷新映射信息");
+            final MenuItem menuItem6 = new MenuItem("导出实例");
+            final MenuItem menuItem7 = new MenuItem("新建子实例");
+            final MenuItem menuItem8 = new MenuItem("检查更新");
+
+            Instance instance;
+
+            {
+                menuItem2.disableProperty()
+                    .bind(menuItem1.disableProperty());
+                menuItem2.disableProperty()
+                    .bind(menuItem1.disableProperty());
+                menuItem3.disableProperty()
+                    .bind(menuItem1.disableProperty());
+                menuItem4.disableProperty()
+                    .bind(menuItem1.disableProperty());
+                menuItem5.disableProperty()
+                    .bind(menuItem1.disableProperty());
+                menuItem6.disableProperty()
+                    .bind(menuItem1.disableProperty());
+                menuItem7.disableProperty()
+                    .bind(menuItem1.disableProperty());
+                menuItem8.disableProperty()
+                    .bind(menuItem1.disableProperty());
+
+                menuItem1.setOnAction(event -> Main.openFileLocation(instance.insDir));
+                menuItem2.setOnAction(event -> Main.openFileLocation(instance.runDir));
+                menuItem3.setOnAction(event -> InstanceMaster.hasChange());
+
+                menuItem6.setOnAction(event -> {
+                    var fileChooser = new FileChooser();
+                    fileChooser.setInitialDirectory(instance.insDir);
+                    fileChooser.setTitle("导出实例");
+                    fileChooser.setInitialFileName(instance.information.name+"_extract.zip");
+                    fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("ZIP","*.zip"),new FileChooser.ExtensionFilter("ALL","*.*"));
+                    var file = fileChooser.showSaveDialog(getOwnerWindow());
+                    Scheduler.submitTasks(new ZplExtractTask(file,instance.insDir, null));
+                });
+
+                getItems()
+                    .addAll(menuItem1, menuItem2, menuItem3, menuItem4, menuItem5, menuItem6, menuItem7, menuItem8);
+            }
+
+            @Override
+            public void show(Node anchor, Side side, double dx, double dy) {
+                instance = InstanceMaster.getCur();
+                menuItem1.setDisable(instance == null);
+                super.show(anchor, side, dx, dy);
+            }
+
+            @Override
+            public void show(Node anchor, double screenX, double screenY) {
+                instance = Instance.get(
+                    treePane.getSelectionModel()
+                        .getSelectedItem()
+                        .getValue());
+                menuItem1.setDisable(instance == null);
+                super.show(anchor, screenX, screenY);
+            }
+        };
+        var menuBtn = new MenuButton("选项") {
+
+            @Override
+            public void show() {
+                menuInstance.show(this, Side.BOTTOM, 0, 0);
+            }
+        };
         {
-            var menuItem1 = new MenuItem("打开实例目录");
-            menuItem1.setOnAction(event -> Main.openFileLocation(InstanceMaster.getCur().insDir));
-
-            menuBtn.getItems()
-                .addAll(menuItem1);
-
             menuBtn.setPrefHeight(40);
             menuBtn.setPrefWidth(80);
         }
+
+        treePane.setContextMenu(menuInstance);
 
         getContentPane().getChildren()
             .add(infoPane);
