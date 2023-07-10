@@ -287,10 +287,13 @@ public class InstanceScene extends BaseVScene {
                     var fileChooser = new FileChooser();
                     fileChooser.setInitialDirectory(instance.insDir);
                     fileChooser.setTitle("导出实例");
-                    fileChooser.setInitialFileName(instance.information.name+"_extract.zip");
-                    fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("ZIP","*.zip"),new FileChooser.ExtensionFilter("ALL","*.*"));
+                    fileChooser.setInitialFileName(instance.information.name + "_extract.zip");
+                    fileChooser.getExtensionFilters()
+                        .addAll(
+                            new FileChooser.ExtensionFilter("ZIP", "*.zip"),
+                            new FileChooser.ExtensionFilter("ALL", "*.*"));
                     var file = fileChooser.showSaveDialog(getOwnerWindow());
-                    Scheduler.submitTasks(new ZplExtractTask(file,instance.insDir, null));
+                    Scheduler.submitTasks(new ZplExtractTask(file, instance.insDir, null));
                 });
 
                 getItems()

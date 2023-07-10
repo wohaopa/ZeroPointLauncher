@@ -80,6 +80,7 @@ public class Main extends Application {
 
         mainScenes.add(new HomeScene());
         mainScenes.add(new InstanceScene());
+        mainScenes.add(new AddInstanceScene());
         mainScenes.add(new AccountScene());
         mainScenes.add(new SettingScene());
 
@@ -96,67 +97,67 @@ public class Main extends Application {
             launchPane.getNode()
                 .setPrefHeight(60);
 
-            var accountButton = new ChoiceBox<>(AccountMaster.getAccounts()) {
+            var accountButton = new ChoiceBox<>(AccountMaster.getAccounts());
 
-                {
-                    setPrefWidth(200);
-                    setPrefHeight(
-                        launchPane.getNode()
-                            .getPrefHeight() - FusionPane.PADDING_V * 2);
+            {
+                accountButton.setPrefWidth(200);
+                accountButton.setPrefHeight(
+                    launchPane.getNode()
+                        .getPrefHeight() - FusionPane.PADDING_V * 2);
 
-                    setBackground(
-                        new Background(
-                            new BackgroundFill(
-                                Theme.current()
-                                    .subSceneBackgroundColor(),
-                                CornerRadii.EMPTY,
-                                Insets.EMPTY)));
-                }
-            };
-            accountButton.getSelectionModel()
-                .selectedItemProperty()
-                .addListener(
-                    (observable, oldValue, newValue) -> { if (newValue != null) AccountMaster.change(newValue); });
-            accountButton.getSelectionModel()
-                .select(AccountMaster.getCur());
-            var instanceButton = new ChoiceBox<>() {
+                accountButton.setBackground(
+                    new Background(
+                        new BackgroundFill(
+                            Theme.current()
+                                .subSceneBackgroundColor(),
+                            CornerRadii.EMPTY,
+                            Insets.EMPTY)));
+                accountButton.getSelectionModel()
+                    .selectedItemProperty()
+                    .addListener(
+                        (observable, oldValue, newValue) -> { if (newValue != null) AccountMaster.change(newValue); });
+                accountButton.getSelectionModel()
+                    .select(AccountMaster.getCur());
+            }
 
-                {
-                    setPrefWidth(200);
-                    setPrefHeight(
-                        launchPane.getNode()
-                            .getPrefHeight() - FusionPane.PADDING_V * 2);
+            var instanceButton = new ChoiceBox<>();
 
-                    setBackground(
-                        new Background(
-                            new BackgroundFill(
-                                Theme.current()
-                                    .subSceneBackgroundColor(),
-                                CornerRadii.EMPTY,
-                                Insets.EMPTY)));
-                }
-            };
-            instanceButton.itemsProperty()
-                .bind(InstanceMaster.instancesProperty());
-            instanceButton.getSelectionModel()
-                .selectedItemProperty()
-                .addListener(
-                    (observable, oldValue, newValue) -> {
-                        if (newValue != null) InstanceMaster.change((Instance) newValue);
-                    });
-            instanceButton.getSelectionModel()
-                .select(InstanceMaster.getCur());
+            {
+                instanceButton.setPrefWidth(200);
+                instanceButton.setPrefHeight(
+                    launchPane.getNode()
+                        .getPrefHeight() - FusionPane.PADDING_V * 2);
 
-            var launchButton = new FusionButton("启动") {
+                instanceButton.setBackground(
+                    new Background(
+                        new BackgroundFill(
+                            Theme.current()
+                                .subSceneBackgroundColor(),
+                            CornerRadii.EMPTY,
+                            Insets.EMPTY)));
+                instanceButton.getStylesheets()
+                    .add("css/choice-box.css");
 
-                {
-                    setPrefWidth(200);
-                    setPrefHeight(
-                        launchPane.getNode()
-                            .getPrefHeight() - FusionPane.PADDING_V * 2);
-                    setOnlyAnimateWhenNotClicked(true);
-                }
-            };
+                instanceButton.itemsProperty()
+                    .bind(InstanceMaster.instancesProperty());
+                instanceButton.getSelectionModel()
+                    .selectedItemProperty()
+                    .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (newValue != null) InstanceMaster.change((Instance) newValue);
+                        });
+                instanceButton.getSelectionModel()
+                    .select(InstanceMaster.getCur());
+            }
+
+            var launchButton = new FusionButton("启动");
+            {
+                launchButton.setPrefWidth(200);
+                launchButton.setPrefHeight(
+                    launchPane.getNode()
+                        .getPrefHeight() - FusionPane.PADDING_V * 2);
+                launchButton.setOnlyAnimateWhenNotClicked(true);
+            }
 
             launchPane.getContentPane()
                 .getChildren()
@@ -291,9 +292,12 @@ public class Main extends Application {
             .show();
     }
 
-    public static void main(String[] args) {
+    public static void launch(String[] args) {
         Theme.setTheme(new ZplTheme());
         Application.launch(Main.class, args);
+        var file = Main.class.getClassLoader()
+            .getResource("css/choice-box.css");
+        System.out.println(file);
     }
 
     public static void openFileLocation(File path) {
