@@ -23,32 +23,48 @@ package com.github.wohaopa.zeropointlanuch.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+import com.github.wohaopa.zeropointlanuch.core.auth.MicrosoftAuth;
 import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
 
 public class Account {
 
-    private static final List<Auth> auths = new ArrayList<>();
+    private static List<Auth> auths;
 
     private static Auth cur;
 
-    static {
-        List<String> list = Config.getConfig().getAccounts();
-        if (list == null) {
-            Config.getConfig().setAccounts(new ArrayList<>());
-
-        } else if (!list.isEmpty()) {
-            list.forEach(s -> auths.add(new OfflineAuth(s)));
-        }
-    }
-
     public static List<Auth> getAuths() {
+        if (auths == null) {
+            auths = new ArrayList<>();
+            Config.getConfig();
+        }
         return auths;
     }
 
     public static void add(Auth auth) {
-        auths.add(auth);
-        Config.getConfig().getAccounts().add(auth.getName());
+        getAuths().add(auth);
+    }
+
+    public static void load(JSONArray array) {
+
+        Iterable<JSONObject> it = array.jsonIter();
+        for (JSONObject jsonObject : it) {
+            switch (jsonObject.getStr("type")) {
+                case "OFFLINE":
+                    getAuths().add(new OfflineAuth().loadInformation(jsonObject));
+                case "MICROSOFT":
+                    getAuths().add(new MicrosoftAuth().loadInformation(jsonObject));
+            }
+        }
+    }
+
+    public static JSONArray save() {
+        JSONArray array = new JSONArray();
+        getAuths().forEach(auth -> array.add(auth.saveInformation()));
+        return array;
     }
 
     public static void select(Auth value) {

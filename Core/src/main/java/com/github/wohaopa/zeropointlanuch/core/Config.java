@@ -21,7 +21,8 @@
 package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
-import java.util.List;
+
+import cn.hutool.json.JSONObject;
 
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
@@ -31,62 +32,61 @@ public class Config {
     private static Config config;
     private static final File configFile = new File(ZplDirectory.getWorkDirectory().getParentFile(), "config.json");
 
-    static {
-        loadConfig();
-        Runtime.getRuntime().addShutdownHook(new Thread(Config::saveConfig));
-    }
-
     public static Config getConfig() {
+        if (config == null) {
+            config = new Config();
+            loadConfig();
+            Runtime.getRuntime().addShutdownHook(new Thread(Config::saveConfig));
+        }
+
         return config;
     }
 
     private static void loadConfig() {
         Log.debug("正在加载设置文件：{}", configFile.toString());
-        if (!configFile.exists()) config = new Config();
-        else try {
-            config = JsonUtil.fromJson(configFile).toBean(Config.class);
+        if (configFile.exists()) try {
+            JSONObject object = JsonUtil.fromJson(configFile).toBean(JSONObject.class);
+
+            config.java8Path = object.getStr("java8Path");
+            config.java17Path = object.getStr("java17Path");
+
+            Account.load(object.getJSONArray("account"));
         } catch (Exception e) {
             Log.warn("配置文件错误：{}", configFile.toString());
             configFile.delete();
-            config = new Config();
         }
     }
 
-    public static void saveConfig() {
+    private static void saveConfig() {
         Log.debug("正在保存设置文件：{}", configFile.toString());
-        FileUtil.fileWrite(configFile, JsonUtil.toJson(config));
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.set("java8Path", config.java8Path);
+        jsonObject.set("java17Path", config.java17Path);
+
+        jsonObject.set("account", Account.save());
+
+        FileUtil.fileWrite(configFile, jsonObject.toJSONString(4));
     }
 
-    public Config() {
-        java8Path = "";
-        java17Path = "";
-    }
+    private Config() {}
 
     private String java8Path;
     private String java17Path;
-    private List<String> accounts;
 
     public String getJava8Path() {
         return java8Path;
-    }
-
-    public String getJava17Path() {
-        return java17Path;
-    }
-
-    public void setAccounts(List<String> accounts) {
-        this.accounts = accounts;
     }
 
     public void setJava8Path(String java8Path) {
         this.java8Path = java8Path;
     }
 
-    public void setJava17Path(String java17Path) {
-        this.java17Path = java17Path;
+    public String getJava17Path() {
+        return java17Path;
     }
 
-    public List<String> getAccounts() {
-        return accounts;
+    public void setJava17Path(String java17Path) {
+        this.java17Path = java17Path;
     }
 }

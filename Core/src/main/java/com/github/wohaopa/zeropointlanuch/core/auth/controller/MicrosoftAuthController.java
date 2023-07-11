@@ -18,30 +18,7 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.auth;
+package com.github.wohaopa.zeropointlanuch.core.auth.controller;
 
-import cn.hutool.json.JSONObject;
-
-public class MicrosoftAuth extends Auth {
-
-    public MicrosoftAuth() {
-        type = "MICROSOFT";
-    }
-
-    @Override
-    protected void login() {
-
-    }
-
-    @Override
-    public JSONObject saveInformation() {
-        return new JSONObject().putOpt("type", type);
-
-    }
-
-    @Override
-    public Auth loadInformation(JSONObject object) {
-
-        return this;
-    }
+public class MicrosoftAuthController {
 }

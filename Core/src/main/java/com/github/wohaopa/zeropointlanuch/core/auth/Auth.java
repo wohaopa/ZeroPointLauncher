@@ -24,8 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.hutool.json.JSONObject;
+
 public abstract class Auth {
 
+    protected String type;
     protected String auth_player_name;
     protected String auth_uuid;
     protected String auth_access_token;
@@ -37,6 +40,10 @@ public abstract class Auth {
     public Auth() {}
 
     protected abstract void login();
+
+    public abstract JSONObject saveInformation();
+
+    public abstract Auth loadInformation(JSONObject object);
 
     public List<String> parseArg(List<String> args) {
         login();
@@ -66,6 +73,6 @@ public abstract class Auth {
 
     @Override
     public String toString() {
-        return auth_player_name + "(" + user_type + ")";
+        return auth_player_name + "(" + type + ")";
     }
 }

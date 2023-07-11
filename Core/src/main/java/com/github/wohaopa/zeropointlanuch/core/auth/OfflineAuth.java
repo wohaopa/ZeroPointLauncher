@@ -22,9 +22,16 @@ package com.github.wohaopa.zeropointlanuch.core.auth;
 
 import java.util.UUID;
 
+import cn.hutool.json.JSONObject;
+
 public class OfflineAuth extends Auth {
 
+    public OfflineAuth() {
+        type = "OFFLINE";
+    }
+
     public OfflineAuth(String name) {
+        this();
 
         auth_player_name = name;
         auth_uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + auth_player_name).getBytes())
@@ -39,6 +46,20 @@ public class OfflineAuth extends Auth {
 
         auth_access_token = UUID.randomUUID().toString().replace("-", "");
 
+    }
+
+    @Override
+    public JSONObject saveInformation() {
+        return new JSONObject().putOpt("type", type).putOpt("name", auth_player_name).putOpt("uuid", auth_uuid);
+    }
+
+    @Override
+    public Auth loadInformation(JSONObject object) {
+        auth_player_name = object.getStr("name");
+        auth_uuid = object.getStr("uuid");
+        user_properties = "{}";
+        user_type = "Offline";
+        return this;
     }
 
 }
