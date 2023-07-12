@@ -18,47 +18,18 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.auth;
+package com.github.wohaopa.zeropointlanuch.core.auth.controller;
 
-import java.util.function.Consumer;
+import static org.junit.jupiter.api.Assertions.*;
 
-import cn.hutool.json.JSONObject;
+import com.github.wohaopa.zeropointlanuch.core.auth.MicrosoftAuth;
 
-import com.github.wohaopa.zeropointlanuch.core.auth.controller.MicrosoftAuthController;
+class MicrosoftAuthControllerTest {
 
-public class MicrosoftAuth extends Auth {
-
-    private MicrosoftAuthController controller;
-
-    private Consumer<JSONObject> callback;
-
-    public MicrosoftAuth() {
-        type = "MICROSOFT";
-        controller = new MicrosoftAuthController();
+    public static void main(String[] args) {
+        MicrosoftAuth auth = new MicrosoftAuth();
+        auth.setCallback(object -> System.out.println(object.getStr("message")));
+        auth.test();
     }
 
-    @Override
-    protected void login() {
-        controller.login(callback);
-    }
-
-    @Override
-    public JSONObject saveInformation() {
-        return controller.save().putOpt("type", type);
-
-    }
-
-    @Override
-    public Auth loadInformation(JSONObject object) {
-        controller.load(object);
-        return this;
-    }
-
-    public void setCallback(Consumer<JSONObject> callback) {
-        this.callback = callback;
-    }
-
-    public void test() {
-        login();
-    }
 }
