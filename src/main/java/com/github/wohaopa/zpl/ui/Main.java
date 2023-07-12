@@ -260,7 +260,7 @@ public class Main extends Application {
         stage.getStage().show();
     }
 
-    public static void launch(String[] args) {
+    public static void main(String[] args) {
         Theme.setTheme(new ZplTheme());
         Application.launch(Main.class, args);
     }

@@ -69,6 +69,7 @@ public class Config {
         } catch (Exception e) {
             Log.warn("配置文件错误：{}", configFile.toString());
             configFile.delete();
+            FileUtil.fileWrite(configFile, "{}");
         }
     }
 

@@ -23,6 +23,6 @@ package boot;
 public class Main {
 
     public static void main(String[] args) {
-        com.github.wohaopa.zpl.ui.Main.launch(args);
+        com.github.wohaopa.zpl.ui.Main.main(args);
     }
 }
