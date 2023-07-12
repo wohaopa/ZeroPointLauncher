@@ -31,7 +31,7 @@ spotless {
 }
 
 launch4j {
-    mainClassName = 'boot.Main'
+    mainClassName = 'com.github.wohaopa.zpl.ui.Main'
     outfile = 'ZPL.exe'
     language = 'SIMPLIFIED_CHINESE'
     fileDescription = 'ZeroPointLaunch, a dedicated starter for GTNH.'
