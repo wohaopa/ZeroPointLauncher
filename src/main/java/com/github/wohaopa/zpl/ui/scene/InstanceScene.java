@@ -38,6 +38,7 @@ import javafx.util.Callback;
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zeropointlanuch.core.tasks.Scheduler;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.ZplExtractTask;
 import com.github.wohaopa.zpl.ui.InstanceMaster;
 import com.github.wohaopa.zpl.ui.Main;
@@ -250,7 +251,15 @@ public class InstanceScene extends BaseVScene {
                 menuItem1.setOnAction(event -> Main.openFileLocation(instance.insDir));
                 menuItem2.setOnAction(event -> Main.openFileLocation(instance.runDir));
                 menuItem3.setOnAction(event -> InstanceMaster.hasChange());
+                menuItem4.setOnAction(event -> Scheduler.submitTasks(new Task<>(null) {
 
+                    @Override
+                    public Object call() {
+                        InstanceMaster.getCur().updateMapping();
+                        return null;
+                    }
+                }));
+                menuItem5.setVisible(false);
                 menuItem6.setOnAction(event -> {
                     var fileChooser = new FileChooser();
                     fileChooser.setInitialDirectory(instance.insDir);
@@ -263,6 +272,8 @@ public class InstanceScene extends BaseVScene {
                     var file = fileChooser.showSaveDialog(getOwnerWindow());
                     Scheduler.submitTasks(new ZplExtractTask(file, instance.insDir, null));
                 });
+                menuItem7.setVisible(false);
+                menuItem8.setVisible(false);
 
                 getItems()
                     .addAll(menuItem1, menuItem2, menuItem3, menuItem4, menuItem5, menuItem6, menuItem7, menuItem8);

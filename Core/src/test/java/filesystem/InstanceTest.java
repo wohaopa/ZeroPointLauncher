@@ -35,6 +35,6 @@ public class InstanceTest {
         // for (Instance instance : Instance.list()) instance.updateMapping();
         Instance instance = Instance.get("2.3.2-Test");
         instance.updateMapping();
-        instance.launchInstance(new OfflineAuth("wohaopa"));
+        instance.launchInstance(new OfflineAuth("wohaopa"), System.out::println);
     }
 }

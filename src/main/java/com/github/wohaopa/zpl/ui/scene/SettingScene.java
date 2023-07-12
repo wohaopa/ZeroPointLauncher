@@ -20,8 +20,20 @@
 
 package com.github.wohaopa.zpl.ui.scene;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+
+import com.github.wohaopa.zeropointlanuch.core.launch.Launch;
+
 import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.ui.scene.VSceneRole;
+import io.vproxy.vfx.ui.wrapper.FusionW;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
 import io.vproxy.vfx.util.FXUtils;
 
@@ -31,18 +43,85 @@ public class SettingScene extends BaseVScene {
         super(VSceneRole.MAIN);
         enableAutoContentWidthHeight();
 
-        var label = new ThemeLabel("设置") {
+        var comboBox = new ComboBox<Launch>();
+        {
+            comboBox.getItems().addAll(Launch.getLaunches());
+            comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue == null) return;
+                _launch.change(newValue);
+            });
+        }
+        var launchConfigGrid = new GridPane();
+        {
+            launchConfigGrid.add(new ThemeLabel("Java路径："), 0, 0);
+            launchConfigGrid.add(new ThemeLabel("Jvm额外参数："), 0, 1);
+            launchConfigGrid.add(new ThemeLabel("游戏额外参数："), 0, 2);
+            launchConfigGrid.add(new ThemeLabel("最大运行内存："), 0, 3);
+            launchConfigGrid.add(new ThemeLabel("最小运行内存："), 0, 4);
 
-            {
-                FontManager.get().setFont(this, settings -> settings.setSize(40));
-            }
-        };
-        getContentPane().getChildren().add(label);
-        FXUtils.observeWidthHeightCenter(getContentPane(), label);
+            launchConfigGrid.add(getTextObj(_launch.javaPath), 1, 0);
+            launchConfigGrid.add(getTextObj(_launch.extraJvmArgs), 1, 1);
+            launchConfigGrid.add(getTextObj(_launch.extraGameArgs), 1, 2);
+            launchConfigGrid.add(getTextObj(_launch.maxMemory), 1, 3);
+            launchConfigGrid.add(getTextObj(_launch.minMemory), 1, 4);
+        }
+
+        comboBox.getSelectionModel().selectFirst();
+        getContentPane().getChildren().addAll(comboBox, launchConfigGrid);
+        FXUtils.observeWidthHeightCenter(getContentPane(), launchConfigGrid);
+        FXUtils.observeWidthCenter(getContentPane(), comboBox);
     }
 
     @Override
     public String title() {
         return "设置";
+    }
+
+    private static class _launch {
+
+        static StringProperty javaPath = new SimpleStringProperty();
+        static StringProperty extraJvmArgs = new SimpleStringProperty();
+        static StringProperty extraGameArgs = new SimpleStringProperty();
+        static StringProperty maxMemory = new SimpleStringProperty();
+        static StringProperty minMemory = new SimpleStringProperty();
+        static Launch cur;
+
+        static void change(Launch launch) {
+            cur = launch;
+            javaPath.setValue(launch.getJavaPath());
+            extraJvmArgs.setValue(launch.getExtraJvmArgs());
+            extraGameArgs.setValue(launch.getExtraGameArgs());
+            maxMemory.setValue(launch.getMaxMemory());
+            minMemory.setValue(launch.getMinMemory());
+        }
+
+        static void hasChange() {
+            cur.setJavaPath(javaPath.getValue());
+            cur.setExtraJvmArgs(extraJvmArgs.getValue());
+            cur.setExtraGameArgs(extraGameArgs.getValue());
+            cur.setMaxMemory(maxMemory.getValue());
+            cur.setMinMemory(minMemory.getValue());
+        }
+    }
+
+    private static Node getTextObj(StringProperty value) {
+        var textField = new TextField();
+        var text = new FusionW(textField) {
+
+            {
+                FontManager.get().setFont(FontUsages.tableCellText, getLabel());
+            }
+        };
+
+        textField.textProperty().bindBidirectional(value);
+        textField.setPadding(new Insets(0, 10, 0, 10));
+        textField.focusedProperty().addListener((ob, old, now) -> {
+            if (old == null || now == null) return;
+            if (old && !now) {
+                _launch.hasChange();
+            }
+        });
+
+        return text;
     }
 }

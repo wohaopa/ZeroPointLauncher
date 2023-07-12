@@ -49,7 +49,7 @@ public class InstallTaskTest {
         Instance instance = new OnlineInstallTask(new File(ZplDirectory.getInstancesDirectory(), name), name, Log::info)
             .call();
         instance.updateMapping();
-        instance.launchInstance(new OfflineAuth("wohaopa"));
+        instance.launchInstance(new OfflineAuth("wohaopa"), System.out::println);
         // new ZplExtractTask(instDir, Log::info).call();
     }
 

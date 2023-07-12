@@ -18,23 +18,19 @@
  * SOFTWARE.
  */
 
-package filesystem;
+package com.github.wohaopa.zpl.ui;
 
-import java.io.File;
+import com.github.wohaopa.zpl.ui.scene.BaseVScene;
+import io.vproxy.vfx.ui.scene.VSceneRole;
 
-import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
-import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
-import com.github.wohaopa.zeropointlanuch.core.launch.Launch;
+public class ServerScene extends BaseVScene {
 
-public class LaunchTest {
+    public ServerScene() {
+        super(VSceneRole.MAIN);
+    }
 
-    public static void main(String[] args) {
-        ZplDirectory.init(new File("D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"));
-        Launch.getLauncher("ZPL-Java8")
-            .launch(
-                new OfflineAuth("wohaopa"),
-                new File(
-                    "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\instances\\GTNH-2.3.3-zpl\\.minecraft"),
-                System.out::println);
+    @Override
+    public String title() {
+        return "服务器";
     }
 }

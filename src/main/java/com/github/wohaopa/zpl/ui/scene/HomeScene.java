@@ -20,6 +20,10 @@
 
 package com.github.wohaopa.zpl.ui.scene;
 
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.image.ImageManager;
 import io.vproxy.vfx.ui.scene.VSceneRole;
@@ -31,14 +35,40 @@ public class HomeScene extends BaseVScene {
     public HomeScene() {
         super(VSceneRole.MAIN);
         enableAutoContentWidthHeight();
-        var label = new ThemeLabel("ZPL GTNH启动器") {
+        var title = new ThemeLabel("ZPL-GTNH启动器");
+        {
+            FontManager.get().setFont(title, settings -> settings.setSize(40));
+        }
+        var info = new ThemeLabel("反馈群：222625575（点击复制）");
+        {
+            FontManager.get().setFont(info, settings -> settings.setSize(18));
+            info.setPrefHeight(20);
+            info.setOnMouseClicked(event -> {
+                Clipboard clipboard = Clipboard.getSystemClipboard();
+                ClipboardContent clipboardContent = new ClipboardContent();
+                clipboardContent.put(DataFormat.PLAIN_TEXT, "222625575");
+                clipboard.setContent(clipboardContent);
+            });
+        }
+        var version = new ThemeLabel("ZPL版本：0.3");
+        {
+            FontManager.get().setFont(info, settings -> settings.setSize(18));
+            info.setOnMouseClicked(event -> {
+                Clipboard clipboard = Clipboard.getSystemClipboard();
+                ClipboardContent clipboardContent = new ClipboardContent();
+                clipboardContent.put(DataFormat.PLAIN_TEXT, "222625575");
+                clipboard.setContent(clipboardContent);
+            });
+        }
 
-            {
-                FontManager.get().setFont(this, settings -> settings.setSize(40));
-            }
-        };
-        getContentPane().getChildren().add(label);
-        FXUtils.observeWidthHeightCenter(getContentPane(), label);
+        getContentPane().getChildren().addAll(title, info, version);
+        getContentPane().heightProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue == null || newValue == null) return;
+            info.setLayoutY(newValue.doubleValue() * 0.5);
+            version.setLayoutY(info.getLayoutY() + info.getPrefHeight());
+        });
+        FXUtils.observeWidthHeightCenter(getContentPane(), title);
+
         setBackgroundImage(ImageManager.get().load("images/bg.jpg"));
     }
 

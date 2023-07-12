@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.wohaopa.zeropointlanuch.core.Config;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 
 public class DownloadProvider {
@@ -64,8 +65,9 @@ public class DownloadProvider {
 
     private static DownloadProvider getProvider() {
         if (provider == null) {
-            String mirrorUrl = System.getProperty("zpl.url");
-            if (mirrorUrl != null && mirrorUrl.startsWith("http")) provider = new DownloadProvider(mirrorUrl, true);
+            String mirrorUrl = Config.getConfig().getLibraries_url();
+            if (mirrorUrl.endsWith("/")) mirrorUrl = mirrorUrl.substring(0, mirrorUrl.length() - 1);
+            if (mirrorUrl.startsWith("http")) provider = new DownloadProvider(mirrorUrl, true);
             else provider = new DefaultDownloadProvider();
         }
 

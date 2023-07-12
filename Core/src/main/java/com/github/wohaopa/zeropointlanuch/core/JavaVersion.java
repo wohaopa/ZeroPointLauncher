@@ -36,16 +36,16 @@ public class JavaVersion {
     private final static Map<File, JavaVersion> inst = new HashMap<>();
 
     static {
-        Log.start("JavaCheck");
-        Log.debug("正在查找Java");
-        File javaRoot = new File("C:\\Program Files\\java\\");
-        if (javaRoot.exists()) {
-            for (File file : Objects.requireNonNull(javaRoot.listFiles())) {
-                new JavaVersion(new File(file, "bin\\java.exe"));
-            }
-        }
-        Log.debug("找到：{}，个有效Java", inst.size());
-        Log.end();
+        // Log.start("JavaCheck");
+        // Log.debug("正在查找Java");
+        // File javaRoot = new File("C:\\Program Files\\java\\");
+        // if (javaRoot.exists()) {
+        // for (File file : Objects.requireNonNull(javaRoot.listFiles())) {
+        // new JavaVersion(new File(file, "bin\\java.exe"));
+        // }
+        // }
+        // Log.debug("找到：{}，个有效Java", inst.size());
+        // Log.end();
     }
 
     public static JavaVersion getJava(File file) {
