@@ -18,47 +18,11 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.auth;
+package com.github.wohaopa.zeropointlanuch.core.utils;
 
-import java.util.function.Consumer;
+public class StringUtil {
 
-import cn.hutool.json.JSONObject;
-
-import com.github.wohaopa.zeropointlanuch.core.auth.controller.MicrosoftAuthController;
-
-public class MicrosoftAuth extends Auth {
-
-    private MicrosoftAuthController controller;
-
-    private Consumer<JSONObject> callback;
-
-    public MicrosoftAuth() {
-        type = "MICROSOFT";
-        controller = new MicrosoftAuthController();
-    }
-
-    @Override
-    protected void login() {
-        controller.login(callback);
-    }
-
-    @Override
-    public JSONObject saveInformation() {
-        return controller.save().putOpt("type", type);
-
-    }
-
-    @Override
-    public Auth loadInformation(JSONObject object) {
-        controller.load(object);
-        return this;
-    }
-
-    public void setCallback(Consumer<JSONObject> callback) {
-        this.callback = callback;
-    }
-
-    public void test() {
-        login();
+    public static boolean isNotEmpty(String s) {
+        return s != null && !s.isEmpty();
     }
 }
