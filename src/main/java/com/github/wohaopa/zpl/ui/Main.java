@@ -34,6 +34,9 @@ import javafx.stage.Stage;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Scheduler;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
 import com.github.wohaopa.zpl.ui.scene.*;
 
 import io.vproxy.vfx.control.globalscreen.GlobalScreenUtils;
@@ -79,6 +82,8 @@ public class Main extends Application {
         mainScenes.add(new InstanceScene());
         mainScenes.add(new AddInstanceScene());
         mainScenes.add(new AccountScene());
+        mainScenes.add(new ServerScene());
+        mainScenes.add(new ConsoleScene());
         mainScenes.add(new SettingScene());
 
         var initialScene = mainScenes.get(0);
@@ -93,9 +98,10 @@ public class Main extends Application {
         {
             launchPane.getNode().setPrefHeight(60);
 
-            var accountButton = new ChoiceBox<>(AccountMaster.getAccounts());
+            var accountButton = new ChoiceBox<>();
 
             {
+                accountButton.itemsProperty().bind(AccountMaster.accountsProperty());
                 accountButton.setPrefWidth(200);
                 accountButton.setPrefHeight(launchPane.getNode().getPrefHeight() - FusionPane.PADDING_V * 2);
 
@@ -105,10 +111,13 @@ public class Main extends Application {
                             Theme.current().subSceneBackgroundColor(),
                             CornerRadii.EMPTY,
                             Insets.EMPTY)));
+                accountButton.getStylesheets().add("css/choice-box.css");
                 accountButton.getSelectionModel()
                     .selectedItemProperty()
                     .addListener(
-                        (observable, oldValue, newValue) -> { if (newValue != null) AccountMaster.change(newValue); });
+                        (observable, oldValue, newValue) -> {
+                            if (newValue != null) AccountMaster.change((Auth) newValue);
+                        });
                 accountButton.getSelectionModel().select(AccountMaster.getCur());
             }
 
@@ -141,6 +150,23 @@ public class Main extends Application {
                 launchButton.setPrefWidth(200);
                 launchButton.setPrefHeight(launchPane.getNode().getPrefHeight() - FusionPane.PADDING_V * 2);
                 launchButton.setOnlyAnimateWhenNotClicked(true);
+                launchButton.setOnAction(event -> {
+                    launchButton.setDisable(true);
+                    launchButton.setText("启动中");
+                    Scheduler.submitTasks(new Task<>(s -> {
+                        if (s.equals("检测到游戏窗口")) Platform.runLater(() -> {
+                            launchButton.setText("启动");
+                            launchButton.setDisable(false);
+                        });
+                    }) {
+
+                        @Override
+                        public Object call() throws Exception {
+                            InstanceMaster.getCur().launchInstance(AccountMaster.getCur(), callback);
+                            return null;
+                        }
+                    });
+                });
             }
 
             launchPane.getContentPane().getChildren().add(accountButton);
@@ -204,6 +230,7 @@ public class Main extends Application {
                     }
                     stage.getRootSceneGroup().hide(menuScene, VSceneHideMethod.TO_LEFT);
                 });
+                if (title.equals("服务器") || title.equals("控制台")) button.setDisable(true);
                 button.setPrefWidth(100);
                 button.setPrefHeight(40);
                 if (i != 0) {

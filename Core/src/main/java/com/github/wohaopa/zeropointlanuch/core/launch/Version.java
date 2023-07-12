@@ -23,6 +23,7 @@ package com.github.wohaopa.zeropointlanuch.core.launch;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import cn.hutool.json.JSONObject;
 
@@ -53,7 +54,7 @@ public class Version {
         this.natives = new File(ZplDirectory.getNativesRootDirectory(), name);
     }
 
-    protected void verifyVersion() throws Exception {
+    protected void verifyVersion(Consumer<String> callback) throws Exception {
 
         if (verified) return;
 
@@ -61,7 +62,7 @@ public class Version {
         Log.debug("正在校验版本：{}", name);
 
         if (!versionJsonFile.exists()) {
-            new DownloadTask(DownloadProvider.getUrlForFile(versionJsonFile), versionJsonFile, null).call();
+            new DownloadTask(DownloadProvider.getUrlForFile(versionJsonFile), versionJsonFile, callback).call();
         }
 
         versionJsonObj = ((JSONObject) JsonUtil.fromJson(versionJsonFile));
@@ -75,14 +76,14 @@ public class Version {
         DownloadProvider.addUrlToMap(url, versionJar);
         new CheckoutTask(versionJar, sha1, null).call();
 
-        assetsTask = new AssetsTask(ZplDirectory.getAssetsDirectory(), getAssetsIndexName(), null);
+        assetsTask = new AssetsTask(ZplDirectory.getAssetsDirectory(), getAssetsIndexName(), callback);
         assetsTask.call();
         libraries = new LibrariesTask(
             ZplDirectory.getLibrariesDirectory(),
             versionJsonObj.getJSONArray("libraries"),
             natives,
             getAssetsIndexName(),
-            null);
+            callback);
         libraries.call();
 
         verified = true;

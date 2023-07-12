@@ -25,7 +25,10 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
+import cn.hutool.json.JSONObject;
+
 import com.github.wohaopa.zeropointlanuch.core.Config;
+import com.github.wohaopa.zeropointlanuch.core.JavaVersion;
 import com.github.wohaopa.zeropointlanuch.core.Log;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
@@ -44,51 +47,83 @@ public class Launch {
         return inst.get(name);
     }
 
-    public static Set<String> getLaunches() {
-        return inst.keySet();
+    public static Collection<Launch> getLaunches() {
+        return inst.values();
     }
-    // 成员属性与方法
 
+    // 成员属性与方法
+    JSONObject jsonObject;
     private final String name;
-    private int maxMemory = 8192;
-    private int minMemory = 4096;
-    private String extraJvmArgs = "";
-    private String extraGameArgs = "";
+    private String maxMemory;
+    private String minMemory;
+    private String extraJvmArgs;
+    private String extraGameArgs;
     private String javaPath;
 
     private final Version version;
 
     public Launch setJavaPath(String javaPath) {
+        jsonObject.set("javaPath", javaPath);
         this.javaPath = javaPath;
         return this;
     }
 
     public Launch setExtraJvmArgs(String extraJvmArgs) {
+        jsonObject.set("extraJvmArgs", extraJvmArgs);
         this.extraJvmArgs = extraJvmArgs;
         return this;
     }
 
     public Launch setExtraGameArgs(String extraGameArgs) {
+        jsonObject.set("extraGameArgs", extraGameArgs);
         this.extraGameArgs = extraGameArgs;
         return this;
     }
 
-    public Launch setMaxMemory(int maxMemory) {
+    public Launch setMaxMemory(String maxMemory) {
+        jsonObject.set("maxMemory", maxMemory);
         this.maxMemory = maxMemory;
         return this;
     }
 
-    public Launch setMinMemory(int minMemory) {
+    public Launch setMinMemory(String minMemory) {
+        jsonObject.set("minMemory", minMemory);
         this.minMemory = minMemory;
         return this;
+    }
+
+    public String getMaxMemory() {
+        return maxMemory;
+    }
+
+    public String getMinMemory() {
+        return minMemory;
+    }
+
+    public String getExtraJvmArgs() {
+        return extraJvmArgs;
+    }
+
+    public String getExtraGameArgs() {
+        return extraGameArgs;
+    }
+
+    public String getJavaPath() {
+        return javaPath;
     }
 
     private Launch(String name) {
         this.name = name;
         this.version = new Version(name, new File(ZplDirectory.getVersionsDirectory(), name + ".json"));
         inst.put(name, this);
-        if (name.endsWith("Java8")) javaPath = Config.getConfig().getJava8Path();
-        else javaPath = Config.getConfig().getJava17Path();
+        jsonObject = Config.getConfig().getLaunchConfig(name);
+
+        maxMemory = jsonObject.getStr("jsonObject", "8192M");
+        minMemory = jsonObject.getStr("minMemory", "1024M");
+        extraJvmArgs = jsonObject.getStr("extraJvmArgs", "");
+        extraGameArgs = jsonObject.getStr("extraJvmArgs", "");
+        javaPath = jsonObject.getStr("javaPath", "java");
+
     }
 
     private String[] getLaunchArguments(Auth auth, File runDir) {
@@ -96,12 +131,16 @@ public class Launch {
         if (javaPath == null || javaPath.isEmpty()) {
             throw new RuntimeException("无效Java路径，启动器：" + name);
         }
+        if (new JavaVersion(new File(javaPath)).version != JavaVersion.Java.JAVA8 && name.equals("ZPL-Java8")) {
+            throw new RuntimeException("无效Java路径，启动器：" + name);
+        }
+
         List<String> commandLine = new ArrayList<>();
 
         commandLine.add(javaPath);
 
-        commandLine.add("-Xmx" + maxMemory + "M");
-        commandLine.add("-Xms" + minMemory + "M");
+        commandLine.add("-Xmx" + maxMemory);
+        commandLine.add("-Xms" + minMemory);
 
         if (extraGameArgs != null && !extraGameArgs.isEmpty()) {
             commandLine.addAll(Arrays.asList(extraJvmArgs.split(" ")));
@@ -120,12 +159,12 @@ public class Launch {
         return commandLine.toArray(new String[0]);
     }
 
-    public void launch(Auth auth, File runDir) {
+    public void launch(Auth auth, File runDir, Consumer<String> callback) {
 
         Log.start("启动");
 
         try {
-            version.verifyVersion();
+            version.verifyVersion(callback);
         } catch (Exception e) {
             Log.warn("文件校验失败。原因：{}", e);
             Log.end();
@@ -139,13 +178,22 @@ public class Launch {
 
         Consumer<String> pump = new Consumer<>() {
 
+            final Consumer<String> callback0;
+            {
+                {
+                    this.callback0 = callback;
+                }
+            }
+
             static final Pattern pattern = Pattern.compile("\\[[0-9:]+\\] \\[Client thread/INFO\\]: LWJGL Version: .+");
 
             @Override
             public void accept(String s) {
-                if (pattern.matcher(s).find()) resume[0] = false;
-
-                System.out.println(s);
+                if (resume[0] && pattern.matcher(s).find()) {
+                    resume[0] = false;
+                    callback.accept("检测到游戏窗口");
+                }
+                callback0.accept(s);
 
             }
         };
@@ -177,5 +225,10 @@ public class Launch {
     private List<String> parseArg(List<String> commands, File runDir) {
         commands.set(commands.indexOf("${game_directory}"), runDir.toString());
         return commands;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

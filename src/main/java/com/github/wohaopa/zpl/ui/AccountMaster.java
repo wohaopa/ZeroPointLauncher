@@ -20,24 +20,32 @@
 
 package com.github.wohaopa.zpl.ui;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import com.github.wohaopa.zeropointlanuch.core.Account;
+import com.github.wohaopa.zeropointlanuch.core.Config;
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
 
 public class AccountMaster {
 
-    private static ObservableList<Auth> accounts;
+    private static final ObjectProperty<ObservableList<Object>> accounts = new SimpleObjectProperty<>();
+
     private static Auth cur;
 
     static {
-        accounts = FXCollections.observableArrayList(Account.getAuths());
-        cur = accounts.size() == 0 ? null : accounts.get(0);
+        accounts.setValue(FXCollections.observableArrayList(Config.getConfig().getAuths()));
+        cur = accounts.getValue().size() == 0 ? null : (Auth) accounts.getValue().get(0);
     }
 
-    public static ObservableList<Auth> getAccounts() {
+    public static ObjectProperty<ObservableList<Object>> accountsProperty() {
         return accounts;
+    }
+
+    public static void addAccount(Auth instance) {
+        accounts.get().add(instance);
+        Config.getConfig().addAccount(instance);
     }
 
     public static void change(Auth instance) {

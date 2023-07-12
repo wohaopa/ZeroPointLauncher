@@ -23,6 +23,7 @@ package com.github.wohaopa.zeropointlanuch.core;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
 import com.github.wohaopa.zeropointlanuch.core.filesystem.MyDirectory;
@@ -188,10 +189,10 @@ public class Instance {
 
     }
 
-    public void launchInstance(Auth auth) {
+    public void launchInstance(Auth auth, Consumer<String> callback) {
         Launch launch = Launch.getLauncher(information.launcher);
         if (launch != null) {
-            launch.launch(auth, runDir);
+            launch.launch(auth, runDir, callback);
         } else throw new RuntimeException("无法找到启动器：" + information.launcher);
     }
 

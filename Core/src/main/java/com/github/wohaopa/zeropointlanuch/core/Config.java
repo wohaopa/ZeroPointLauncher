@@ -21,9 +21,15 @@
 package com.github.wohaopa.zeropointlanuch.core;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 
+import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+import com.github.wohaopa.zeropointlanuch.core.auth.MicrosoftAuth;
+import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
@@ -47,10 +53,19 @@ public class Config {
         if (configFile.exists()) try {
             JSONObject object = JsonUtil.fromJson(configFile).toBean(JSONObject.class);
 
-            config.java8Path = object.getStr("java8Path");
-            config.java17Path = object.getStr("java17Path");
+            config.libraries_url = object.getStr("libraries_url", "http://downloads.wohaopa.cn");
+            config.launchConfig = object.getJSONObject("launchConfig");
+            if (config.launchConfig == null) config.launchConfig = new JSONObject();
+            config.auths = new ArrayList<>();
 
-            Account.load(object.getJSONArray("account"));
+            Iterable<JSONObject> it = object.getJSONArray("account").jsonIter();
+            for (JSONObject jsonObject : it) {
+                switch (jsonObject.getStr("type")) {
+                    case "OFFLINE" -> config.auths.add(new OfflineAuth().loadInformation(jsonObject));
+                    case "MICROSOFT" -> config.auths.add(new MicrosoftAuth().loadInformation(jsonObject));
+                }
+            }
+
         } catch (Exception e) {
             Log.warn("配置文件错误：{}", configFile.toString());
             configFile.delete();
@@ -61,32 +76,55 @@ public class Config {
         Log.debug("正在保存设置文件：{}", configFile.toString());
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.set("java8Path", config.java8Path);
-        jsonObject.set("java17Path", config.java17Path);
+        jsonObject.set("libraries_url", config.libraries_url);
+        jsonObject.set("launchConfig", config.launchConfig);
+        JSONArray array = new JSONArray();
+        config.auths.forEach(auth -> array.add(auth.saveInformation()));
 
-        jsonObject.set("account", Account.save());
+        jsonObject.set("account", array);
 
         FileUtil.fileWrite(configFile, jsonObject.toJSONString(4));
     }
 
+    public void addAccount(Auth auth) {
+        auths.add(auth);
+    }
+
+    public List<Auth> getAuths() {
+        return auths;
+    }
+
     private Config() {}
 
-    private String java8Path;
-    private String java17Path;
+    private String libraries_url;
+    private JSONObject launchConfig;
 
-    public String getJava8Path() {
-        return java8Path;
+    private List<Auth> auths;
+
+    private Auth curAccount;
+
+    public void select(Auth value) {
+        curAccount = value;
     }
 
-    public void setJava8Path(String java8Path) {
-        this.java8Path = java8Path;
+    public Auth getCur() {
+        return curAccount;
     }
 
-    public String getJava17Path() {
-        return java17Path;
+    public String getLibraries_url() {
+        return libraries_url;
     }
 
-    public void setJava17Path(String java17Path) {
-        this.java17Path = java17Path;
+    public void setLibraries_url(String libraries_url) {
+        this.libraries_url = libraries_url;
+    }
+
+    public JSONObject getLaunchConfig(String name) {
+        JSONObject jsonObject = launchConfig.getJSONObject(name);
+        if (jsonObject == null) {
+            jsonObject = new JSONObject();
+            launchConfig.set(name, jsonObject);
+        }
+        return jsonObject;
     }
 }
