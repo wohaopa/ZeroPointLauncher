@@ -18,9 +18,8 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui;
+package com.github.wohaopa.zpl.ui.scene;
 
-import com.github.wohaopa.zpl.ui.scene.BaseVScene;
 import io.vproxy.vfx.ui.scene.VSceneRole;
 
 public class ConsoleScene extends BaseVScene {

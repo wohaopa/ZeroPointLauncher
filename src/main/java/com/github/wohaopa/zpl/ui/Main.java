@@ -54,11 +54,15 @@ import io.vproxy.vfx.util.FXUtils;
 
 public class Main extends Application {
 
+    private static Main instance;
     private final List<BaseVScene> mainScenes = new ArrayList<>();
     private VSceneGroup sceneGroup;
+    private MessageStage messageStage;
+    private MessageScene messageScene = new MessageScene();
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+        instance = this;
         ImageManager.get().loadBlackAndChangeColor("/images/menu.png", Map.of("white", 0xffffffff));
         // ImageManager.get().loadBlackAndChangeColor("/images/up-arrow.png", Map.of("white",
         // 0xffffffff));
@@ -92,6 +96,8 @@ public class Main extends Application {
             if (s == initialScene) continue;
             sceneGroup.addScene(s);
         }
+
+        messageStage = new MessageStage();
 
         // 启动栏
         var launchPane = new FusionPane();
@@ -151,9 +157,17 @@ public class Main extends Application {
                 launchButton.setPrefHeight(launchPane.getNode().getPrefHeight() - FusionPane.PADDING_V * 2);
                 launchButton.setOnlyAnimateWhenNotClicked(true);
                 launchButton.setOnAction(event -> {
+                    var noInstance = InstanceMaster.getCur() == null;
+                    var noAccount = AccountMaster.getCur() == null;
+                    if (noInstance || noAccount) {
+                        if (noInstance) Main.addMessageToScene("缺少实例！请至少安装一个实例再启动。", 4);
+                        if (noAccount) Main.addMessageToScene("缺少账户！请至少添加一个账户再启动。", 4);
+                        return;
+                    }
                     launchButton.setDisable(true);
                     launchButton.setText("启动中");
                     Scheduler.submitTasks(new Task<>(s -> {
+                        messageStage.accept(s);
                         if (s.equals("检测到游戏窗口")) Platform.runLater(() -> {
                             launchButton.setText("启动");
                             launchButton.setDisable(false);
@@ -161,7 +175,7 @@ public class Main extends Application {
                     }) {
 
                         @Override
-                        public Object call() throws Exception {
+                        public Object call() {
                             InstanceMaster.getCur().launchInstance(AccountMaster.getCur(), callback);
                             return null;
                         }
@@ -191,6 +205,22 @@ public class Main extends Application {
         FXUtils.observeHeight(stage.getInitialScene().getContentPane(), sceneGroup.getNode(), -10 - 60 - 5 - 10);
         FXUtils.observeWidth(stage.getInitialScene().getContentPane(), sceneGroup.getNode(), -20);
         FXUtils.observeWidth(stage.getInitialScene().getContentPane(), launchPane.getNode(), -20);
+
+        // 提示消息
+
+        {
+            stage.getRootSceneGroup().addScene(messageScene, VSceneHideMethod.TO_TOP);
+
+            messageScene.setShowCallable(() -> {
+                stage.getRootSceneGroup().show(messageScene, VSceneShowMethod.FROM_TOP);
+                return null;
+            });
+
+            messageScene.setHideCallable(() -> {
+                stage.getRootSceneGroup().hide(messageScene, VSceneHideMethod.TO_TOP);
+                return null;
+            });
+        }
 
         // 菜单
         var menuScene = new VScene(VSceneRole.DRAWER_VERTICAL);
@@ -258,6 +288,10 @@ public class Main extends Application {
         stage.getStage().setHeight(480);
         stage.getStage().centerOnScreen();
         stage.getStage().show();
+    }
+
+    public static void addMessageToScene(String msg, int time) {
+        instance.messageScene.addMessage(msg, time);
     }
 
     public static void main(String[] args) {
