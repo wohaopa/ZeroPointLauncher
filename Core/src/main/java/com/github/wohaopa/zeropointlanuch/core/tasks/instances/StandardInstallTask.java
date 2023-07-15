@@ -54,10 +54,10 @@ public class StandardInstallTask extends ZplInstallTask {
         builder.setVersionFile(new File(instanceDir, "version.json"))
             .setVersion(version)
             .setDepVersion("null")
+            .setChecksum(new File(instanceDir, "image"))
             .setIncludeMods(ModMaster.coverModsList(new File(instanceDir, "image/mods")))
             .setExcludeMods(null)
             // .setMyImage(myDirectory)
-            .setChecksum(new File(instanceDir, "image"))
             .saveConfig();
 
         return builder.build();

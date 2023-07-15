@@ -69,7 +69,7 @@ public class AddInstanceScene extends BaseVScene {
             grid.add(versionTextField, 1, 2);
         }
         grid.visibleProperty().bind(comboBox.getSelectionModel().selectedIndexProperty().isNotEqualTo(1));
-        versionTextField.visibleProperty().bind(comboBox.getSelectionModel().selectedIndexProperty().isEqualTo(0));
+        versionTextField.visibleProperty().bind(comboBox.getSelectionModel().selectedIndexProperty().isNotEqualTo(1));
 
         var btn = new FusionButton("添加");
         {

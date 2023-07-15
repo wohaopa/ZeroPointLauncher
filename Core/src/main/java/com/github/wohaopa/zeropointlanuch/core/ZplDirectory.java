@@ -35,7 +35,6 @@ public class ZplDirectory {
     private static File modsDirectory;
     private static File zipDirectory;
     private static File shareDirectory;
-    private static File tmpDirectory;
     private static File versionsDirectory;
 
     private static File nativesRootDirectory;
@@ -59,7 +58,6 @@ public class ZplDirectory {
         ZplDirectory.modsDirectory = FileUtil.initAndMkDir(workDir, "mods");
         ZplDirectory.zipDirectory = FileUtil.initAndMkDir(workDir, "zip");
         ZplDirectory.shareDirectory = FileUtil.initAndMkDir(workDir, "share");
-        ZplDirectory.tmpDirectory = FileUtil.initAndMkDir(workDir, "temp");
         ZplDirectory.versionsDirectory = FileUtil.initAndMkDir(workDir, "versions");
         ZplDirectory.nativesRootDirectory = FileUtil.initAndMkDir(workDir, "natives");
     }
@@ -90,10 +88,6 @@ public class ZplDirectory {
 
     public static File getShareDirectory() {
         return shareDirectory;
-    }
-
-    public static File getTmpDirectory() {
-        return tmpDirectory;
     }
 
     public static File getVersionsDirectory() {
