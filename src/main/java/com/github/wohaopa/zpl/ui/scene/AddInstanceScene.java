@@ -30,8 +30,11 @@ import com.github.wohaopa.zeropointlanuch.core.tasks.Scheduler;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.StandardInstallTask;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.ZplInstallTask;
 
+import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.ui.button.FusionButton;
 import io.vproxy.vfx.ui.scene.VSceneRole;
+import io.vproxy.vfx.ui.wrapper.FusionW;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
 
 public class AddInstanceScene extends BaseVScene {
@@ -57,16 +60,22 @@ public class AddInstanceScene extends BaseVScene {
 
         var grid = new GridPane();
         var nameTextField = new TextField();
+        var nameText = new FusionW(nameTextField);
+        FontManager.get().setFont(FontUsages.tableCellText, nameText.getLabel());
         var zipTextField = new TextField();
+        var zipText = new FusionW(zipTextField);
+        FontManager.get().setFont(FontUsages.tableCellText, zipText.getLabel());
         var versionTextField = new TextField();
+        var versionText = new FusionW(versionTextField);
+        FontManager.get().setFont(FontUsages.tableCellText, versionText.getLabel());
 
         {
             grid.add(new ThemeLabel("实例名："), 0, 0);
             grid.add(new ThemeLabel("安装包路径："), 0, 1);
             grid.add(new ThemeLabel("版本："), 0, 2);
-            grid.add(nameTextField, 1, 0);
-            grid.add(zipTextField, 1, 1);
-            grid.add(versionTextField, 1, 2);
+            grid.add(nameText, 1, 0);
+            grid.add(zipText, 1, 1);
+            grid.add(versionText, 1, 2);
         }
         grid.visibleProperty().bind(comboBox.getSelectionModel().selectedIndexProperty().isNotEqualTo(1));
         versionTextField.visibleProperty().bind(comboBox.getSelectionModel().selectedIndexProperty().isNotEqualTo(1));

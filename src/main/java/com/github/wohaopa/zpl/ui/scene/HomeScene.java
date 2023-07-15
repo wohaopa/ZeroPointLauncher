@@ -20,6 +20,8 @@
 
 package com.github.wohaopa.zpl.ui.scene;
 
+import io.vproxy.vfx.util.FXUtils;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
@@ -28,16 +30,16 @@ import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.image.ImageManager;
 import io.vproxy.vfx.ui.scene.VSceneRole;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
-import io.vproxy.vfx.util.FXUtils;
 
 public class HomeScene extends BaseVScene {
 
     public HomeScene() {
         super(VSceneRole.MAIN);
-        enableAutoContentWidthHeight();
+
         var title = new ThemeLabel("ZPL-GTNH启动器");
         {
             FontManager.get().setFont(title, settings -> settings.setSize(40));
+            title.setPrefHeight(40);
         }
         var info = new ThemeLabel("反馈群：222625575（点击复制）");
         {
@@ -61,14 +63,17 @@ public class HomeScene extends BaseVScene {
             });
         }
 
-        getContentPane().getChildren().addAll(title, info, version);
-        getContentPane().heightProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldValue == null || newValue == null) return;
+        ChangeListener<? super Number> hl = (observable, oldValue, newValue) -> {
+            title.setLayoutY((newValue.doubleValue() - title.getHeight()) * 0.5);
             info.setLayoutY(newValue.doubleValue() * 0.5);
-            version.setLayoutY(info.getLayoutY() + info.getPrefHeight());
-        });
-        FXUtils.observeWidthHeightCenter(getContentPane(), title);
+            version.setLayoutY(info.getLayoutY() + info.getHeight());
+        };
+        getContentPane().heightProperty().addListener(hl);
 
+//        FXUtils.observeHeightCenter()
+        FXUtils.observeWidthHeightCenter(getContentPane(),title);
+        getContentPane().getChildren().addAll(title, info, version);
+        enableAutoContentWidthHeight();
         setBackgroundImage(ImageManager.get().load("images/bg.jpg"));
     }
 

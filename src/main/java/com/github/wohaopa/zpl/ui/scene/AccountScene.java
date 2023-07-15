@@ -30,11 +30,14 @@ import com.github.wohaopa.zeropointlanuch.core.Config;
 import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
 import com.github.wohaopa.zpl.ui.AccountMaster;
 
+import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.ui.button.FusionButton;
 import io.vproxy.vfx.ui.layout.HPadding;
 import io.vproxy.vfx.ui.scene.VSceneRole;
 import io.vproxy.vfx.ui.stage.VStage;
 import io.vproxy.vfx.ui.stage.VStageInitParams;
+import io.vproxy.vfx.ui.wrapper.FusionW;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
 
 public class AccountScene extends BaseVScene {
@@ -70,10 +73,13 @@ public class AccountScene extends BaseVScene {
             }
 
             var offlineGrid = new GridPane();
+
             var offlineTextField = new TextField();
+            var offlineText = new FusionW(offlineTextField);
+            FontManager.get().setFont(FontUsages.tableCellText, offlineText.getLabel());
             {
                 offlineGrid.add(new ThemeLabel("用户名："), 0, 0);
-                offlineGrid.add(offlineTextField, 1, 0);
+                offlineGrid.add(offlineText, 1, 0);
                 offlineGrid.visibleProperty().bind(comboBox.getSelectionModel().selectedIndexProperty().isEqualTo(0));
             }
 
@@ -88,6 +94,7 @@ public class AccountScene extends BaseVScene {
                         AccountMaster.addAccount(new OfflineAuth(name));
                         updateVBox(pane);
                     }
+                    addStage.close();
                 });
             }
 

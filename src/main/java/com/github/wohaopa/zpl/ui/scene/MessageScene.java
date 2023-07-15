@@ -23,8 +23,6 @@ package com.github.wohaopa.zpl.ui.scene;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
-
-import io.vproxy.vfx.control.scroll.VScrollPane;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
@@ -56,7 +54,6 @@ public class MessageScene extends VScene {
             new Background(
                 new BackgroundFill(Theme.current().subSceneBackgroundColor(), CornerRadii.EMPTY, Insets.EMPTY)));
         FXUtils.observeWidthCenter(getNode(), vBox);
-
     }
 
     Timer timer = new Timer();

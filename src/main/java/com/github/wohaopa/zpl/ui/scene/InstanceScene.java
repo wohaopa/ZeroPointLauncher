@@ -355,12 +355,8 @@ public class InstanceScene extends BaseVScene {
 
     private static Node getTextObj(StringProperty property) {
         var textField = new TextField();
-        var text = new FusionW(textField) {
-
-            {
-                FontManager.get().setFont(FontUsages.tableCellText, getLabel());
-            }
-        };
+        var text = new FusionW(textField);
+        FontManager.get().setFont(FontUsages.tableCellText, text.getLabel());
 
         textField.textProperty().bindBidirectional(property);
         textField.setPadding(new Insets(0, 10, 0, 0));
