@@ -24,7 +24,8 @@ import java.util.*;
 
 public class InstanceInstaller {
 
-    // public static void installForZip(File zip, File instanceDir, Instance.Information information) {
+    // public static void installForZip(File zip, File instanceDir, Instance.Information information)
+    // {
     // Log.start("实例安装");
     // instanceDir.mkdirs();
     // File versionJson = new File(instanceDir, "version.json");
@@ -45,7 +46,8 @@ public class InstanceInstaller {
     // Log.debug("正在生成校验文件");
     // instance.information.checksum = FileUtil.genChecksum(instance.imageDir); // 加载文件校验
     //
-    // instance.information.includeMods = genModList(new File(instance.imageDir, "mods"), true); // 加载mods信息
+    // instance.information.includeMods = genModList(new File(instance.imageDir, "mods"), true); //
+    // 加载mods信息
     // instance.information.excludeMods = new ArrayList<>();
     //
     // Log.debug("正在生成映射配置");
@@ -173,11 +175,13 @@ public class InstanceInstaller {
     // * @param targetVersion 依赖的实例名
     // */
     // @Deprecated
-    // public static void installUpdate(File updaterFile, File dir, String name, String version, String targetVersion)
+    // public static void installUpdate(File updaterFile, File dir, String name, String version,
+    // String targetVersion)
     // {}
     //
     // @Deprecated
-    // public static void installTranslation(File translationFile, File dir, String name, String version,
+    // public static void installTranslation(File translationFile, File dir, String name, String
+    // version,
     // Instance targetVersion) {
     //
     // File image = FileUtil.initAndMkDir(dir, "image");

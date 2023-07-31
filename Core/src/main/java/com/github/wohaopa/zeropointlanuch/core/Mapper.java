@@ -55,7 +55,6 @@ public class Mapper {
         updateMods(); // 映射mod
         updateSharer(sharer);
         updateInstance();
-
     }
 
     private void updateInstance() {
@@ -98,7 +97,6 @@ public class Mapper {
             Log.error("无法刷新mods，可能无法下载mod：{}", e);
             throw new RuntimeException(e);
         }
-
     }
 
     private MyFileBase.MargeInfo getMargeInfo(String name) {

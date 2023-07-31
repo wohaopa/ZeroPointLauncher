@@ -27,7 +27,7 @@ import cn.hutool.json.JSONObject;
 public class OfflineAuth extends Auth {
 
     public OfflineAuth() {
-        type = "OFFLINE";
+        user_type = UserType.Offline;
     }
 
     public OfflineAuth(String name) {
@@ -38,28 +38,25 @@ public class OfflineAuth extends Auth {
             .toString()
             .replace("-", "");
         user_properties = "{}";
-        user_type = "Offline";
     }
 
     @Override
     protected void login() {
 
         auth_access_token = UUID.randomUUID().toString().replace("-", "");
-
     }
 
     @Override
     public JSONObject saveInformation() {
-        return new JSONObject().putOpt("type", type).putOpt("name", auth_player_name).putOpt("uuid", auth_uuid);
+        return new JSONObject().putOpt("type", user_type).putOpt("name", auth_player_name).putOpt("uuid", auth_uuid);
     }
 
     @Override
     public Auth loadInformation(JSONObject object) {
         auth_player_name = object.getStr("name");
         auth_uuid = object.getStr("uuid");
-        user_properties = "{}";
-        user_type = "Offline";
+        user_properties = object.getStr("user_properties");
+        user_type = UserType.valueOf(object.getStr("user_type"));
         return this;
     }
-
 }

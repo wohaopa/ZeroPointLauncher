@@ -121,7 +121,6 @@ public class Version {
             args.add(getClasspath());
         }
         return args;
-
     }
 
     protected List<String> getGameArguments() {
@@ -167,5 +166,4 @@ public class Version {
     private String getClasspath() {
         return libraries.getClasspath() + versionJar.toString();
     }
-
 }

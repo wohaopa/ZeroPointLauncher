@@ -33,7 +33,8 @@ import com.github.wohaopa.zeropointlanuch.core.tasks.instances.OnlineInstallTask
 public class InstallTaskTest {
 
     public static void main(String[] args) throws Exception {
-        // ZplDirectory.init(new File("D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"));
+        // ZplDirectory.init(new
+        // File("D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"));
         DownloadProvider.setProvider(new DownloadProvider("http://127.0.0.1", false));
 
         File zip = new File(
@@ -52,5 +53,4 @@ public class InstallTaskTest {
         instance.launchInstance(new OfflineAuth("wohaopa"), System.out::println);
         // new ZplExtractTask(instDir, Log::info).call();
     }
-
 }

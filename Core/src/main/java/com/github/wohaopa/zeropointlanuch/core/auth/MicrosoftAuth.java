@@ -28,12 +28,13 @@ import com.github.wohaopa.zeropointlanuch.core.auth.controller.MicrosoftAuthCont
 
 public class MicrosoftAuth extends Auth {
 
-    private MicrosoftAuthController controller;
+    private final MicrosoftAuthController controller;
 
     private Consumer<JSONObject> callback;
 
     public MicrosoftAuth() {
-        type = "MICROSOFT";
+        user_properties = "{}";
+        user_type = UserType.Microsoft;
         controller = new MicrosoftAuthController();
     }
 
@@ -44,13 +45,17 @@ public class MicrosoftAuth extends Auth {
 
     @Override
     public JSONObject saveInformation() {
-        return controller.save().putOpt("type", type);
-
+        return new JSONObject().putOpt("microsoft_refresh_token", controller.microsoftRefreshToken)
+            .putOpt("auth_access_token", controller.minecraftToken)
+            .putOpt("minecraftProfile", controller.minecraftProfile)
+            .putOpt("type", user_type);
     }
 
     @Override
     public Auth loadInformation(JSONObject object) {
-        controller.load(object);
+        controller.microsoftRefreshToken = object.getStr("microsoftRefreshToken");
+        controller.minecraftToken = object.getStr("minecraftToken");
+        controller.minecraftProfile = object.getJSONObject("minecraftProfile");
         return this;
     }
 

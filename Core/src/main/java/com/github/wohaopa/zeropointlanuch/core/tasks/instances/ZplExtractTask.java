@@ -32,6 +32,7 @@ import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
 public class ZplExtractTask extends Task<File> {
 
     private static final List<String> include = new ArrayList<>();
+
     static {
         include.add("image");
         include.add("checksum.json");

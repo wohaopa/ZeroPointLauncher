@@ -28,12 +28,11 @@ import cn.hutool.json.JSONObject;
 
 public abstract class Auth {
 
-    protected String type;
     protected String auth_player_name;
     protected String auth_uuid;
     protected String auth_access_token;
     protected String user_properties;
-    protected String user_type;
+    protected UserType user_type;
 
     private final Map<String, String> var = new HashMap<>();
 
@@ -52,12 +51,11 @@ public abstract class Auth {
         var.put("auth_uuid", auth_uuid);
         var.put("auth_access_token", auth_access_token);
         var.put("user_properties", user_properties);
-        var.put("user_type", user_type);
+        var.put("user_type", String.valueOf(user_type));
 
         for (String key : var.keySet()) {
             int index = args.indexOf("${" + key + "}");
             if (index >= 0) args.set(index, var.get(key));
-
         }
 
         return args;
@@ -67,12 +65,12 @@ public abstract class Auth {
         return auth_player_name;
     }
 
-    public String getUserType() {
+    public UserType getUserType() {
         return user_type;
     }
 
     @Override
     public String toString() {
-        return auth_player_name + "(" + type + ")";
+        return auth_player_name + "(" + user_type + ")";
     }
 }

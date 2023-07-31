@@ -44,6 +44,5 @@ public class MyFileSystemMargeTest {
         exclude.add("\\mods\\1.7.10");
         MyFileBase.MargeInfo margeInfo = new MyFileBase.MargeInfo(null, exclude);
         MyFileBase.marge(myDirectory, imageDirectory, margeInfo);
-
     }
 }

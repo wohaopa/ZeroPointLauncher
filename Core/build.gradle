@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'com.diffplug.spotless' version '6.7.2'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
@@ -16,10 +15,6 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
     implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
 
-//    implementation 'dev.3-3:jmccc:3.1.4'
-//    implementation 'dev.3-3:jmccc-mcdownloader:3.1.4'
-//    implementation 'dev.3-3:jmccc-microsoft-authenticator:3.1.4'
-
     implementation 'org.apache.commons:commons-compress:1.21'
     implementation 'org.tukaani:xz:1.9'
 
@@ -29,28 +24,4 @@ dependencies {
 
 test {
     useJUnitPlatform()
-}
-
-spotless {
-    encoding 'UTF-8'
-
-    format 'misc', {
-        target '.gitignore'
-
-        trimTrailingWhitespace()
-        indentWithSpaces(4)
-        endWithNewline()
-    }
-
-
-    java {
-        target 'src/*/java/**/*.java', 'src/*/scala/**/*.java'
-
-        toggleOffOn()
-        importOrderFile('../spotless.importorder')
-        removeUnusedImports()
-        licenseHeaderFile("../licenseHeader")
-        eclipse('4.19.0').configFile('../spotless.eclipseformat.xml')
-    }
-
 }

@@ -60,7 +60,6 @@ public class DownloadProvider {
         if (file.toString().startsWith(ZplDirectory.getWorkDirectory().toString())) return getUrlForPath0(
             file.toString().substring(ZplDirectory.getWorkDirectory().toString().length()).replace("\\", "/"));
         return null;
-
     }
 
     private static DownloadProvider getProvider() {

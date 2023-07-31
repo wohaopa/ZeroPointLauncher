@@ -37,18 +37,18 @@ import com.github.wohaopa.zeropointlanuch.core.utils.StringUtil;
 
 public class MicrosoftAuthController {
 
-    private final static String ZPL_CLIENT_ID = "d5b49040-8f93-484d-9b1b-5138159c2288";
-    private final static int timeout = -1;
+    private static final String ZPL_CLIENT_ID = "d5b49040-8f93-484d-9b1b-5138159c2288";
+    private static final int timeout = -1;
 
     private String deviceCode;
     private String microsoftAccessToken;
-    private String microsoftRefreshToken;
+    public String microsoftRefreshToken;
     private String xboxUserToken;
     private String xboxXstsToken;
     private String xboxUhs;
-    private String minecraftToken;
+    public String minecraftToken;
 
-    private JSONObject minecraftProfile;
+    public JSONObject minecraftProfile;
 
     private JSONObject getMicrosoftDeviceCode() {
         Map<String, Object> paramMap = new HashMap<>();
@@ -225,20 +225,19 @@ public class MicrosoftAuthController {
         if (response.isOk()) {
             JSONObject resultJson = (JSONObject) JsonUtil.fromJson(response.body());
 
-            minecraftToken = resultJson.getStr("Token");
+            minecraftToken = resultJson.getStr("access_token");
             return resultJson;
         }
         Log.error(param.toJSONString(0));
         Log.error(response.body());
         throw new RuntimeException("失败：无法正确获取Minecraft令牌");
-
     }
 
     private JSONObject getMinecraftProfile() {
 
         HttpResponse response;
         try {
-            response = HttpRequest.get("https://api.minecraftservices.com/authentication/login_with_xbox")
+            response = HttpRequest.get("https://api.minecraftservices.com/minecraft/profile")
                 .header(Header.AUTHORIZATION, String.format("Bearer %s", minecraftToken))
                 .timeout(timeout)
                 .execute();
@@ -254,50 +253,10 @@ public class MicrosoftAuthController {
         }
         Log.error(response.body());
         throw new RuntimeException("失败：无法正确获取Minecraft令牌");
-
-    }
-
-    public JSONObject save() {
-        return new JSONObject().putOpt("microsoftRefreshToken", microsoftAccessToken)
-            .putOpt("microsoftRefreshToken", microsoftRefreshToken)
-            .putOpt("xboxUserToken", xboxUserToken)
-            .putOpt("xboxXstsToken", xboxXstsToken)
-            .putOpt("xboxUhs", xboxUhs)
-            .putOpt("minecraftToken", minecraftToken)
-            .putOpt("minecraftProfile", minecraftProfile);
-    }
-
-    public void load(JSONObject object) {
-
-        microsoftAccessToken = object.getStr("microsoftAccessToken");
-        microsoftRefreshToken = object.getStr("microsoftRefreshToken");
-
-        xboxUserToken = object.getStr("xboxUserToken");
-
-        xboxXstsToken = object.getStr("xboxXstsToken");
-        xboxUhs = object.getStr("xboxUhs");
-
-        minecraftToken = object.getStr("minecraftToken");
-
-        minecraftProfile = object.getJSONObject("minecraftProfile");
-
     }
 
     public void login(Consumer<JSONObject> callback) {
         if (StringUtil.isNotEmpty(minecraftToken)) try {
-            getMinecraftProfile();
-            return;
-        } catch (Exception ignored) {}
-
-        if (StringUtil.isNotEmpty(xboxUhs) && StringUtil.isNotEmpty(xboxXstsToken)) try {
-            getMinecraftToken();
-            getMinecraftProfile();
-            return;
-        } catch (Exception ignored) {}
-
-        if (StringUtil.isNotEmpty(xboxUserToken)) try {
-            getXboxXstsToken();
-            getMinecraftToken();
             getMinecraftProfile();
             return;
         } catch (Exception ignored) {}
@@ -335,5 +294,4 @@ public class MicrosoftAuthController {
         getMinecraftToken();
         getMinecraftProfile();
     }
-
 }

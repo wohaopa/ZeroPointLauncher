@@ -74,7 +74,6 @@ public class MyFile extends MyFileBase {
 
             Log.debug("影子文件：{}", path);
             list.add(new Pair<>(getFile().toString(), target.getFile().toString()));
-
         }
     }
 
@@ -116,7 +115,6 @@ public class MyFile extends MyFileBase {
         }
 
         return super.getSate();
-
     }
 
     public MyFile setChecksum(long l) {
@@ -133,5 +131,4 @@ public class MyFile extends MyFileBase {
     public boolean isFile() {
         return true;
     }
-
 }

@@ -61,7 +61,6 @@ public abstract class MyFileBase {
                 .setFile(file)
                 .setRootDir(file);
         }
-
     }
 
     public static MyFileBase getMyFileSystemByJson(String name, File file, File rootDir) {
@@ -97,7 +96,6 @@ public abstract class MyFileBase {
 
     public static void update(MyFileBase myFileBase1, File rootDir, File json) {
         myFileBase1.setRootDir(rootDir).update(json.lastModified()).saveChecksumAsJson(json);
-
     }
 
     protected String name; // 文件名
@@ -207,7 +205,6 @@ public abstract class MyFileBase {
             if (exclude == null || exclude.isEmpty()) return false;
             return exclude.contains(path);
         }
-
     }
 
     // 映射
@@ -239,7 +236,7 @@ public abstract class MyFileBase {
 
     protected File getFile() {
         if (file == null) {
-            if (parent == null) file = getRootDir();// 根目录
+            if (parent == null) file = getRootDir(); // 根目录
             else file = new File(parent.getRootDir(), path);
         }
         return file;

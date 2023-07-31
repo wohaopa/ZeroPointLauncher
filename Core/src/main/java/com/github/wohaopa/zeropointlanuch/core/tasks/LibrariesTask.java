@@ -80,7 +80,6 @@ public class LibrariesTask extends Task<Boolean> {
                 Future<File> future = Scheduler.submitTasks(new CheckoutTask(file, libraryBase.sha1, callback));
                 if (libraryBase.natives) futuresNative.add(future);
                 else futures.add(future);
-
             }
         }
 
@@ -98,14 +97,12 @@ public class LibrariesTask extends Task<Boolean> {
         for (Future<File> file : futures) {
             Log.debug("校验完成:{}", file.get().getName());
             sb.append(file.get()).append(s);
-
         }
 
         classpath = sb.toString();
         verified = true;
         Log.debug("校验完成！");
         Log.end();
-
     }
 
     public String getClasspath() {

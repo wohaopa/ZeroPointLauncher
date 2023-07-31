@@ -38,7 +38,6 @@ public class MyDirectory extends MyFileBase {
     protected MyDirectory(MyDirectory parent, String name) {
         super(parent, name);
         subs = new HashMap<>();
-
     }
 
     protected MyFileBase makeMyFileSystemInstance(File file) {
@@ -213,7 +212,6 @@ public class MyDirectory extends MyFileBase {
             for (String name : list) {
                 Log.debug("文件夹\"{}\"：移除文件：\"{}\"", this.name, name);
                 subs.remove(name);
-
             }
         } else {
             for (MyFileBase myFileBase : subs.values()) {
@@ -226,7 +224,7 @@ public class MyDirectory extends MyFileBase {
 
     /**
      * 下放映射
-     * 
+     *
      * @return
      */
     private MyDirectory devolveShade() {

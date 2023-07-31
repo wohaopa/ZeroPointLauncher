@@ -33,7 +33,7 @@ import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
 public class AssetsTask extends Task<Boolean> {
 
-    private final static List<String> verified = new ArrayList<>();
+    private static final List<String> verified = new ArrayList<>();
 
     private final File assetsDir;
     private final String versionString;
@@ -88,6 +88,5 @@ public class AssetsTask extends Task<Boolean> {
 
         Log.debug("校验完成");
         Log.end();
-
     }
 }

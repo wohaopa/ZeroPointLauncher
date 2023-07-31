@@ -30,6 +30,6 @@ class MicrosoftAuthControllerTest {
         MicrosoftAuth auth = new MicrosoftAuth();
         auth.setCallback(object -> System.out.println(object.getStr("message")));
         auth.test();
+        var json = auth.saveInformation();
     }
-
 }

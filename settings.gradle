@@ -1,5 +1,5 @@
 rootProject.name = 'ZeroPointLaunch'
-include 'Wrapper'
 include 'Core'
 include 'MappingTools'
+include 'UI'
 

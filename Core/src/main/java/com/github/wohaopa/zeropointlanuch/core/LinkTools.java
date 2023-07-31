@@ -76,5 +76,4 @@ public class LinkTools {
 
         Log.info("映射完成！");
     }
-
 }

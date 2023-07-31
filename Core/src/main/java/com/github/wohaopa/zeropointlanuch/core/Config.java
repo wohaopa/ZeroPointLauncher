@@ -61,8 +61,8 @@ public class Config {
             Iterable<JSONObject> it = object.getJSONArray("account").jsonIter();
             for (JSONObject jsonObject : it) {
                 switch (jsonObject.getStr("type")) {
-                    case "OFFLINE" -> config.auths.add(new OfflineAuth().loadInformation(jsonObject));
-                    case "MICROSOFT" -> config.auths.add(new MicrosoftAuth().loadInformation(jsonObject));
+                    case "offline" -> config.auths.add(new OfflineAuth().loadInformation(jsonObject));
+                    case "microsoft" -> config.auths.add(new MicrosoftAuth().loadInformation(jsonObject));
                 }
             }
 

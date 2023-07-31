@@ -31,7 +31,6 @@ public class OnlineInstallTask extends ZplInstallTask {
 
     public OnlineInstallTask(File instanceDir, String name, Consumer<String> callback) {
         super(null, instanceDir, name, callback);
-
     }
 
     @Override
@@ -45,6 +44,5 @@ public class OnlineInstallTask extends ZplInstallTask {
             }
         }
         return super.call();
-
     }
 }

@@ -31,9 +31,9 @@ import java.util.regex.Pattern;
 
 public class JavaVersion {
 
-    private final static Pattern pattern = Pattern.compile("java version \"(.+)\"");
+    private static final Pattern pattern = Pattern.compile("java version \"(.+)\"");
 
-    private final static Map<File, JavaVersion> inst = new HashMap<>();
+    private static final Map<File, JavaVersion> inst = new HashMap<>();
 
     static {
         // Log.start("JavaCheck");
@@ -110,7 +110,6 @@ public class JavaVersion {
             version = version1;
             inst.put(javaExe, this);
         }
-
     }
 
     @Override

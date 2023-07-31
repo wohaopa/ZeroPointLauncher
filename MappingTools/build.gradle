@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'com.diffplug.spotless' version '6.7.2'
 }
 
 group 'com.github.wohaopa'
@@ -26,32 +25,4 @@ jar {
         )
 
     }
-}
-
-spotless {
-    java {
-        googleJavaFormat()
-    }
-
-    encoding 'UTF-8'
-
-    format 'misc', {
-        target '.gitignore'
-
-        trimTrailingWhitespace()
-        indentWithSpaces(4)
-        endWithNewline()
-    }
-
-
-    java {
-        target 'src/*/java/**/*.java', 'src/*/scala/**/*.java'
-
-        toggleOffOn()
-        importOrderFile('../spotless.importorder')
-        removeUnusedImports()
-        licenseHeaderFile("../licenseHeader")
-        eclipse('4.19.0').configFile('../spotless.eclipseformat.xml')
-    }
-
 }

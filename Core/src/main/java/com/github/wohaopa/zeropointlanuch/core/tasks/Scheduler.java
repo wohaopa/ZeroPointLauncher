@@ -38,5 +38,4 @@ public class Scheduler {
         tasksCount++;
         return executorService.submit(task);
     }
-
 }

@@ -123,7 +123,6 @@ public class Launch {
         extraJvmArgs = jsonObject.getStr("extraJvmArgs", "");
         extraGameArgs = jsonObject.getStr("extraJvmArgs", "");
         javaPath = jsonObject.getStr("javaPath", "java");
-
     }
 
     private String[] getLaunchArguments(Auth auth, File runDir) {
@@ -179,6 +178,7 @@ public class Launch {
         Consumer<String> pump = new Consumer<>() {
 
             final Consumer<String> callback0;
+
             {
                 {
                     this.callback0 = callback;
@@ -194,7 +194,6 @@ public class Launch {
                     callback.accept("检测到游戏窗口");
                 }
                 callback0.accept(s);
-
             }
         };
 

@@ -77,5 +77,4 @@ public class DownloadTask extends Task<File> {
         }
         return null;
     }
-
 }

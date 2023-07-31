@@ -27,7 +27,7 @@ public class DefaultDownloadProvider extends DownloadProvider {
     }
 
     protected String getUrlForPath0(String path) {
-        if (path.endsWith("/assets/indexes/1.7.10.json"))// 使用BMCL API
+        if (path.endsWith("/assets/indexes/1.7.10.json")) // 使用BMCL API
             return "https://bmclapi2.bangbang93.com/v1/packages/1863782e33ce7b584fc45b037325a1964e095d3e/1.7.10.json";
         if (path.startsWith("/assets/objects/"))
             return "https://bmclapi2.bangbang93.com/assets/" + path.substring("/assets/objects/".length());
@@ -38,5 +38,4 @@ public class DefaultDownloadProvider extends DownloadProvider {
 
         return super.getUrlForPath0(path);
     }
-
 }

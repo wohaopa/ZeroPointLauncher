@@ -159,14 +159,14 @@ public class Instance {
 
     // 实例对象属性与方法
 
-    public File versionFile;// 实例配置文件
-    public File insDir;// 实例文件夹
+    public File versionFile; // 实例配置文件
+    public File insDir; // 实例文件夹
     public File imageDir; // 镜像文件夹
-    public File runDir;// 运行文件夹
-    public File checksumFile;// 校验文件
-    private MyDirectory myImage;// MyFileSystem对象
+    public File runDir; // 运行文件夹
+    public File checksumFile; // 校验文件
+    private MyDirectory myImage; // MyFileSystem对象
     private Mapper mapper;
-    public Information information;// 实例信息，名称版本都在这
+    public Information information; // 实例信息，名称版本都在这
 
     private Instance(File versionFile, Information information) {
         assert (versionFile != null);
@@ -180,13 +180,12 @@ public class Instance {
 
         assert (information.name != null); // 名字
 
-        if (information.version == null) information.version = information.name;// 版本，用于更新
-        if (information.depVersion == null) information.depVersion = "null";// 父版本，空为null，特殊标记用
+        if (information.version == null) information.version = information.name; // 版本，用于更新
+        if (information.depVersion == null) information.depVersion = "null"; // 父版本，空为null，特殊标记用
         if (information.launcher == null) information.launcher = "ZPL-Java8"; // 启动器，Java8/Java17
         if (information.sharer == null) information.sharer = "Common"; // 分享器
         if (information.excludeMods == null) information.excludeMods = new LinkedList<>(); // 排除mod
         if (information.includeMods == null) information.includeMods = new LinkedList<>(); // 包含mod
-
     }
 
     public void launchInstance(Auth auth, Consumer<String> callback) {
@@ -200,15 +199,14 @@ public class Instance {
         Sharer sharer = Sharer.get(information.sharer); // 先拿到sharer
         if (sharer == null) Log.warn("未找到Sharer：{}", information.sharer);
         if (mapper == null) mapper = new Mapper(null, this);
-        mapper.update(sharer);// 执行合并文件夹方法
+        mapper.update(sharer); // 执行合并文件夹方法
         return mapper;
     }
 
     public void updateMapping() {
 
         getMapper();
-        mapper.doLink();// 生成映射文件清单
-
+        mapper.doLink(); // 生成映射文件清单
     }
 
     public MyDirectory getMyDirectory() {
@@ -226,16 +224,12 @@ public class Instance {
         return myImage;
     }
 
-    /**
-     * 从文件重新加载实例信息
-     */
+    /** 从文件重新加载实例信息 */
     public void loadInformation() {
         this.information = Information.formJson(versionFile);
     }
 
-    /**
-     * 保存实例信息到文件
-     */
+    /** 保存实例信息到文件 */
     public void savaInformation() {
         if (checksumFile != null && !checksumFile.isFile()) {
             checksumFile.delete();
@@ -335,6 +329,5 @@ public class Instance {
         public void setExcludeMods(List<String> excludeMods) {
             this.excludeMods = excludeMods;
         }
-
     }
 }

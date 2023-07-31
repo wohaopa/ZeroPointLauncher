@@ -48,7 +48,6 @@ public class MyFileSystemTest {
         // myFileBase.saveChecksumAsJson(json);
         MyDirectory myDirectory = (MyDirectory) MyFileBase.getMyFileSystemByJson("", json, file);
         MyFileBase.update(myDirectory, file, json);
-
     }
 
     public static void geneDiff() {
@@ -110,8 +109,6 @@ public class MyFileSystemTest {
                 my1.saveDiffAsJson(new File(root, "only_first.json"), MyFileBase.Sate.only_me);
                 my2.saveDiffAsJson(new File(root, "only_second.json"), MyFileBase.Sate.only_me);
             }
-
         }
     }
-
 }

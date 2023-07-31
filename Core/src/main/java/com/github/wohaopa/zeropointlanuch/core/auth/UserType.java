@@ -18,27 +18,9 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui;
+package com.github.wohaopa.zeropointlanuch.core.auth;
 
-import io.vproxy.vfx.manager.font.FontManager;
-import io.vproxy.vfx.manager.font.FontProvider;
-import io.vproxy.vfx.manager.font.FontSettings;
-import io.vproxy.vfx.theme.impl.DarkTheme;
-import io.vproxy.vfx.theme.impl.DarkThemeFontProvider;
-
-public class ZplTheme extends DarkTheme {
-
-    @Override
-    public FontProvider fontProvider() {
-        return new ZplFontProvider();
-    }
-
-    public static class ZplFontProvider extends DarkThemeFontProvider {
-
-        @Override
-        protected void defaultFont(FontSettings settings) {
-            super.defaultFont(settings);
-            settings.setFamily(FontManager.FONT_NAME_JetBrainsMono);
-        }
-    }
+public enum UserType {
+    Offline,
+    Microsoft;
 }
