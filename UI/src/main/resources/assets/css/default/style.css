@@ -1,0 +1,123 @@
+/* ====================== launcherBar ======================*/
+
+.zpl-combo-box .list-view .jfx-list-cell {
+    -fx-background-color: rgba(0.1, 0.1, 0.1, 0.5);
+
+}
+
+.zpl-combo-box .list-view .jfx-list-cell .jfx-rippler {
+    -jfx-rippler-fill: rgba(0.6, 0.6, 0.6);
+}
+
+
+.zpl-combo-box .list-view {
+    -fx-background-color: none;
+}
+
+.zpl-combo-box .list-cell {
+    -fx-background-insets: 0.0;
+    -fx-text-fill: white;
+    -fx-alignment: center;
+}
+
+.zpl-combo-box .list-view .jfx-list-cell:selected,
+.zpl-combo-box .list-view .jfx-list-cell:filled:hover {
+    -fx-background-color: gray;
+}
+
+.zpl-text-field {
+    -fx-text-fill: white;
+    /*-fx-padding: 2, 0, 0, 2;*/
+}
+
+.tab-pane,
+.tab-pane .tab-header-background {
+    -fx-background-color: none;
+}
+
+.tab-pane .tab {
+    -fx-background-color: none;
+    -fx-border-insets: 1, 1, 1, 1;
+    -fx-border-color: none;
+
+}
+
+.tab-pane .tab:armed,
+.tab-pane .tab:selected {
+    -fx-border-color: white;
+
+}
+
+.tab-pane .tab-label {
+    -fx-text-fill: white;
+}
+
+
+/* ====================== 实例视图 ======================*/
+.jfx-tree-view {
+    -fx-background-color: none;
+}
+
+.instance-info-grid .label,
+.instance-info-grid .jfx-text-field,
+.jfx-tree-view .tree-cell {
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+}
+
+.jfx-tree-view .tree-cell {
+    -fx-background-color: none;
+}
+
+.jfx-tree-view .tree-cell:selected {
+    -fx-background-color: rgba(30, 30, 30, 0.5);
+}
+
+.instance-info-grid {
+    /*-fx-grid-lines-visible: true;*/
+    -fx-alignment: top-center;
+}
+
+.control-view {
+    -fx-alignment: top-center;
+    -fx-spacing: 2;
+}
+
+.control-view .jfx-button {
+    -fx-text-fill: white;
+    -fx-pref-width: 120;
+}
+
+.control-view .jfx-button:hover {
+    -fx-background-color: rgba(30, 30, 30, 0.5);
+}
+
+/* ====================== dialog ======================*/
+
+.dialog-layout{
+    -fx-background-color: black;
+}
+
+.dialog-title {
+    -fx-text-fill: white;
+}
+
+/* ====================== 菜单 ======================*/
+.context-menu {
+    -fx-background-color: black;
+}
+.context-menu .menu-item .label{
+    -fx-text-fill: white;
+}
+/*.context-menu .menu-item :selected {*/
+/*    -fx-background-color: rgba(46, 67, 110,0.8);*/
+/*}*/
+.zpl-button {
+    -fx-text-fill: white;
+}
+.zpl-content .viewport  {
+    -fx-background-color: black;
+}
+.zpl-content .scroll-bar:vertical {
+    -fx-background-color: black;
+}
