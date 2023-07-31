@@ -1,10 +1,29 @@
+/*
+ * MIT License
+ * Copyright (c) 2023 初夏同学
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.github.wohaopa.zpl.ui.zplui.scene;
 
-import com.github.wohaopa.zpl.ui.zplui.Accounts;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
-import com.jfoenix.controls.JFXTextField;
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -17,13 +36,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-import java.awt.*;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.github.wohaopa.zpl.ui.zplui.Accounts;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXTextField;
 
 public class AccountView extends BaseMyScene {
-
 
     public AccountView() {
         super(() -> {
@@ -43,7 +62,6 @@ public class AccountView extends BaseMyScene {
                 text.setTextFill(Color.WHITE);
                 var refresh = new JFXButton("刷新");
                 {
-
                     refresh.setTextFill(Color.WHITE);
                     refresh.setOnAction(event -> {
                         var list = accounts.getChildren();
@@ -122,7 +140,6 @@ public class AccountView extends BaseMyScene {
                                 content.getChildren().addAll(msg, code, link);
                                 content.setAlignment(Pos.CENTER);
                                 msTab.setContent(content);
-
                             }
                             var yagtab = new Tab();
                             {
@@ -131,9 +148,7 @@ public class AccountView extends BaseMyScene {
                                 var msg = new Label("外置登录正在开发中");
 
                                 yagtab.setContent(msg);
-
                             }
-
 
                             tabPane.getTabs().addAll(offlineTab, msTab, yagtab);
                             tabPane.getSelectionModel().selectFirst();
@@ -143,21 +158,17 @@ public class AccountView extends BaseMyScene {
                         HBox.setHgrow(sp, Priority.ALWAYS);
 
                         layout.setBody(new HBox(tabPane, sp, new ImageView(img)));
-//                        layout.setBody(tabPane,);
+                        // layout.setBody(tabPane,);
                         var acceptBtn = new JFXButton("完成");
                         acceptBtn.setTextFill(Color.WHITE);
-                        acceptBtn.setOnAction(event -> {
-                            dialog.close();
-                        });
+                        acceptBtn.setOnAction(event -> { dialog.close(); });
                         layout.setActions(acceptBtn);
                         layout.setBackground(new Background(new BackgroundFill(Color.gray(0.2), null, null)));
                         dialog.setContent(layout);
                         dialog.setBackground(Background.EMPTY);
-
                     }
                     add.setOnAction(event -> dialog.show(rootPane));
                 }
-
 
                 HBox.setHgrow(sp1, Priority.ALWAYS);
                 HBox.setHgrow(sp2, Priority.ALWAYS);
@@ -165,7 +176,6 @@ public class AccountView extends BaseMyScene {
                 control.setMaxWidth(300);
                 control.getChildren().addAll(refresh, sp1, text, sp2, add);
             }
-
 
             mainPane.setAlignment(Pos.TOP_CENTER);
             mainPane.getChildren().addAll(control, accounts);

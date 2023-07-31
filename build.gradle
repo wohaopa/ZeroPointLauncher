@@ -16,6 +16,14 @@ repositories {
     }
     mavenCentral()
 }
+subprojects {
+    tasks.withType(JavaCompile).tap {
+        configureEach {
+            options.encoding = 'UTF-8'
+        }
+    }
+}
+
 spotless {
     java {
         googleJavaFormat()

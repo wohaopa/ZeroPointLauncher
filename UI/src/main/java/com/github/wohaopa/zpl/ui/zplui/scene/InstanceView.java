@@ -1,10 +1,27 @@
+/*
+ * MIT License
+ * Copyright (c) 2023 初夏同学
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.github.wohaopa.zpl.ui.zplui.scene;
 
-import com.github.wohaopa.zpl.ui.zplui.Instances;
-import com.jfoenix.controls.*;
-import com.jfoenix.validation.RequiredFieldValidator;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import java.util.HashMap;
+import java.util.Map;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -13,10 +30,12 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.github.wohaopa.zpl.ui.zplui.Instances;
+import com.jfoenix.controls.*;
+import com.jfoenix.validation.RequiredFieldValidator;
 
 public class InstanceView extends BaseMyScene {
+
     public InstanceView() {
         super(() -> {
             var rootPane = new StackPane();
@@ -25,11 +44,8 @@ public class InstanceView extends BaseMyScene {
 
             var treeView = new JFXTreeView<String>();
             {
-
                 var rootTreeItem = new TreeItem<>("实例继承图");
                 {
-
-
                     Map<String, TreeItem> cache = new HashMap<>();
                     Instances.instancesProperty().get().forEach(o -> {
                         if (o instanceof String obj) {
@@ -37,7 +53,7 @@ public class InstanceView extends BaseMyScene {
                         }
                     });
                     cache.forEach((s, o) -> {
-//                        if (o.toString().endsWith("."))
+                        // if (o.toString().endsWith("."))
                         rootTreeItem.getChildren().add(o);
                     });
                 }
@@ -53,7 +69,6 @@ public class InstanceView extends BaseMyScene {
                     var heading = new Label("新建实例");
                     heading.getStyleClass().add("dialog-title");
                     layout.setHeading(heading);
-
 
                     var tabPane = new TabPane();
                     {
@@ -77,7 +92,6 @@ public class InstanceView extends BaseMyScene {
                                 }
                             });
 
-
                             var textField2 = new JFXTextField();
                             textField2.setPromptText("安装包路径");
                             textField2.getStyleClass().add("zpl-text-field");
@@ -93,14 +107,15 @@ public class InstanceView extends BaseMyScene {
                             btn.setText("安装");
                             btn.getStyleClass().add("zpl-button");
 
-
                             content.setAlignment(Pos.CENTER);
                             content.setSpacing(25);
                             content.getChildren().addAll(textField1, textField2, btn);
 
-                            textField1.widthProperty().addListener((observable, oldValue, newValue) -> {
-                                if (newValue != null) btn.setPrefWidth(newValue.doubleValue());
-                            });
+                            textField1.widthProperty()
+                                .addListener(
+                                    (observable, oldValue, newValue) -> {
+                                        if (newValue != null) btn.setPrefWidth(newValue.doubleValue());
+                                    });
 
                             content.setPadding(new Insets(20, 0, 20, 0));
 
@@ -119,14 +134,12 @@ public class InstanceView extends BaseMyScene {
                             textField1.setPromptText("实例名");
                             textField1.getStyleClass().add("zpl-text-field");
 
-
                             textField1.getValidators().add(validator);
                             textField1.focusedProperty().addListener((o, oldVal, newVal) -> {
                                 if (!newVal) {
                                     textField1.validate();
                                 }
                             });
-
 
                             var jfxComboBox = new JFXComboBox<>();
                             jfxComboBox.setPromptText("远程版本");
@@ -155,7 +168,6 @@ public class InstanceView extends BaseMyScene {
 
                             content.setPadding(new Insets(20, 0, 20, 0));
                             onlineTab.setContent(content);
-
                         }
                         var gtnhtab = new Tab();
                         {
@@ -188,7 +200,6 @@ public class InstanceView extends BaseMyScene {
                                 }
                             });
 
-
                             var jfxComboBox = new JFXComboBox<>();
                             jfxComboBox.setPromptText("安装包路径");
                             jfxComboBox.getStyleClass().add("zpl-combo-box");
@@ -212,24 +223,24 @@ public class InstanceView extends BaseMyScene {
 
                             content.setAlignment(Pos.CENTER);
                             content.setSpacing(25);
-                            content.getChildren().addAll(textField1,textField2, jfxComboBox, btn);
+                            content.getChildren().addAll(textField1, textField2, jfxComboBox, btn);
 
                             content.setPadding(new Insets(20, 0, 20, 0));
 
-                            content0.widthProperty().addListener((observable, oldValue, newValue) -> {
-                                if(newValue!=null)content.setPrefWidth(newValue.doubleValue()*0.95);
-                            });
+                            content0.widthProperty()
+                                .addListener(
+                                    (observable, oldValue, newValue) -> {
+                                        if (newValue != null) content.setPrefWidth(newValue.doubleValue() * 0.95);
+                                    });
 
                             content0.getStyleClass().add("zpl-content");
                             content0.setContent(content);
 
                             gtnhtab.setContent(content0);
-
                         }
 
                         tabPane.getTabs().addAll(zplTab, onlineTab, gtnhtab);
                         tabPane.getSelectionModel().selectFirst();
-
                     }
 
                     layout.setBody(tabPane);
@@ -237,10 +248,8 @@ public class InstanceView extends BaseMyScene {
                     dialog.setContent(layout);
                 }
 
-
                 var menu = new ContextMenu();
                 {
-
                     var newInstance = new MenuItem("新建实例");
                     newInstance.setOnAction(event -> {
                         dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
@@ -260,7 +269,6 @@ public class InstanceView extends BaseMyScene {
                 column1.setHgrow(Priority.ALWAYS);
                 gridPane.getColumnConstraints().addAll(column1, column2);
 
-
                 gridPane.add(new Label("实例名："), 0, 0);
                 gridPane.add(new Label("版本："), 0, 1);
                 gridPane.add(new Label("继承："), 0, 2);
@@ -268,14 +276,12 @@ public class InstanceView extends BaseMyScene {
                 gridPane.add(new Label("分享器："), 0, 4);
                 gridPane.add(new Label("自更新："), 0, 5);
 
-
                 gridPane.add(textFileWrapper("测试用例"), 1, 0);
                 gridPane.add(textFileWrapper("测试用例版本"), 1, 1);
                 gridPane.add(textFileWrapper("null"), 1, 2);
                 gridPane.add(textFileWrapper("默认"), 1, 3);
                 gridPane.add(textFileWrapper("默认"), 1, 4);
                 gridPane.add(textFileWrapper("False"), 1, 5);
-
             }
             var controlView = new VBox();
             {
@@ -294,8 +300,7 @@ public class InstanceView extends BaseMyScene {
                         layout.setHeading(heading);
 
                         var body = new JFXTreeView<>();
-                        {
-                        }
+                        {}
 
                         modsManager.setContent(layout);
                     }
@@ -312,7 +317,16 @@ public class InstanceView extends BaseMyScene {
                 var updateVersion = new JFXButton("版本更新");
                 var extractInstance = new JFXButton("导出实例");
 
-                controlView.getChildren().addAll(openInstanceDir, openRuntimeDir, openModsManager, openMapManager, refreshInstance, newSubInstance, updateVersion, extractInstance);
+                controlView.getChildren()
+                    .addAll(
+                        openInstanceDir,
+                        openRuntimeDir,
+                        openModsManager,
+                        openMapManager,
+                        refreshInstance,
+                        newSubInstance,
+                        updateVersion,
+                        extractInstance);
             }
 
             mainPane.widthProperty().addListener((observable, oldValue, newValue) -> {
@@ -332,10 +346,9 @@ public class InstanceView extends BaseMyScene {
     private static Node textFileWrapper(String s) {
         var textField = new JFXTextField();
         textField.setText(s);
-//        textField.textProperty().bindBidirectional();
+        // textField.textProperty().bindBidirectional();
 
         return textField;
-
     }
 
     @Override
