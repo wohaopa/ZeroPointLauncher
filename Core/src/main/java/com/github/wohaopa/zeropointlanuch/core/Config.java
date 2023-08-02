@@ -30,6 +30,7 @@ import cn.hutool.json.JSONObject;
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
 import com.github.wohaopa.zeropointlanuch.core.auth.MicrosoftAuth;
 import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
+import com.github.wohaopa.zeropointlanuch.core.auth.UserType;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 
@@ -38,13 +39,13 @@ public class Config {
     private static Config config;
     private static final File configFile = new File(ZplDirectory.getWorkDirectory().getParentFile(), "config.json");
 
-    public static Config getConfig() {
-        if (config == null) {
-            config = new Config();
-            loadConfig();
-            Runtime.getRuntime().addShutdownHook(new Thread(Config::saveConfig));
-        }
+    static {
+        config = new Config();
+        loadConfig();
+        Runtime.getRuntime().addShutdownHook(new Thread(Config::saveConfig));
+    }
 
+    public static Config getConfig() {
         return config;
     }
 
@@ -60,9 +61,9 @@ public class Config {
 
             Iterable<JSONObject> it = object.getJSONArray("account").jsonIter();
             for (JSONObject jsonObject : it) {
-                switch (jsonObject.getStr("type")) {
-                    case "offline" -> config.auths.add(new OfflineAuth().loadInformation(jsonObject));
-                    case "microsoft" -> config.auths.add(new MicrosoftAuth().loadInformation(jsonObject));
+                switch (UserType.valueOf(jsonObject.getStr("type"))) {
+                    case Offline -> config.auths.add(new OfflineAuth().loadInformation(jsonObject));
+                    case Microsoft -> config.auths.add(new MicrosoftAuth().loadInformation(jsonObject));
                 }
             }
 

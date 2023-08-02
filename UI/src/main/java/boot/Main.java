@@ -20,11 +20,11 @@
 
 package boot;
 
-import com.github.wohaopa.zpl.ui.zplui.ZPLApplication;
+import com.github.wohaopa.zplui.ZplApplication;
 
 public class Main {
 
     public static void main(String[] args) {
-        ZPLApplication.main(args);
+        ZplApplication.main(args);
     }
 }

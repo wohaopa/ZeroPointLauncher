@@ -18,29 +18,21 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zplui.scene;
+package com.github.wohaopa.zplui.scene;
 
-import java.awt.*;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.DataFormat;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
+import com.github.wohaopa.zplui.ZplApplication;
+import com.github.wohaopa.zplui.dialog.FeedbackDialog;
+import com.github.wohaopa.zplui.dialog.WikiLinkDialog;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXNodesList;
 import com.jfoenix.svg.SVGGlyph;
 
@@ -78,34 +70,11 @@ public class HomeView extends BaseMyScene {
                         qq.setBackground(new Background(new BackgroundFill(null, new CornerRadii(20), null)));
                         qq.setTextFill(Color.WHITE);
 
-                        var dialog = new JFXDialog();
-                        {
-                            var layout = new JFXDialogLayout();
-                            var heading = new Label("ZeroPointLauncher 反馈群");
-                            heading.setTextFill(Color.WHITE);
-                            layout.setHeading(heading);
-                            var img = new Image("/assets/img/bg1.jpg", 100, 100, false, true);
-                            var text = new Label("QQ群：222625575 \n您的催更将会是我更新的动力，快来催更吧！");
-                            text.setTextFill(Color.WHITE);
-                            var sp = new Region();
-                            HBox.setHgrow(sp, Priority.ALWAYS);
-
-                            layout.setBody(new HBox(text, sp, new ImageView(img)));
-                            var acceptBtn = new JFXButton("复制");
-                            acceptBtn.setTextFill(Color.WHITE);
-                            acceptBtn.setOnAction(event -> {
-                                Clipboard clipboard = Clipboard.getSystemClipboard();
-                                clipboard.setContent(Map.of(DataFormat.PLAIN_TEXT, "222625575"));
-                                dialog.close();
-                            });
-                            layout.setActions(acceptBtn);
-                            layout.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
-                            dialog.setContent(layout);
-                        }
+                        var dialog = new FeedbackDialog();
 
                         qq.setOnAction(event -> {
                             dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
-                            dialog.show(rootPane);
+                            dialog.show(ZplApplication.getRootPane());
                         });
                     }
 
@@ -116,37 +85,11 @@ public class HomeView extends BaseMyScene {
                         web_wiki.setBackground(new Background(new BackgroundFill(null, new CornerRadii(20), null)));
                         web_wiki.setTextFill(Color.WHITE);
 
-                        var dialog = new JFXDialog();
-                        {
-                            var layout = new JFXDialogLayout();
-                            var heading = new Label("GTNH中文维基");
-                            heading.setTextFill(Color.WHITE);
-                            layout.setHeading(heading);
-                            var img = new Image("/assets/img/Gtnh_wiki_logo.png", 100, 80, false, true);
-                            var text = new Label("https://gtnh.huijiwiki.com/");
-                            text.setTextFill(Color.WHITE);
-                            var sp = new Region();
-                            HBox.setHgrow(sp, Priority.ALWAYS);
-
-                            layout.setBody(new HBox(text, sp, new ImageView(img)));
-
-                            Hyperlink link = new Hyperlink("使用浏览器打开");
-                            link.setOnAction(event -> {
-                                try {
-                                    Desktop.getDesktop().browse(new URI("https://gtnh.huijiwiki.com/"));
-                                } catch (IOException | URISyntaxException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            });
-
-                            layout.setActions(link);
-                            layout.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
-                            dialog.setContent(layout);
-                        }
+                        var dialog = new WikiLinkDialog();
 
                         web_wiki.setOnAction(event -> {
                             dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
-                            dialog.show(rootPane);
+                            dialog.show(ZplApplication.getRootPane());
                         });
                     }
 

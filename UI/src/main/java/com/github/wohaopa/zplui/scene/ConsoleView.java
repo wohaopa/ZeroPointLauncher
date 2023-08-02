@@ -18,27 +18,27 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zplui;
+package com.github.wohaopa.zplui.scene;
 
-import java.io.IOException;
-import javafx.application.Application;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.scene.Parent;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 
-import com.github.wohaopa.zpl.ui.zplui.scene.RootScene;
+public class ConsoleView extends BaseMyScene {
 
-public class ZPLApplication extends Application {
+    public ConsoleView() {
 
-    public static void main(String[] args) {
-        launch(ZPLApplication.class);
+        super(() -> {
+            var img = new Label("控制台");
+            img.setTextFill(Color.WHITE);
+            return img;
+        });
     }
 
     @Override
-    public void start(Stage stage) throws IOException {
-
-        stage.setScene(new RootScene().getScene());
-        stage.setTitle("ZeroPointLauncher - A GTNH Launcher by wohaopa!");
-        stage.initStyle(StageStyle.TRANSPARENT);
-        stage.show();
+    public Parent getIcon() {
+        var img = new Label("控制台");
+        img.setTextFill(Color.WHITE);
+        return img;
     }
 }

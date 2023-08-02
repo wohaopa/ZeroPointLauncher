@@ -28,16 +28,15 @@ public class OfflineAuth extends Auth {
 
     public OfflineAuth() {
         user_type = UserType.Offline;
+        user_properties = "{}";
     }
 
     public OfflineAuth(String name) {
         this();
-
         auth_player_name = name;
         auth_uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + auth_player_name).getBytes())
             .toString()
             .replace("-", "");
-        user_properties = "{}";
     }
 
     @Override
@@ -55,8 +54,6 @@ public class OfflineAuth extends Auth {
     public Auth loadInformation(JSONObject object) {
         auth_player_name = object.getStr("name");
         auth_uuid = object.getStr("uuid");
-        user_properties = object.getStr("user_properties");
-        user_type = UserType.valueOf(object.getStr("user_type"));
         return this;
     }
 }

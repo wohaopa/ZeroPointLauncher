@@ -18,26 +18,14 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zplui.scene;
+package com.github.wohaopa.zplui.util;
 
-import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-public class LauncherView extends BaseMyScene {
+public class ResourceUtils {
 
-    public LauncherView() {
-        super(() -> {
-            var img = new Label("启动器");
-            img.setTextFill(Color.WHITE);
-            return img;
-        });
-    }
-
-    @Override
-    public Parent getIcon() {
-        var img = new Label("启动器");
-        img.setTextFill(Color.WHITE);
-        return img;
+    public static ResourceBundle get(Locale locale) {
+        return ResourceBundle.getBundle("assets.i18n.lang", locale);
     }
 }

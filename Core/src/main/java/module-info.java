@@ -1,8 +1,12 @@
 module ZeroPointLaunch.Core {
-  requires cn.hutool;
   requires org.apache.logging.log4j;
   requires java.sql;
   requires org.apache.commons.compress;
+  requires cn.hutool.core;
+  requires cn.hutool.json;
+  requires cn.hutool.http;
+  requires cn.hutool.crypto;
+  requires cn.hutool.extra;
 
   exports com.github.wohaopa.zeropointlanuch.core;
   exports com.github.wohaopa.zeropointlanuch.core.filesystem;

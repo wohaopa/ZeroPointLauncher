@@ -18,25 +18,9 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zplui.util;
+package com.github.wohaopa.zplui.dialog;
 
-import java.util.concurrent.Callable;
+import com.jfoenix.controls.JFXDialog;
 
-public class Lazy<T> {
-
-    private final Callable<T> callable;
-    private T value;
-
-    public Lazy(Callable<T> callable) {
-        this.callable = callable;
-    }
-
-    public T getValue() {
-        if (value == null) try {
-            value = callable.call();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return value;
-    }
+public class BaseDialog extends JFXDialog {
 }

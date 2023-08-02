@@ -18,13 +18,25 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zplui.util;
+package com.github.wohaopa.zplui.util;
 
-import java.io.IOException;
+import java.util.concurrent.Callable;
 
-public class Log {
+public class Lazy<T> {
 
-    public static void error(Class<?> fxmLsClass, String msg, IOException e) {
-        System.out.println("错误：" + fxmLsClass.getName() + ": " + msg + " " + e);
+    private final Callable<T> callable;
+    private T value;
+
+    public Lazy(Callable<T> callable) {
+        this.callable = callable;
+    }
+
+    public T getValue() {
+        if (value == null) try {
+            value = callable.call();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return value;
     }
 }

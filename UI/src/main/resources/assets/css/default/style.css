@@ -27,7 +27,6 @@
 
 .zpl-text-field {
     -fx-text-fill: white;
-    /*-fx-padding: 2, 0, 0, 2;*/
 }
 
 .tab-pane,
@@ -102,6 +101,28 @@
     -fx-text-fill: white;
 }
 
+.dialog-content .vbox{
+    -fx-alignment: center;
+    -fx-spacing: 25;
+}
+
+.dialog-content .jfx-button {
+    -fx-text-fill: white;
+}
+
+.dialog-content .jfx-button:hover {
+    -fx-background-color: rgba(30, 30, 30, 0.5);
+}
+
+.dialog-content .scroll-pane .viewport  {
+    -fx-background-color: black;
+}
+.dialog-content .scroll-pane .scroll-bar:horizontal,
+.dialog-content .scroll-pane .scroll-bar:vertical {
+    -fx-background-color: black;
+}
+
+
 /* ====================== 菜单 ======================*/
 .context-menu {
     -fx-background-color: black;
@@ -109,15 +130,4 @@
 .context-menu .menu-item .label{
     -fx-text-fill: white;
 }
-/*.context-menu .menu-item :selected {*/
-/*    -fx-background-color: rgba(46, 67, 110,0.8);*/
-/*}*/
-.zpl-button {
-    -fx-text-fill: white;
-}
-.zpl-content .viewport  {
-    -fx-background-color: black;
-}
-.zpl-content .scroll-bar:vertical {
-    -fx-background-color: black;
-}
+

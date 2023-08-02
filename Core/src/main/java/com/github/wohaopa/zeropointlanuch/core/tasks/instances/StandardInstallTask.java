@@ -24,7 +24,6 @@ import java.io.File;
 import java.util.function.Consumer;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
-import com.github.wohaopa.zeropointlanuch.core.Log;
 import com.github.wohaopa.zeropointlanuch.core.ModMaster;
 import com.github.wohaopa.zeropointlanuch.core.tasks.DecompressTask;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
@@ -44,22 +43,17 @@ public class StandardInstallTask extends ZplInstallTask {
 
         File image = FileUtil.initAndMkDir(instanceDir, "image");
 
-        Log.debug("开始解压：{}", zip);
-        long time1 = System.currentTimeMillis();
         new DecompressTask(zip, image, callback).call();
-        long time2 = System.currentTimeMillis();
-        Log.debug("解压完成！用时：{}s", (time2 - time1) / 1000);
 
         Instance.Builder builder = new Instance.Builder(name);
-        builder.setVersionFile(new File(instanceDir, "version.json"))
-            .setVersion(version)
-            .setDepVersion("null")
-            .setChecksum(new File(instanceDir, "image"))
-            .setIncludeMods(ModMaster.coverModsList(new File(instanceDir, "image/mods")))
-            .setExcludeMods(null)
-            // .setMyImage(myDirectory)
-            .saveConfig();
+        builder.setVersionFile(new File(instanceDir, "version.json")).setVersion(version).setDepVersion("null");
+        accept("正在生成校验：" + name);
+        builder.setChecksum(new File(instanceDir, "image"));
+        accept("正在处理mods：" + name);
+        builder.setIncludeMods(ModMaster.coverModsList(new File(instanceDir, "image/mods")));
+        builder.setExcludeMods(null).saveConfig();
 
+        accept("已完成安装：" + name);
         return builder.build();
     }
 }

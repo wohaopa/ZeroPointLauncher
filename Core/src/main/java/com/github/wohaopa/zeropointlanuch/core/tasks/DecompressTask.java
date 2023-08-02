@@ -27,6 +27,7 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 
 import cn.hutool.core.lang.Filter;
 
+import com.github.wohaopa.zeropointlanuch.core.Log;
 import com.github.wohaopa.zeropointlanuch.core.utils.ZipUtil;
 
 public class DecompressTask extends Task<File> {
@@ -48,8 +49,14 @@ public class DecompressTask extends Task<File> {
 
     @Override
     public File call() throws Exception {
+
+        Log.debug("开始解压：{}", file);
+        accept("正在解压：" + file.getName());
+        long time1 = System.currentTimeMillis();
         ZipUtil.decompress(file, targetDir, filter);
 
+        long time2 = System.currentTimeMillis();
+        Log.debug("解压完成！用时：{}s", (time2 - time1) / 1000);
         return targetDir;
     }
 }

@@ -18,23 +18,44 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zplui;
+package com.github.wohaopa.zplui;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.application.Application;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
-public class Accounts {
+import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+import com.github.wohaopa.zplui.scene.RootScene;
 
-    private static ObjectProperty<ObservableList<Object>> accounts = new SimpleObjectProperty<>();
+public class ZplApplication extends Application {
 
-    static {
-        accounts.setValue(FXCollections.observableArrayList());
-        accounts.getValue().addAll("账户测试占位1", "账户测试占位2");
+    static RootScene root;
+
+    public static void main(String[] args) {
+        launch(ZplApplication.class);
     }
 
-    public static ObjectProperty<ObservableList<Object>> accountsProperty() {
-        return accounts;
+    @Override
+    public void start(Stage stage) {
+        root = new RootScene();
+
+        stage.setScene(root.getScene());
+        stage.setTitle("ZeroPointLauncher - A GTNH Launcher by wohaopa!");
+        stage.initStyle(StageStyle.TRANSPARENT);
+        stage.show();
+    }
+
+    public static StackPane getRootPane() {
+        return root.getRootPane();
+    }
+
+    public static Instance getSelectInstance() {
+        return root.getSelectInstance();
+    }
+
+    public static Auth getSelectAccount() {
+        return root.getSelectAccount();
     }
 }

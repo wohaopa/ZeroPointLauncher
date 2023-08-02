@@ -18,24 +18,26 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zplui.scene;
+package com.github.wohaopa.zplui.scene;
 
-import java.util.concurrent.Callable;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 
-import com.github.wohaopa.zpl.ui.zplui.util.Lazy;
+public class SettingView extends BaseMyScene {
 
-public abstract class BaseMyScene {
-
-    protected Lazy<? extends Parent> pane;
-
-    public BaseMyScene(Callable<Parent> callable) {
-        pane = new Lazy<>(callable);
+    public SettingView() {
+        super(() -> {
+            var img = new Label("设置");
+            img.setTextFill(Color.WHITE);
+            return img;
+        });
     }
 
-    public abstract Parent getIcon();
-
-    public Parent getPane() {
-        return pane.getValue();
+    @Override
+    public Parent getIcon() {
+        var img = new Label("设置");
+        img.setTextFill(Color.WHITE);
+        return img;
     }
 }

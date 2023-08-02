@@ -32,6 +32,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 
 import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.auth.MSAuthenticationException;
 import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
 import com.github.wohaopa.zeropointlanuch.core.utils.StringUtil;
 
@@ -255,7 +256,7 @@ public class MicrosoftAuthController {
         throw new RuntimeException("失败：无法正确获取Minecraft令牌");
     }
 
-    public void login(Consumer<JSONObject> callback) {
+    public void login() {
         if (StringUtil.isNotEmpty(minecraftToken)) try {
             getMinecraftProfile();
             return;
@@ -270,6 +271,10 @@ public class MicrosoftAuthController {
             return;
         } catch (Exception ignored) {}
 
+        throw new MSAuthenticationException();
+    }
+
+    public void loginFist(Consumer<JSONObject> callback) {
         JSONObject resultMicrosoftDeviceCode = getMicrosoftDeviceCode();
         callback.accept(resultMicrosoftDeviceCode);
 

@@ -38,7 +38,9 @@ public class OnlineInstallTask extends ZplInstallTask {
         zip = new File(instanceDir, name + ".zip");
         if (!zip.exists()) {
             try {
-                new DownloadTask(DownloadProvider.getUrlForFile(zip), zip, callback).call(); // 过于复杂的逻辑，懒得分开写了
+                String url = DownloadProvider.getUrlForFile(zip);
+                accept("正在下载实例：" + name + "链接：" + url);
+                new DownloadTask(url, zip, callback).call(); // 过于复杂的逻辑，懒得分开写了
             } catch (Exception e) {
                 accept("无法下载实例：" + name);
             }

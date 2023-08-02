@@ -51,12 +51,7 @@ public class ZplInstallTask extends Task<Instance> {
             return Instance.get(name);
         }
 
-        Log.debug("开始解压：{}", zip);
-        accept("正在解压：" + zip.getName());
-        long time1 = System.currentTimeMillis();
         new DecompressTask(zip, instanceDir, callback).call();
-        long time2 = System.currentTimeMillis();
-        Log.debug("解压完成！用时：{}s", (time2 - time1) / 1000);
 
         Instance.Builder builder = new Instance.Builder(new File(instanceDir, "version.json"));
         builder.setName(name).saveConfig();
@@ -68,6 +63,7 @@ public class ZplInstallTask extends Task<Instance> {
             new OnlineInstallTask(dir, dep, callback).call();
         }
 
+        accept("已完成安装：" + name);
         return instance;
     }
 }

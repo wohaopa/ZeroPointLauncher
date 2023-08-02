@@ -18,27 +18,26 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zplui.util;
+package com.github.wohaopa.zplui.scene;
 
-import java.io.IOException;
-import java.util.Locale;
-import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 
-import com.github.wohaopa.zpl.ui.zplui.ZPLApplication;
+public class ServerView extends BaseMyScene {
 
-public class FXMLs {
+    public ServerView() {
+        super(() -> {
+            var img = new Label("服务器");
+            img.setTextFill(Color.WHITE);
+            return img;
+        });
+    }
 
-    public static <T> T loadFXML(String path) {
-        try {
-            final FXMLLoader loader = new FXMLLoader();
-            loader.setResources(ResourceUtils.get(Locale.CHINESE));
-            loader.setLocation(ZPLApplication.class.getResource("fxml/" + path));
-            loader.load();
-
-            return loader.getController();
-        } catch (IOException e) {
-            Log.error(FXMLs.class, "init AddServerView failed", e);
-            throw new IllegalStateException(e);
-        }
+    @Override
+    public Parent getIcon() {
+        var img = new Label("服务器");
+        img.setTextFill(Color.WHITE);
+        return img;
     }
 }

@@ -18,7 +18,7 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zplui.scene;
+package com.github.wohaopa.zplui.scene;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,8 +34,10 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
-import com.github.wohaopa.zpl.ui.zplui.Accounts;
-import com.github.wohaopa.zpl.ui.zplui.Instances;
+import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+import com.github.wohaopa.zplui.Accounts;
+import com.github.wohaopa.zplui.Instances;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.svg.SVGGlyph;
@@ -56,6 +58,9 @@ public class RootScene {
         }
     };
     private Scene scene;
+
+    public JFXComboBox<Object> accountCh = new JFXComboBox<>(); // 内部Auth
+    public JFXComboBox<Object> instanceCh = new JFXComboBox<>(); // 内部Instance
     private double xOffset, yOffset;
 
     public RootScene() {
@@ -73,7 +78,10 @@ public class RootScene {
             var spacer1 = new Region();
             var spacer2 = new Region();
             var close = new JFXButton();
-            close.setOnAction(event -> Platform.exit());
+            close.setOnAction(event -> {
+                Platform.exit();
+                System.exit(0);
+            });
 
             var backImg = new SVGGlyph(
                 0,
@@ -157,8 +165,6 @@ public class RootScene {
         }
         launcherBar = new HBox();
         {
-            var accountCh = new JFXComboBox<>();
-            var instanceCh = new JFXComboBox<>();
             var spacer1 = new Region();
             var spacer2 = new Region();
             var launch = new JFXButton();
@@ -187,12 +193,18 @@ public class RootScene {
             instanceCh.setUnFocusColor(Color.WHITE);
 
             instanceCh.getSelectionModel().selectFirst();
+            instanceCh.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue instanceof Instance) {
+                    if (InstanceView.instances != null) {
+                        InstanceView.instances.getSelectionModel()
+                            .select(InstanceView.cache.get(((Instance) newValue).information.name));
+                    }
+                }
+            });
 
             launch.setButtonType(JFXButton.ButtonType.RAISED);
             launch.setText("启动");
-            //
-            // launch.setStyle("-fx-text-fill:WHITE;-fx-background-color:black;-fx-font-size:14px;-fx-border-image-insets:
-            // 10px;");
+
             launch.setTextFill(Color.WHITE);
             launch.setBackground(new Background(new BackgroundFill(null, new CornerRadii(5), null)));
             launch.setBorder(
@@ -243,5 +255,17 @@ public class RootScene {
 
     public Scene getScene() {
         return scene;
+    }
+
+    public StackPane getRootPane() {
+        return rootPane;
+    }
+
+    public Instance getSelectInstance() {
+        return (Instance) instanceCh.getSelectionModel().getSelectedItem();
+    }
+
+    public Auth getSelectAccount() {
+        return (Auth) accountCh.getSelectionModel().getSelectedItem();
     }
 }

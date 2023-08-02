@@ -18,26 +18,26 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zplui.scene;
+package com.github.wohaopa.zplui;
 
-import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-public class SettingView extends BaseMyScene {
+import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.tasks.instances.DiscoverInstanceTask;
 
-    public SettingView() {
-        super(() -> {
-            var img = new Label("设置");
-            img.setTextFill(Color.WHITE);
-            return img;
-        });
+public class Instances {
+
+    private static final ObjectProperty<ObservableList<Object>> instances = new SimpleObjectProperty<>();
+
+    static {
+        new DiscoverInstanceTask(null).call();
+        instances.setValue(FXCollections.observableArrayList(Instance.list()));
     }
 
-    @Override
-    public Parent getIcon() {
-        var img = new Label("设置");
-        img.setTextFill(Color.WHITE);
-        return img;
+    public static ObjectProperty<ObservableList<Object>> instancesProperty() {
+        return instances;
     }
 }

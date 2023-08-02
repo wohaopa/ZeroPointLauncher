@@ -30,8 +30,6 @@ public class MicrosoftAuth extends Auth {
 
     private final MicrosoftAuthController controller;
 
-    private Consumer<JSONObject> callback;
-
     public MicrosoftAuth() {
         user_properties = "{}";
         user_type = UserType.Microsoft;
@@ -40,30 +38,35 @@ public class MicrosoftAuth extends Auth {
 
     @Override
     protected void login() {
-        controller.login(callback);
+        controller.login();
+
+        auth_player_name = controller.minecraftProfile.getStr("name");
+        auth_uuid = controller.minecraftProfile.getStr("id");
+        auth_access_token = controller.minecraftToken;
     }
 
     @Override
     public JSONObject saveInformation() {
-        return new JSONObject().putOpt("microsoft_refresh_token", controller.microsoftRefreshToken)
-            .putOpt("auth_access_token", controller.minecraftToken)
-            .putOpt("minecraftProfile", controller.minecraftProfile)
+        return new JSONObject().putOpt("refresh_token", controller.microsoftRefreshToken)
+            .putOpt("access_token", controller.minecraftToken)
+            .putOpt("name", auth_player_name)
+            .putOpt("uuid", auth_uuid)
             .putOpt("type", user_type);
     }
 
     @Override
     public Auth loadInformation(JSONObject object) {
-        controller.microsoftRefreshToken = object.getStr("microsoftRefreshToken");
-        controller.minecraftToken = object.getStr("minecraftToken");
-        controller.minecraftProfile = object.getJSONObject("minecraftProfile");
+        controller.microsoftRefreshToken = object.getStr("refresh_token");
+        auth_access_token = controller.minecraftToken = object.getStr("access_token");
+        auth_uuid = object.getStr("uuid");
+        auth_player_name = object.getStr("name");
         return this;
     }
 
-    public void setCallback(Consumer<JSONObject> callback) {
-        this.callback = callback;
-    }
-
-    public void test() {
-        login();
+    public void loginFist(Consumer<JSONObject> callback) {
+        controller.loginFist(callback);
+        auth_player_name = controller.minecraftProfile.getStr("name");
+        auth_uuid = controller.minecraftProfile.getStr("id");
+        auth_access_token = controller.minecraftToken;
     }
 }

@@ -18,23 +18,42 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zpl.ui.zplui;
+package com.github.wohaopa.zplui;
 
+import java.util.function.Consumer;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class Instances {
+import cn.hutool.json.JSONObject;
 
-    private static ObjectProperty<ObservableList<Object>> instances = new SimpleObjectProperty<>();
+import com.github.wohaopa.zeropointlanuch.core.Config;
+import com.github.wohaopa.zeropointlanuch.core.auth.MicrosoftAuth;
+import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
+
+public class Accounts {
+
+    private static final ObjectProperty<ObservableList<Object>> accounts = new SimpleObjectProperty<>();
 
     static {
-        instances.setValue(FXCollections.observableArrayList());
-        instances.getValue().addAll("实例测试占位1", "实例测试占位2");
+        accounts.setValue(FXCollections.observableArrayList(Config.getConfig().getAuths()));;
     }
 
-    public static ObjectProperty<ObservableList<Object>> instancesProperty() {
-        return instances;
+    public static ObjectProperty<ObservableList<Object>> accountsProperty() {
+        return accounts;
+    }
+
+    public static void addOfflineAccount(String name) {
+        var auth = new OfflineAuth(name);
+        Config.getConfig().addAccount(auth);
+        accounts.get().add(auth);
+    }
+
+    public static void addMSAccounts(Consumer<JSONObject> callback) {
+        var auth = new MicrosoftAuth();
+        Config.getConfig().addAccount(auth);
+        accounts.get().add(auth);
+        auth.loginFist(callback);
     }
 }

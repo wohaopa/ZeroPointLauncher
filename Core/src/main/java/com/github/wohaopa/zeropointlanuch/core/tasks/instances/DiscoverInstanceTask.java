@@ -36,7 +36,7 @@ public class DiscoverInstanceTask extends Task<Boolean> {
     }
 
     @Override
-    public Boolean call() throws Exception {
+    public Boolean call() {
         File dir = ZplDirectory.getInstancesDirectory();
         for (File file : Objects.requireNonNull(dir.listFiles())) {
             if (file.isDirectory()) {
