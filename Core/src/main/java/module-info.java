@@ -7,8 +7,8 @@ module ZeroPointLaunch.Core {
   requires cn.hutool.http;
   requires cn.hutool.crypto;
   requires cn.hutool.extra;
+  requires org.apache.logging.log4j.core;
   requires org.apache.logging.log4j;
-  requires static org.apache.logging.log4j.core;
 
   exports com.github.wohaopa.zeropointlanuch.core;
   exports com.github.wohaopa.zeropointlanuch.core.filesystem;
