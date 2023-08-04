@@ -22,18 +22,21 @@ package com.github.wohaopa.zeropointlanuch.core;
 
 import java.util.Stack;
 
-import cn.hutool.log.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 public class Log {
 
-    private static final cn.hutool.log.Log myLogger = LogFactory.get("Main");
+    private static final Logger myLogger = LogManager.getLogger("Main");
 
-    private static String marker = "默认：";
-    private static final Stack<String> old_marker = new Stack<>();
+    private static Marker marker = MarkerManager.getMarker("默认");
+    private static final Stack<Marker> old_marker = new Stack<>();
 
     public static void start(String session) {
         Log.old_marker.push(Log.marker);
-        Log.marker = session + "：";
+        Log.marker = MarkerManager.getMarker(session);
     }
 
     public static void end() {
@@ -41,82 +44,82 @@ public class Log {
     }
 
     public static void debug(String s) {
-        myLogger.debug(marker + s);
+        myLogger.debug(marker, s);
     }
 
     public static void debug(String s, Object o1) {
-        myLogger.debug(marker + s, o1);
+        myLogger.debug(marker, s, o1);
     }
 
     public static void debug(String s, Object o1, Object o2) {
-        myLogger.debug(marker + s, o1, o2);
+        myLogger.debug(marker, s, o1, o2);
     }
 
     public static void debug(String s, Object o1, Object o2, Object o3) {
-        myLogger.debug(marker + s, o1, o2, o3);
+        myLogger.debug(marker, s, o1, o2, o3);
     }
 
     public static void debug(String s, Object o1, Object o2, Object o3, Object o4) {
-        myLogger.debug(marker + s, o1, o2, o3, o4);
+        myLogger.debug(marker, s, o1, o2, o3, o4);
     }
 
     public static void info(String s) {
-        myLogger.info(marker + s);
+        myLogger.info(marker, s);
     }
 
     public static void info(String s, Object o1) {
-        myLogger.info(marker + s, o1);
+        myLogger.info(marker, s, o1);
     }
 
     public static void info(String s, Object o1, Object o2) {
-        myLogger.info(marker + s, o1, o2);
+        myLogger.info(marker, s, o1, o2);
     }
 
     public static void info(String s, Object o1, Object o2, Object o3) {
-        myLogger.info(marker + s, o1, o2, o3);
+        myLogger.info(marker, s, o1, o2, o3);
     }
 
     public static void info(String s, Object o1, Object o2, Object o3, Object o4) {
-        myLogger.info(marker + s, o1, o2, o3, o4);
+        myLogger.info(marker, s, o1, o2, o3, o4);
     }
 
     public static void warn(String s) {
-        myLogger.warn(marker + s);
+        myLogger.warn(marker, s);
     }
 
     public static void warn(String s, Object o1) {
-        myLogger.warn(marker + s, o1);
+        myLogger.warn(marker, s, o1);
     }
 
     public static void warn(String s, Object o1, Object o2) {
-        myLogger.warn(marker + s, o1, o2);
+        myLogger.warn(marker, s, o1, o2);
     }
 
     public static void warn(String s, Object o1, Object o2, Object o3) {
-        myLogger.warn(marker + s, o1, o2, o3);
+        myLogger.warn(marker, s, o1, o2, o3);
     }
 
     public static void warn(String s, Object o1, Object o2, Object o3, Object o4) {
-        myLogger.error(marker + s, o1, o2, o3, o4);
+        myLogger.error(marker, s, o1, o2, o3, o4);
     }
 
     public static void error(String s) {
-        myLogger.error(marker + s);
+        myLogger.error(marker, s);
     }
 
     public static void error(String s, Object o1) {
-        myLogger.error(marker + s, o1);
+        myLogger.error(marker, s, o1);
     }
 
     public static void error(String s, Object o1, Object o2) {
-        myLogger.error(marker + s, o1, o2);
+        myLogger.error(marker, s, o1, o2);
     }
 
     public static void error(String s, Object o1, Object o2, Object o3) {
-        myLogger.error(marker + s, o1, o2, o3);
+        myLogger.error(marker, s, o1, o2, o3);
     }
 
     public static void error(String s, Object o1, Object o2, Object o3, Object o4) {
-        myLogger.error(marker + s, o1, o2, o3, o4);
+        myLogger.error(marker, s, o1, o2, o3, o4);
     }
 }

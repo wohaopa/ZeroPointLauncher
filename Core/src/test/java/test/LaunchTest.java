@@ -18,31 +18,23 @@
  * SOFTWARE.
  */
 
-package filesystem;
+package test;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
-import com.github.wohaopa.zeropointlanuch.core.filesystem.MyDirectory;
-import com.github.wohaopa.zeropointlanuch.core.filesystem.MyFileBase;
+import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
+import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
+import com.github.wohaopa.zeropointlanuch.core.launch.Launch;
 
-public class MyFileSystemMargeTest {
+public class LaunchTest {
 
     public static void main(String[] args) {
-        marge();
-    }
-
-    public static void marge() {
-        MyDirectory myDirectory = (MyDirectory) MyFileBase
-            .getMyFileSystemByFile(new File("D:\\ZeroPointServer\\Launcher\\copyTest\\test"), MyFileBase.DEFAULT_FI);
-
-        MyDirectory imageDirectory = (MyDirectory) MyFileBase
-            .getMyFileSystemByFile(new File("D:\\ZeroPointServer\\Launcher\\copyTest\\image"), MyFileBase.DEFAULT_FI);
-
-        List<String> exclude = new ArrayList<>();
-        exclude.add("\\mods\\1.7.10");
-        MyFileBase.MargeInfo margeInfo = new MyFileBase.MargeInfo(null, exclude);
-        MyFileBase.marge(myDirectory, imageDirectory, margeInfo);
+        ZplDirectory.init(new File("D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"));
+        Launch.getLauncher("ZPL-Java8")
+            .launch(
+                new OfflineAuth("wohaopa"),
+                new File(
+                    "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH\\instances\\GTNH-2.3.3-zpl\\.minecraft"),
+                System.out::println);
     }
 }

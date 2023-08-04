@@ -18,7 +18,7 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.auth.controller;
+package test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,9 +27,9 @@ import com.github.wohaopa.zeropointlanuch.core.auth.MicrosoftAuth;
 class MicrosoftAuthControllerTest {
 
     public static void main(String[] args) {
-        MicrosoftAuth auth = new MicrosoftAuth();
-        auth.setCallback(object -> System.out.println(object.getStr("message")));
-        auth.test();
-        var json = auth.saveInformation();
+//        MicrosoftAuth auth = new MicrosoftAuth();
+//        auth.setCallback(object -> System.out.println(object.getStr("message")));
+//        auth.test();
+//        var json = auth.saveInformation();
     }
 }

@@ -18,7 +18,7 @@
  * SOFTWARE.
  */
 
-package filesystem;
+package test;
 
 import java.io.File;
 import java.util.HashMap;

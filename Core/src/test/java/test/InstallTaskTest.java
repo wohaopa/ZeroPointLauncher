@@ -18,7 +18,7 @@
  * SOFTWARE.
  */
 
-package filesystem;
+package test;
 
 import java.io.File;
 
@@ -49,7 +49,8 @@ public class InstallTaskTest {
         // new StandardInstallTask(zip, instDir, name, version, null).call();
         Instance instance = new OnlineInstallTask(new File(ZplDirectory.getInstancesDirectory(), name), name, Log::info)
             .call();
-        instance.updateMapping();
+        instance.getMapper();
+        instance.doLink();
         instance.launchInstance(new OfflineAuth("wohaopa"), System.out::println);
         // new ZplExtractTask(instDir, Log::info).call();
     }

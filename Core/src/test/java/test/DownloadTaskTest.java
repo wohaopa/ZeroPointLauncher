@@ -18,23 +18,20 @@
  * SOFTWARE.
  */
 
-package filesystem;
+package test;
 
 import java.io.File;
 
-import com.github.wohaopa.zeropointlanuch.core.Instance;
-import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
-import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
-import com.github.wohaopa.zeropointlanuch.core.tasks.instances.DiscoverInstanceTask;
+import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.tasks.DownloadTask;
 
-public class InstanceTest {
+public class DownloadTaskTest {
 
     public static void main(String[] args) throws Exception {
-        ZplDirectory.init(new File("D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH"));
-        new DiscoverInstanceTask(null).call();
-        // for (Instance instance : Instance.list()) instance.updateMapping();
-        Instance instance = Instance.get("2.3.2-Test");
-        instance.updateMapping();
-        instance.launchInstance(new OfflineAuth("wohaopa"), System.out::println);
+        File file = new File(
+            "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\GT_New_Horizons_2.3.4_Client.zip");
+        String url = "http://downloads.gtnewhorizons.com/ClientPacks/GT_New_Horizons_2.3.4_Client.zip";
+        DownloadTask downloadTask = new DownloadTask(url, file, Log::info);
+        downloadTask.call();
     }
 }

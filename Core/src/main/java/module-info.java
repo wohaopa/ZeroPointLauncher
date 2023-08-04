@@ -1,5 +1,5 @@
 module ZeroPointLaunch.Core {
-  //  requires org.apache.logging.log4j;
+
   requires java.sql;
   requires org.apache.commons.compress;
   requires cn.hutool.core;
@@ -7,7 +7,8 @@ module ZeroPointLaunch.Core {
   requires cn.hutool.http;
   requires cn.hutool.crypto;
   requires cn.hutool.extra;
-  requires cn.hutool.log;
+  requires org.apache.logging.log4j;
+  requires static org.apache.logging.log4j.core;
 
   exports com.github.wohaopa.zeropointlanuch.core;
   exports com.github.wohaopa.zeropointlanuch.core.filesystem;
@@ -16,4 +17,6 @@ module ZeroPointLaunch.Core {
   exports com.github.wohaopa.zeropointlanuch.core.tasks;
   exports com.github.wohaopa.zeropointlanuch.core.launch;
   exports com.github.wohaopa.zeropointlanuch.core.tasks.instances;
+
+
 }
