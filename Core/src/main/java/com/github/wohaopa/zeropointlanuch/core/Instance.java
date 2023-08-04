@@ -203,9 +203,7 @@ public class Instance {
         return mapper;
     }
 
-    public void updateMapping() {
-
-        getMapper();
+    public void doLink() {
         mapper.doLink(); // 生成映射文件清单
     }
 

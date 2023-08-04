@@ -20,47 +20,25 @@
 
 package com.github.wohaopa.zplui.dialog;
 
-import javafx.beans.property.StringProperty;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 
-import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXTreeView;
 
-public class DoneDialog extends BaseDialog {
+public class MapManagerDialog extends BaseDialog {
 
-    private JFXDialogLayout layout = new JFXDialogLayout();
+    public MapManagerDialog() {
+        var layout = new JFXDialogLayout();
+        layout.getStyleClass().add("dialog-layout");
 
-    public DoneDialog(String title, StringProperty context) {
-        var label = new Label();
-        label.textProperty().bind(context);
-        label.getStyleClass().add("dialog-title");
-
-        init(title, label);
-    }
-
-    public DoneDialog(String title, String context) {
-        var label = new Label(context);
-        label.getStyleClass().add("dialog-title");
-
-        init(title, label);
-    }
-
-    public DoneDialog(String title, Node context) {
-        init(title, context);
-    }
-
-    protected void init(String title, Node context) {
-        var heading = new Label(title);
+        var heading = new Label("映射管理");
         heading.getStyleClass().add("dialog-title");
         layout.setHeading(heading);
 
-        layout.setBody(context);
-        var doneBtn = new JFXButton("完成");
-        doneBtn.setOnAction(event -> this.close());
+        var body = new JFXTreeView<>();
+        {}
+        layout.setBody(body);
 
-        layout.setActions(doneBtn);
-        layout.getStyleClass().add("dialog-layout");
         this.setContent(layout);
     }
 }

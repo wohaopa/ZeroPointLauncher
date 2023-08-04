@@ -18,15 +18,32 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.utils;
+package com.github.wohaopa.zplui.util;
 
-public class StringUtil {
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-    public static boolean isNotEmpty(String s) {
-        return s != null && !s.isEmpty();
+import com.github.wohaopa.zeropointlanuch.core.Log;
+
+public class DesktopUtils {
+
+    public static void openLink(String url) {
+        try {
+            Desktop.getDesktop().browse(new URI(url));
+        } catch (IOException | URISyntaxException e) {
+            Log.warn(e.getMessage());
+        }
     }
 
-    public static boolean isEmpty(String s) {
-        return s == null || s.isEmpty();
+    public static void openFileLocation(File path) {
+        try {
+            if (path.isFile()) Runtime.getRuntime().exec("explorer.exe /e,/select," + path);
+            else Runtime.getRuntime().exec("explorer.exe /e," + path + "\\");
+        } catch (IOException e) {
+            Log.warn(e.getMessage());
+        }
     }
 }

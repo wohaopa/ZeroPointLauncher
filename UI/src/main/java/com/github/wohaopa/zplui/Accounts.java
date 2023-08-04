@@ -20,6 +20,8 @@
 
 package com.github.wohaopa.zplui;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -29,8 +31,11 @@ import javafx.collections.ObservableList;
 import cn.hutool.json.JSONObject;
 
 import com.github.wohaopa.zeropointlanuch.core.Config;
+import com.github.wohaopa.zeropointlanuch.core.Log;
+import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
 import com.github.wohaopa.zeropointlanuch.core.auth.MicrosoftAuth;
 import com.github.wohaopa.zeropointlanuch.core.auth.OfflineAuth;
+import com.github.wohaopa.zplui.dialog.DoneDialog;
 
 public class Accounts {
 
@@ -39,6 +44,9 @@ public class Accounts {
     static {
         accounts.setValue(FXCollections.observableArrayList(Config.getConfig().getAuths()));;
     }
+
+    private static Auth select;
+    private static final List<IChangeListener<Auth>> listeners = new ArrayList<>();
 
     public static ObjectProperty<ObservableList<Object>> accountsProperty() {
         return accounts;
@@ -55,5 +63,32 @@ public class Accounts {
         Config.getConfig().addAccount(auth);
         accounts.get().add(auth);
         auth.loginFist(callback);
+    }
+
+    public static void change(Auth newAuth) {
+        if (select != newAuth) {
+            select = newAuth;
+            try {
+                for (IChangeListener<Auth> listener : listeners) {
+                    listener.change(newAuth);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static void addListener(IChangeListener<Auth> listener) {
+        listeners.add(listener);
+    }
+
+    public static Auth getSelect() {
+        if (select == null) {
+            Log.warn("无账户！");
+            var dialog = new DoneDialog("警告", "无账户！请勿操作");
+            dialog.show(ZplApplication.getRootPane());
+            throw new RuntimeException("无账户");
+        }
+        return select;
     }
 }

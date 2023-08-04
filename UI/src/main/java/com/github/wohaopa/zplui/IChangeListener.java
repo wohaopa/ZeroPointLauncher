@@ -18,15 +18,9 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.utils;
+package com.github.wohaopa.zplui;
 
-public class StringUtil {
+public interface IChangeListener<T> {
 
-    public static boolean isNotEmpty(String s) {
-        return s != null && !s.isEmpty();
-    }
-
-    public static boolean isEmpty(String s) {
-        return s == null || s.isEmpty();
-    }
+    void change(T newValue);
 }

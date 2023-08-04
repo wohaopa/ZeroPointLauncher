@@ -23,6 +23,7 @@ package com.github.wohaopa.zplui.scene;
 import java.util.LinkedList;
 import java.util.List;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -36,10 +37,16 @@ import javafx.scene.text.Font;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Scheduler;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
 import com.github.wohaopa.zplui.Accounts;
 import com.github.wohaopa.zplui.Instances;
+import com.github.wohaopa.zplui.ZplApplication;
+import com.github.wohaopa.zplui.dialog.DoneDialog;
+import com.github.wohaopa.zplui.util.FXUtils;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.svg.SVGGlyph;
 
 public class RootScene {
@@ -59,14 +66,12 @@ public class RootScene {
     };
     private Scene scene;
 
-    public JFXComboBox<Object> accountCh = new JFXComboBox<>(); // 内部Auth
-    public JFXComboBox<Object> instanceCh = new JFXComboBox<>(); // 内部Instance
     private double xOffset, yOffset;
 
     public RootScene() {
         rootPane = new StackPane(); // 根Pane，用于显示其他的各种Pane
         {
-            rootPane.getStylesheets().add("/assets/css/default/style.css");
+            rootPane.getStylesheets().add("/assets/css/style.css");
             rootPane.setMinWidth(580);
             rootPane.setMinHeight(360);
         }
@@ -172,6 +177,7 @@ public class RootScene {
             HBox.setHgrow(spacer1, Priority.ALWAYS);
             HBox.setHgrow(spacer2, Priority.ALWAYS);
 
+            var accountCh = new JFXComboBox<>();
             accountCh.getStyleClass().add("zpl-combo-box");
             accountCh.setPrefWidth(150);
             accountCh.setFocusColor(Color.WHITE);
@@ -181,8 +187,15 @@ public class RootScene {
             accountCh.itemsProperty().bind(Accounts.accountsProperty());
             accountCh.setPromptText("请添加账户");
 
+            accountCh.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue instanceof Auth account) {
+                    Accounts.change(account);
+                }
+            });
+            Accounts.addListener(newValue -> accountCh.getSelectionModel().select(newValue));
             accountCh.getSelectionModel().selectFirst();
 
+            var instanceCh = new JFXComboBox<>();
             instanceCh.getStyleClass().add("zpl-combo-box");
             instanceCh.setPrefWidth(150);
             instanceCh.setFocusColor(Color.WHITE);
@@ -192,15 +205,13 @@ public class RootScene {
             instanceCh.setPromptText("请添加实例");
             instanceCh.setUnFocusColor(Color.WHITE);
 
-            instanceCh.getSelectionModel().selectFirst();
             instanceCh.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue instanceof Instance) {
-                    if (InstanceView.instances != null) {
-                        InstanceView.instances.getSelectionModel()
-                            .select(InstanceView.cache.get(((Instance) newValue).information.name));
-                    }
+                if (newValue instanceof Instance instance) {
+                    Instances.change(instance);
                 }
             });
+            Instances.addListener(newValue -> instanceCh.getSelectionModel().select(newValue));
+            instanceCh.getSelectionModel().selectFirst();
 
             launch.setButtonType(JFXButton.ButtonType.RAISED);
             launch.setText("启动");
@@ -217,6 +228,24 @@ public class RootScene {
                         new Insets(1))));
             launch.setRipplerFill(Color.BLACK);
             launch.setPrefSize(150, 40);
+
+            launch.setOnAction(event -> {
+                var msg = new SimpleStringProperty("正在等待...");
+                var dialog = new DoneDialog("启动：" + Instances.getSelect().information.name, msg);
+                dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
+                dialog.show(ZplApplication.getRootPane());
+                var account = Accounts.getSelect();
+                var instance = Instances.getSelect();
+
+                Scheduler.submitTasks(new Task<>(s -> FXUtils.runFX(() -> msg.setValue(s))) {
+
+                    @Override
+                    public Object call() {
+                        instance.launchInstance(account, callback);
+                        return null;
+                    }
+                });
+            });
 
             launcherBar.setAlignment(Pos.CENTER);
             launcherBar.getChildren().addAll(accountCh, spacer1, instanceCh, spacer2, launch);
@@ -259,13 +288,5 @@ public class RootScene {
 
     public StackPane getRootPane() {
         return rootPane;
-    }
-
-    public Instance getSelectInstance() {
-        return (Instance) instanceCh.getSelectionModel().getSelectedItem();
-    }
-
-    public Auth getSelectAccount() {
-        return (Auth) accountCh.getSelectionModel().getSelectedItem();
     }
 }

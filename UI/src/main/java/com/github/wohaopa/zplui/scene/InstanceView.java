@@ -20,8 +20,11 @@
 
 package com.github.wohaopa.zplui.scene;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -29,15 +32,25 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Scheduler;
+import com.github.wohaopa.zeropointlanuch.core.tasks.instances.NewSubInstanceTask;
+import com.github.wohaopa.zeropointlanuch.core.tasks.instances.RefreshInstanceTask;
+import com.github.wohaopa.zeropointlanuch.core.tasks.instances.ZplExtractTask;
 import com.github.wohaopa.zplui.Instances;
 import com.github.wohaopa.zplui.ZplApplication;
 import com.github.wohaopa.zplui.dialog.AddInstanceDialog;
+import com.github.wohaopa.zplui.dialog.DoneDialog;
+import com.github.wohaopa.zplui.dialog.MapManagerDialog;
+import com.github.wohaopa.zplui.dialog.ModsManagerDialog;
+import com.github.wohaopa.zplui.util.DesktopUtils;
+import com.github.wohaopa.zplui.util.FXUtils;
 import com.jfoenix.controls.*;
 
 public class InstanceView extends BaseMyScene {
 
-    static JFXTreeView<String> instances;
-    static Map<String, TreeItem> cache;
+    private static JFXTreeView<String> instances;
+    private static Map<String, TreeItem<String>> cache;
 
     public InstanceView() {
         super(() -> {
@@ -65,7 +78,15 @@ public class InstanceView extends BaseMyScene {
                 }
 
                 treeView.setRoot(rootTreeItem);
-                treeView.getSelectionModel().select(cache.get(ZplApplication.getSelectInstance().information.name));
+                treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue != null) {
+                        Instances.change(Instance.get(newValue.getValue()));
+                    }
+                });
+                if (Instances.getSelect() != null)
+                    treeView.getSelectionModel().select(cache.get(Instances.getSelect().information.name));
+                Instances
+                    .addListener(newValue -> treeView.getSelectionModel().select(cache.get(newValue.information.name)));
 
                 var dialog = new AddInstanceDialog();
 
@@ -97,46 +118,97 @@ public class InstanceView extends BaseMyScene {
                 gridPane.add(new Label("分享器："), 0, 4);
                 gridPane.add(new Label("自更新："), 0, 5);
 
-                gridPane.add(textFileWrapper("测试用例"), 1, 0);
-                gridPane.add(textFileWrapper("测试用例版本"), 1, 1);
-                gridPane.add(textFileWrapper("null"), 1, 2);
-                gridPane.add(textFileWrapper("默认"), 1, 3);
-                gridPane.add(textFileWrapper("默认"), 1, 4);
-                gridPane.add(textFileWrapper("False"), 1, 5);
+                gridPane.add(textFileWrapper(Instances.nameProperty()), 1, 0);
+                gridPane.add(textFileWrapper(Instances.versionProperty()), 1, 1);
+                gridPane.add(textFileWrapper(Instances.depInstanceProperty()), 1, 2);
+                gridPane.add(textFileWrapper(Instances.launcherProperty()), 1, 3);
+                gridPane.add(textFileWrapper(Instances.sharerProperty()), 1, 4);
+                var toggle = new JFXToggleButton();
+                toggle.selectedProperty().bindBidirectional(Instances.updateProperty());
+
+                gridPane.add(toggle, 1, 5);
             }
             var controlView = new VBox();
             {
                 controlView.getStyleClass().add("control-view");
                 var openInstanceDir = new JFXButton("打开实例目录");
+                openInstanceDir.setOnAction(event -> DesktopUtils.openFileLocation(Instances.getSelect().insDir));
+
                 var openRuntimeDir = new JFXButton("打开运行目录");
+                openRuntimeDir.setOnAction(event -> DesktopUtils.openFileLocation(Instances.getSelect().runDir));
+
                 var openModsManager = new JFXButton("Mods管理");
                 {
-                    var modsManager = new JFXDialog();
-                    {
-                        var layout = new JFXDialogLayout();
-                        layout.getStyleClass().add("dialog-layout");
-
-                        var heading = new Label("Mods管理");
-                        heading.getStyleClass().add("dialog-title");
-                        layout.setHeading(heading);
-
-                        var body = new JFXTreeView<>();
-                        {}
-
-                        modsManager.setContent(layout);
-                    }
+                    var dialog = new ModsManagerDialog();
 
                     openModsManager.setOnAction(event -> {
-                        modsManager.setTransitionType(JFXDialog.DialogTransition.CENTER);
-                        modsManager.show(ZplApplication.getRootPane());
+                        dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
+                        dialog.show(ZplApplication.getRootPane());
                     });
                 }
 
                 var openMapManager = new JFXButton("映射管理");
+                {
+                    var dialog = new MapManagerDialog();
+
+                    openMapManager.setOnAction(event -> {
+                        dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
+                        dialog.show(ZplApplication.getRootPane());
+                    });
+                }
+
                 var refreshInstance = new JFXButton("刷新实例");
+                {
+                    refreshInstance.setOnAction(event -> {
+                        var msg = new SimpleStringProperty("正在等待...");
+                        var dialog = new DoneDialog("刷新实例：" + Instances.getSelect().information.name, msg);
+
+                        dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
+                        dialog.show(ZplApplication.getRootPane());
+                        Scheduler.submitTasks(
+                            new RefreshInstanceTask(Instances.getSelect(), s -> FXUtils.runFX(() -> msg.setValue(s))));
+                    });
+                }
+
                 var newSubInstance = new JFXButton("新建子实例");
+                {
+                    newSubInstance.setOnAction(event -> {
+                        var msg = new SimpleStringProperty("正在等待...");
+                        var dialog = new DoneDialog("新建子实例：" + Instances.getSelect().information.name, msg);
+
+                        dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
+                        dialog.show(ZplApplication.getRootPane());
+                        var name = Instances.getSelect().information.name + "-sub";
+                        var instanceDir = new File(ZplDirectory.getInstancesDirectory(), name);
+
+                        Scheduler.submitTasks(
+                            new NewSubInstanceTask(
+                                instanceDir,
+                                name,
+                                Instances.getSelect(),
+                                s -> FXUtils.runFX(() -> msg.setValue(s))));
+                    });
+                }
+
                 var updateVersion = new JFXButton("版本更新");
+                updateVersion.setDisable(true);
+
                 var extractInstance = new JFXButton("导出实例");
+                {
+                    extractInstance.setOnAction(event -> {
+                        var msg = new SimpleStringProperty("正在等待...");
+                        var dialog = new DoneDialog("导出实例：" + Instances.getSelect().information.name, msg);
+
+                        dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
+                        dialog.show(ZplApplication.getRootPane());
+                        var instance = Instances.getSelect();
+                        var zip = new File(instance.insDir, instance.information.name + ".zip");
+                        if (zip.exists()) zip.delete();
+                        Scheduler.submitTasks(
+                            new ZplExtractTask(zip, instance.insDir, s -> FXUtils.runFX(() -> msg.setValue(s))));
+                        DesktopUtils.openFileLocation(instance.insDir);
+                    });
+                }
 
                 controlView.getChildren()
                     .addAll(
@@ -163,10 +235,9 @@ public class InstanceView extends BaseMyScene {
         });
     }
 
-    private static Node textFileWrapper(String s) {
+    private static Node textFileWrapper(Property<String> property) {
         var textField = new JFXTextField();
-        textField.setText(s);
-        // textField.textProperty().bindBidirectional();
+        textField.textProperty().bindBidirectional(property);
 
         return textField;
     }

@@ -42,7 +42,7 @@ public class Config {
     static {
         config = new Config();
         loadConfig();
-        Runtime.getRuntime().addShutdownHook(new Thread(Config::saveConfig));
+        // Runtime.getRuntime().addShutdownHook(new Thread(Config::saveConfig));
     }
 
     public static Config getConfig() {
@@ -51,13 +51,13 @@ public class Config {
 
     private static void loadConfig() {
         Log.debug("正在加载设置文件：{}", configFile.toString());
+        config.auths = new ArrayList<>();
         if (configFile.exists()) try {
             JSONObject object = JsonUtil.fromJson(configFile).toBean(JSONObject.class);
 
             config.libraries_url = object.getStr("libraries_url", "http://downloads.wohaopa.cn");
             config.launchConfig = object.getJSONObject("launchConfig");
             if (config.launchConfig == null) config.launchConfig = new JSONObject();
-            config.auths = new ArrayList<>();
 
             Iterable<JSONObject> it = object.getJSONArray("account").jsonIter();
             for (JSONObject jsonObject : it) {

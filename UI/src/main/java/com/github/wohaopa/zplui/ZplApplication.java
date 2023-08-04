@@ -21,12 +21,11 @@
 package com.github.wohaopa.zplui;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import com.github.wohaopa.zeropointlanuch.core.Instance;
-import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
 import com.github.wohaopa.zplui.scene.RootScene;
 
 public class ZplApplication extends Application {
@@ -45,17 +44,13 @@ public class ZplApplication extends Application {
         stage.setTitle("ZeroPointLauncher - A GTNH Launcher by wohaopa!");
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.show();
+        stage.setOnCloseRequest(event -> {
+            Platform.exit();
+            System.exit(0);
+        });
     }
 
     public static StackPane getRootPane() {
         return root.getRootPane();
-    }
-
-    public static Instance getSelectInstance() {
-        return root.getSelectInstance();
-    }
-
-    public static Auth getSelectAccount() {
-        return root.getSelectAccount();
     }
 }

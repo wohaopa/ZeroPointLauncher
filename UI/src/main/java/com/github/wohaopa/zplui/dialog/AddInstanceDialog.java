@@ -27,7 +27,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
 
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
@@ -35,10 +34,7 @@ import com.github.wohaopa.zeropointlanuch.core.tasks.Scheduler;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.StandardInstallTask;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.ZplInstallTask;
 import com.github.wohaopa.zplui.ZplApplication;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXDialogLayout;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import com.jfoenix.validation.RequiredFieldValidator;
 
 public class AddInstanceDialog extends BaseDialog {
@@ -51,7 +47,7 @@ public class AddInstanceDialog extends BaseDialog {
         heading.getStyleClass().add("dialog-title");
         layout.setHeading(heading);
 
-        var tabPane = new TabPane();
+        var tabPane = new JFXTabPane();
         {
             var zplTab = new Tab();
             {

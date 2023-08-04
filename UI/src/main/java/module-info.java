@@ -1,6 +1,5 @@
-module com.github.wohaopa.zpl.ui.zplui {
+module com.github.wohaopa.zplui {
   requires javafx.controls;
-  requires javafx.fxml;
   requires com.jfoenix;
   requires java.desktop;
   requires java.base;
@@ -8,4 +7,7 @@ module com.github.wohaopa.zpl.ui.zplui {
   requires cn.hutool.json;
 
   exports com.github.wohaopa.zplui;
+
+  opens assets.css;
+  opens assets.img;
 }

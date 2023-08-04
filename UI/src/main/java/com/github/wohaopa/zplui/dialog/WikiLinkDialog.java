@@ -21,15 +21,13 @@
 package com.github.wohaopa.zplui.dialog;
 
 import java.awt.*;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
+import com.github.wohaopa.zplui.util.DesktopUtils;
 import com.jfoenix.controls.JFXDialogLayout;
 
 public class WikiLinkDialog extends BaseDialog {
@@ -49,13 +47,7 @@ public class WikiLinkDialog extends BaseDialog {
         layout.setBody(new HBox(text, sp, new ImageView(img)));
 
         Hyperlink link = new Hyperlink("使用浏览器打开");
-        link.setOnAction(event -> {
-            try {
-                Desktop.getDesktop().browse(new URI("https://gtnh.huijiwiki.com/"));
-            } catch (IOException | URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        link.setOnAction(event -> DesktopUtils.openLink("https://gtnh.huijiwiki.com/"));
 
         layout.setActions(link);
 

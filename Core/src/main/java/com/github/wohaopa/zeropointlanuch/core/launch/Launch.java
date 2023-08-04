@@ -32,6 +32,7 @@ import com.github.wohaopa.zeropointlanuch.core.JavaVersion;
 import com.github.wohaopa.zeropointlanuch.core.Log;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zeropointlanuch.core.auth.Auth;
+import com.github.wohaopa.zeropointlanuch.core.utils.StringUtil;
 
 public class Launch {
 
@@ -118,20 +119,33 @@ public class Launch {
         inst.put(name, this);
         jsonObject = Config.getConfig().getLaunchConfig(name);
 
-        maxMemory = jsonObject.getStr("jsonObject", "8192M");
-        minMemory = jsonObject.getStr("minMemory", "1024M");
-        extraJvmArgs = jsonObject.getStr("extraJvmArgs", "");
-        extraGameArgs = jsonObject.getStr("extraJvmArgs", "");
-        javaPath = jsonObject.getStr("javaPath", "java");
+        maxMemory = jsonObject.getStr("jsonObject");
+        if (StringUtil.isEmpty(maxMemory)) setMaxMemory("8192M");
+
+        minMemory = jsonObject.getStr("minMemory");
+        if (StringUtil.isEmpty(minMemory)) setMinMemory("8192M");
+
+        extraJvmArgs = jsonObject.getStr("extraJvmArgs");
+        if (extraJvmArgs == null) setExtraJvmArgs("");
+
+        extraGameArgs = jsonObject.getStr("extraGameArgs");
+        if (extraGameArgs == null) setExtraGameArgs("");
+
+        javaPath = jsonObject.getStr("javaPath");
+        if (javaPath == null) setJavaPath("");
     }
 
-    private String[] getLaunchArguments(Auth auth, File runDir) {
+    private String[] getLaunchArguments(Auth auth, File runDir, Consumer<String> callback) {
 
         if (javaPath == null || javaPath.isEmpty()) {
-            throw new RuntimeException("无效Java路径，启动器：" + name);
+            Log.warn("无效Java路径，请设置Java，启动器：{}", name);
+            callback.accept("无效Java路径，请设置Java，启动器：" + name);
+            return null;
         }
         if (new JavaVersion(new File(javaPath)).version != JavaVersion.Java.JAVA8 && name.equals("ZPL-Java8")) {
-            throw new RuntimeException("无效Java路径，启动器：" + name);
+            Log.warn("无效Java路径，请设置Java：{}", javaPath);
+            callback.accept("无效Java路径，请设置Java：" + javaPath);
+            return null;
         }
 
         List<String> commandLine = new ArrayList<>();
@@ -162,15 +176,18 @@ public class Launch {
 
         Log.start("启动");
 
+        callback.accept("正在校验");
         try {
             version.verifyVersion(callback);
         } catch (Exception e) {
             Log.warn("文件校验失败。原因：{}", e);
+            callback.accept("校验失败：" + e);
             Log.end();
             return;
         }
 
-        String[] commandLine = getLaunchArguments(auth, runDir);
+        callback.accept("正在启动");
+        String[] commandLine = getLaunchArguments(auth, runDir, callback);
         Log.info("启动指令：['{}']", String.join("' '", commandLine));
 
         final boolean[] resume = { true };
@@ -193,7 +210,7 @@ public class Launch {
                     resume[0] = false;
                     callback.accept("检测到游戏窗口");
                 }
-                callback0.accept(s);
+                // callback0.accept(s);
             }
         };
 
@@ -203,8 +220,12 @@ public class Launch {
         try {
             Process mc = pb.start();
             Log.debug("进程pid：{}", mc.pid());
-            new Thread(new Pump(mc.getInputStream(), pump)).start();
-            new Thread(new Pump(mc.getErrorStream(), pump)).start();
+            var thread1 = new Thread(new Pump(mc.getInputStream(), pump));
+            thread1.setDaemon(true);
+            thread1.start();
+            var thread2 = new Thread(new Pump(mc.getErrorStream(), pump));
+            thread2.setDaemon(true);
+            thread2.start();
 
         } catch (IOException e) {
             Log.warn("无法启动，错误：{}", e);

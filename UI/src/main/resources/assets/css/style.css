@@ -73,7 +73,7 @@
 }
 
 .instance-info-grid {
-    /*-fx-grid-lines-visible: true;*/
+    -fx-vgap: 10;
     -fx-alignment: top-center;
 }
 
@@ -93,7 +93,7 @@
 
 /* ====================== dialog ======================*/
 
-.dialog-layout{
+.dialog-layout {
     -fx-background-color: black;
 }
 
@@ -106,6 +106,7 @@
     -fx-spacing: 25;
 }
 
+.dialog-layout .jfx-button,
 .dialog-content .jfx-button {
     -fx-text-fill: white;
 }
@@ -120,6 +121,22 @@
 .dialog-content .scroll-pane .scroll-bar:horizontal,
 .dialog-content .scroll-pane .scroll-bar:vertical {
     -fx-background-color: black;
+}
+.dialog-content .tab-header-background{
+    -fx-background-color: none;
+}
+.jfx-tab-pane .headers-region .tab-container .tab-label {
+    -fx-font-size: 12;
+}
+.jfx-tab-pane .headers-region > .tab > .jfx-rippler {
+    -jfx-rippler-fill: white;
+}
+.jfx-tab-pane .headers-region .tab-selected-line {
+    -fx-background-color: white;
+}
+.jfx-toggle-button {
+    -jfx-size: 8;
+    -jfx-toggle-color: white;
 }
 
 

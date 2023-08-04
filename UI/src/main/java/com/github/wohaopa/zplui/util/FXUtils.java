@@ -18,15 +18,14 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.utils;
+package com.github.wohaopa.zplui.util;
 
-public class StringUtil {
+import javafx.application.Platform;
 
-    public static boolean isNotEmpty(String s) {
-        return s != null && !s.isEmpty();
-    }
+public class FXUtils {
 
-    public static boolean isEmpty(String s) {
-        return s == null || s.isEmpty();
+    public static void runFX(Runnable runnable) {
+        if (Platform.isFxApplicationThread()) runnable.run();
+        else Platform.runLater(runnable);
     }
 }

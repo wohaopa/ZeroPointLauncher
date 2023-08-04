@@ -28,15 +28,14 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+//import org.apache.logging.log4j.LogManager;
+//import org.apache.logging.log4j.Logger;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.http.HttpUtil;
+import com.github.wohaopa.zeropointlanuch.core.Log;
 
 public class DownloadUtil {
-
-    private static final Logger downloadLog = LogManager.getLogger("Download");
 
     private static int tasksCount = 0;
 
@@ -78,7 +77,7 @@ public class DownloadUtil {
 
         while (tasksCount != 0) {
             tasksCount--;
-            downloadLog.debug("正在下载：{} 剩余：{}", count - tasksCount, tasksCount);
+            Log.debug("正在下载：{} 剩余：{}", count - tasksCount, tasksCount);
             result = cs.take();
             list.add(result.get());
         }
@@ -101,7 +100,7 @@ public class DownloadUtil {
             try {
                 return HttpUtil.downloadFileFromUrl(url, file);
             } catch (Exception e) {
-                downloadLog.error("无法下载链接：{}", url);
+                Log.error("无法下载链接：{}", url);
             }
             return null;
         }

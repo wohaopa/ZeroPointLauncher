@@ -21,15 +21,11 @@
 package com.github.wohaopa.zplui.dialog;
 
 import java.awt.*;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
 import javafx.application.Platform;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -39,8 +35,10 @@ import com.github.wohaopa.zeropointlanuch.core.tasks.Scheduler;
 import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
 import com.github.wohaopa.zplui.Accounts;
 import com.github.wohaopa.zplui.ZplApplication;
+import com.github.wohaopa.zplui.util.DesktopUtils;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.JFXTextField;
 
 public class AddAccountDialog extends BaseDialog {
@@ -52,7 +50,7 @@ public class AddAccountDialog extends BaseDialog {
         layout.setHeading(heading);
 
         var img = new Image("/assets/img/bg1.jpg", 296 * 0.4, 256 * 0.4, false, true);
-        var tabPane = new TabPane();
+        var tabPane = new JFXTabPane();
         {
             var offlineTab = new Tab();
             {
@@ -128,13 +126,7 @@ public class AddAccountDialog extends BaseDialog {
                 }));
 
                 Hyperlink link = new Hyperlink("验证链接");
-                link.setOnAction(event -> {
-                    try {
-                        Desktop.getDesktop().browse(new URI("https://www.microsoft.com/link"));
-                    } catch (IOException | URISyntaxException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                link.setOnAction(event -> DesktopUtils.openLink("https://www.microsoft.com/link"));
 
                 content.getStyleClass().add("vbox");
                 content.getChildren().addAll(getCode, code, link);

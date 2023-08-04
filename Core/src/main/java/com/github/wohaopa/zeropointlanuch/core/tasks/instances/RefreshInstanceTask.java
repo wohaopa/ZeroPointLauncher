@@ -18,15 +18,30 @@
  * SOFTWARE.
  */
 
-package com.github.wohaopa.zeropointlanuch.core.utils;
+package com.github.wohaopa.zeropointlanuch.core.tasks.instances;
 
-public class StringUtil {
+import java.util.function.Consumer;
 
-    public static boolean isNotEmpty(String s) {
-        return s != null && !s.isEmpty();
+import com.github.wohaopa.zeropointlanuch.core.Instance;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
+
+public class RefreshInstanceTask extends Task<Object> {
+
+    private final Instance instance;
+
+    public RefreshInstanceTask(Instance instance, Consumer<String> callback) {
+        super(callback);
+        this.instance = instance;
     }
 
-    public static boolean isEmpty(String s) {
-        return s == null || s.isEmpty();
+    @Override
+    public Object call() throws Exception {
+        accept("正在刷新实例：" + instance.information.name);
+        instance.getMapper();
+        accept("正在生成链接文件，因为使用系统链接需要管理员权限，本程序完全开源，请放心同意：" + instance.information.name);
+        instance.doLink();
+        accept("刷新完成！");
+
+        return null;
     }
 }

@@ -4,6 +4,7 @@ plugins {
     id 'org.javamodularity.moduleplugin' version '1.8.12'
     id 'org.openjfx.javafxplugin' version '0.0.13'
     id 'org.beryx.jlink' version '2.25.0'
+    id("org.moditect.gradleplugin") version "1.0.0-rc3"
 }
 
 group = 'com.github.wohaopa'
@@ -15,13 +16,18 @@ targetCompatibility = '17'
 
 
 application {
+
+    applicationDefaultJvmArgs += ["--add-opens", "java.base/java.lang.reflect=com.jfoenix"]
+    applicationDefaultJvmArgs += ["--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix"]
+    applicationDefaultJvmArgs += ["--add-exports", "javafx.controls/com.sun.javafx.scene.control=com.jfoenix"]
     mainModule = 'com.github.wohaopa.zplui'
-    mainClass = 'com.github.wohaopa.zplui.ZPLApplication'
+    mainClass = 'com.github.wohaopa.zplui.ZplApplication'
+
 }
 
 javafx {
     version = '17.0.2'
-    modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.base']
+    modules = ['javafx.controls', 'javafx.graphics', 'javafx.base']
 }
 
 repositories {
@@ -33,7 +39,7 @@ repositories {
 
 dependencies {
     implementation 'com.jfoenix:jfoenix:9.0.10'
-    implementation 'cn.hutool:hutool-json:5.8.20'
+    implementation 'org.dromara.hutool:hutool-json:5.8.20'
     implementation project(path: ":Core")
 
     testImplementation platform('org.junit:junit-bom:5.9.1')
@@ -48,7 +54,8 @@ jlink {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
-        name = 'app'
+        name = 'ZeroPointLauncher'
+        noConsole = false
     }
 }
 
@@ -62,7 +69,25 @@ tasks.register('runZPL', JavaExec) {
     mainClass = 'boot.Main'
     jvmArgs += ["--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED"]
 
-    systemProperty("zpl.rootDir", "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH")
-    systemProperty("zpl.url", "http://127.0.0.1")
 
+
+}
+
+moditect {
+    addDependenciesModuleInfo {
+        jdepsExtraArgs = ['-q']
+        outputDirectory = file("$buildDir/modules")
+        overwriteExistingFiles = false
+        modules {
+            module {
+                artifact 'cn.hutool:hutool-log:5.8.20'
+                moduleInfoSource = '''
+                module cn.hutool.log {
+                      exports cn.hutool.log;
+                      uses cn.hutool.log.LogFactory;
+                }
+            '''
+            }
+        }
+    }
 }
