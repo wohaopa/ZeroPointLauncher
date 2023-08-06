@@ -2,6 +2,7 @@
 /.gradle/
 /.idea/
 /.GTNH/
+/UI/.GTNH/
 /build/
 /TestResources/
 /*/build/

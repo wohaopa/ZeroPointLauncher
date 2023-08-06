@@ -23,21 +23,24 @@ package com.github.wohaopa.zeropointlanuch.core;
 import java.io.File;
 import java.io.IOException;
 
+import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
+import com.github.wohaopa.zeropointlanuch.core.tasks.DownloadTask;
 import com.github.wohaopa.zeropointlanuch.core.utils.FileUtil;
 
 public class LinkTools {
 
     private static boolean enable;
-    private static final File fileJar = new File(
-        ZplDirectory.getWorkDirectory().getParentFile(),
-        "lib\\MappingTools.jar");
-    private static final File cmdFile = new File(
-        ZplDirectory.getWorkDirectory().getParentFile(),
-        "lib\\MappingTools.bat");
+    private static final File fileJar = new File(ZplDirectory.getWorkDirectory(), "lib\\MappingTools.jar");
+    private static final File cmdFile = new File(ZplDirectory.getWorkDirectory(), "lib\\MappingTools.bat");
 
     static {
-        if (!fileJar.isFile()) Log.warn("无法加载映射工具！");
-        else {}
+        if (!fileJar.isFile()) {
+            try {
+                new DownloadTask(DownloadProvider.getUrlForFile(fileJar), fileJar, null).call();
+            } catch (Exception e) {
+                Log.error("无法下载链接工具！{}", e);
+            }
+        }
     }
 
     public static void doLink(File file) throws IOException {
@@ -49,7 +52,7 @@ public class LinkTools {
                 @echo off
                 cd /d %~dp0
                 title ZeroPointLauncher
-                java -jar MappingTools-0.2.0.jar %1
+                java -jar MappingTools.jar %1
                 echo Done!
                 pause>nul
                 """;

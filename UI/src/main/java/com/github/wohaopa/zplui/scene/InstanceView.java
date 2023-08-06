@@ -45,12 +45,12 @@ import com.github.wohaopa.zplui.dialog.MapManagerDialog;
 import com.github.wohaopa.zplui.dialog.ModsManagerDialog;
 import com.github.wohaopa.zplui.util.DesktopUtils;
 import com.github.wohaopa.zplui.util.FXUtils;
+import com.github.wohaopa.zplui.util.Lazy;
 import com.jfoenix.controls.*;
 
 public class InstanceView extends BaseMyScene {
 
-    private static JFXTreeView<String> instances;
-    private static Map<String, TreeItem<String>> cache;
+    private static Map<String, TreeItem<String>> cache = new HashMap<>();
 
     public InstanceView() {
         super(() -> {
@@ -58,24 +58,8 @@ public class InstanceView extends BaseMyScene {
 
             var treeView = new JFXTreeView<String>();
             {
-                instances = treeView;
                 var rootTreeItem = new TreeItem<>("实例继承图");
-                {
-                    cache = new HashMap<>();
-                    Instances.instancesProperty().get().forEach(o -> {
-                        if (o instanceof Instance instance) {
-                            cache.put(instance.information.name, new TreeItem<>(instance.information.name));
-                        }
-                    });
-                    cache.forEach((s, o) -> {
-                        var dep = Instance.get(s).information.depVersion;
-                        if ("null".equals(dep)) {
-                            rootTreeItem.getChildren().add(o);
-                        } else if (cache.get(dep) != null) {
-                            cache.get(dep).getChildren().add(o);
-                        }
-                    });
-                }
+                refreshCall(rootTreeItem);
 
                 treeView.setRoot(rootTreeItem);
                 treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -88,16 +72,18 @@ public class InstanceView extends BaseMyScene {
                 Instances
                     .addListener(newValue -> treeView.getSelectionModel().select(cache.get(newValue.information.name)));
 
-                var dialog = new AddInstanceDialog();
+                var dialog = new Lazy<>(AddInstanceDialog::new);
 
                 var menu = new ContextMenu();
                 {
                     var newInstance = new MenuItem("新建实例");
                     newInstance.setOnAction(event -> {
-                        dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
-                        dialog.show(ZplApplication.getRootPane());
+                        dialog.getValue().setTransitionType(JFXDialog.DialogTransition.CENTER);
+                        dialog.getValue().show(ZplApplication.getRootPane());
                     });
-                    menu.getItems().addAll(newInstance);
+                    var refresh = new MenuItem("刷新");
+                    refresh.setOnAction(event -> refreshCall(rootTreeItem));
+                    menu.getItems().addAll(newInstance, refresh);
                 }
                 treeView.setContextMenu(menu);
             }
@@ -247,5 +233,24 @@ public class InstanceView extends BaseMyScene {
         var img = new Label("实例");
         img.setTextFill(Color.WHITE);
         return img;
+    }
+
+    public static void refreshCall(TreeItem<String> rootTreeItem) {
+        cache.clear();
+        rootTreeItem.getChildren().clear();
+        Instances.refresh();
+        Instances.instancesProperty().get().forEach(o -> {
+            if (o instanceof Instance instance) {
+                cache.put(instance.information.name, new TreeItem<>(instance.information.name));
+            }
+        });
+        cache.forEach((s, o) -> {
+            var dep = Instance.get(s).information.depVersion;
+            if ("null".equals(dep)) {
+                rootTreeItem.getChildren().add(o);
+            } else if (cache.get(dep) != null) {
+                cache.get(dep).getChildren().add(o);
+            }
+        });
     }
 }

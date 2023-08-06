@@ -1,5 +1,4 @@
 module ZeroPointLaunch.Core {
-
   requires java.sql;
   requires org.apache.commons.compress;
   requires cn.hutool.core;
@@ -17,6 +16,5 @@ module ZeroPointLaunch.Core {
   exports com.github.wohaopa.zeropointlanuch.core.tasks;
   exports com.github.wohaopa.zeropointlanuch.core.launch;
   exports com.github.wohaopa.zeropointlanuch.core.tasks.instances;
-
-
+  exports com.github.wohaopa.zeropointlanuch.core.utils;
 }

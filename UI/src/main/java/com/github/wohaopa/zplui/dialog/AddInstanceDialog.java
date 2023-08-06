@@ -21,6 +21,7 @@
 package com.github.wohaopa.zplui.dialog;
 
 import java.io.File;
+import java.util.LinkedList;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
@@ -29,10 +30,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.VBox;
 
+import cn.hutool.json.JSONObject;
+
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
+import com.github.wohaopa.zeropointlanuch.core.download.DownloadProvider;
+import com.github.wohaopa.zeropointlanuch.core.tasks.DownloadTask;
 import com.github.wohaopa.zeropointlanuch.core.tasks.Scheduler;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
+import com.github.wohaopa.zeropointlanuch.core.tasks.instances.OnlineInstallTask;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.StandardInstallTask;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.ZplInstallTask;
+import com.github.wohaopa.zeropointlanuch.core.utils.JsonUtil;
+import com.github.wohaopa.zeropointlanuch.core.utils.StringUtil;
 import com.github.wohaopa.zplui.ZplApplication;
 import com.jfoenix.controls.*;
 import com.jfoenix.validation.RequiredFieldValidator;
@@ -87,13 +96,23 @@ public class AddInstanceDialog extends BaseDialog {
                     var path = textField2.getText();
 
                     var msg = new SimpleStringProperty();
-                    var zip = new File(path);
-                    var instanceDir = new File(ZplDirectory.getInstancesDirectory(), name);
-                    if (zip.exists() && !instanceDir.exists()) {
-                        Scheduler.submitTasks(
-                            new ZplInstallTask(zip, instanceDir, name, s -> Platform.runLater(() -> msg.set(s))));
+
+                    if (StringUtil.isNotEmpty(name)) {
+
+                        var zip = new File(path);
+                        var instanceDir = new File(ZplDirectory.getInstancesDirectory(), name);
+
+                        if (zip.exists() && !instanceDir.exists()) {
+                            Scheduler.submitTasks(
+                                new ZplInstallTask(zip, instanceDir, name, s -> Platform.runLater(() -> msg.set(s))));
+                            close();
+                        } else {
+                            msg.setValue("压缩包不存在！或实例名重复！");
+                        }
+
+                    } else {
+                        msg.setValue("实例名不能为空");
                     }
-                    close();
                     new DoneDialog("实例安装", msg).show(ZplApplication.getRootPane());
                 });
 
@@ -122,26 +141,79 @@ public class AddInstanceDialog extends BaseDialog {
                 var textField1 = new JFXTextField();
                 textField1.setPromptText("实例名");
                 textField1.getStyleClass().add("zpl-text-field");
+                textField1.setEditable(false);
 
-                textField1.getValidators().add(validator);
-                textField1.focusedProperty().addListener((o, oldVal, newVal) -> {
-                    if (!newVal) {
-                        textField1.validate();
-                    }
-                });
-
-                var jfxComboBox = new JFXComboBox<>();
+                var jfxComboBox = new JFXComboBox<OnlineInstanceItem>();
                 jfxComboBox.setPromptText("远程版本");
                 jfxComboBox.getStyleClass().add("zpl-combo-box");
 
                 jfxComboBox.getValidators().add(validator);
+
+                Scheduler.submitTasks(new Task<>(null) {
+
+                    @Override
+                    public Object call() throws Exception {
+                        var file = new File(ZplDirectory.getInstancesDirectory(), "instances.json");
+                        new DownloadTask(DownloadProvider.getUrlForFile(file), file, null).call();
+
+                        JSONObject jsonObject = (JSONObject) JsonUtil.fromJson(file);
+                        var insts = new LinkedList<OnlineInstanceItem>();
+                        jsonObject.getJSONArray("instances").forEach(o -> {
+                            if (o instanceof JSONObject object) {
+                                insts.add(
+                                    new OnlineInstanceItem(
+                                        object.getStr("file"),
+                                        object.getStr("desc"),
+                                        object.getStr("name")));
+                            }
+                        });
+                        Platform.runLater(() -> jfxComboBox.getItems().addAll(insts));
+
+                        return null;
+                    }
+                });
                 jfxComboBox.focusedProperty().addListener((o, oldVal, newVal) -> {
                     if (!newVal) {
                         jfxComboBox.validate();
                     }
                 });
+
+                var textField2 = new JFXTextField();
+                textField2.setPromptText("实例名");
+                textField2.getStyleClass().add("zpl-text-field");
+                textField2.setEditable(false);
+                textField2.setText("请选择在线实例");
+                jfxComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue != null) {
+                        textField1.setText(newValue.fileName);
+                        textField2.setText(newValue.desc);
+                    } else {
+                        textField2.setText("请选择在线实例");
+                    }
+                });
+
                 var btn = new JFXButton();
                 btn.setText("安装");
+                btn.setOnAction(event -> {
+                    // var name = textField1.getText();
+                    var online = jfxComboBox.getSelectionModel().getSelectedItem();
+
+                    var msg = new SimpleStringProperty();
+                    if (online != null) {
+                        var name = online.fileName;
+                        var instanceDir = new File(ZplDirectory.getInstancesDirectory(), name);
+                        if (!instanceDir.exists()) {
+                            Scheduler.submitTasks(
+                                new OnlineInstallTask(instanceDir, name, s -> Platform.runLater(() -> msg.set(s))));
+                            close();
+                        } else {
+                            msg.setValue("压缩包不存在！或实例名重复！");
+                        }
+                    } else {
+                        msg.setValue("请选择在线实例！");
+                    }
+                    new DoneDialog("实例安装", msg).show(ZplApplication.getRootPane());
+                });
 
                 textField1.widthProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue != null) {
@@ -152,7 +224,7 @@ public class AddInstanceDialog extends BaseDialog {
 
                 content.setAlignment(Pos.CENTER);
                 content.setSpacing(25);
-                content.getChildren().addAll(textField1, jfxComboBox, btn);
+                content.getChildren().addAll(textField1, jfxComboBox, textField2, btn);
 
                 content.setPadding(new Insets(20, 0, 20, 0));
                 onlineTab.setContent(content);
@@ -205,18 +277,24 @@ public class AddInstanceDialog extends BaseDialog {
                     var path = textField3.getText();
 
                     var msg = new SimpleStringProperty();
-                    var zip = new File(path);
-                    var instanceDir = new File(ZplDirectory.getInstancesDirectory(), name);
-                    if (zip.exists() && !instanceDir.exists()) {
-                        Scheduler.submitTasks(
-                            new StandardInstallTask(
-                                zip,
-                                instanceDir,
-                                name,
-                                version,
-                                s -> Platform.runLater(() -> msg.set(s))));
+                    if (StringUtil.isNotEmpty(name)) {
+                        var zip = new File(path);
+                        var instanceDir = new File(ZplDirectory.getInstancesDirectory(), name);
+                        if (zip.exists() && !instanceDir.exists()) {
+                            Scheduler.submitTasks(
+                                new StandardInstallTask(
+                                    zip,
+                                    instanceDir,
+                                    name,
+                                    version,
+                                    s -> Platform.runLater(() -> msg.set(s))));
+                            close();
+                        } else {
+                            msg.setValue("压缩包不存在！或实例名重复！");
+                        }
+                    } else {
+                        msg.setValue("实例名不能为空");
                     }
-                    close();
                     new DoneDialog("实例安装", msg).show(ZplApplication.getRootPane());
                 });
 
@@ -242,5 +320,23 @@ public class AddInstanceDialog extends BaseDialog {
         layout.setBody(tabPane);
 
         this.setContent(layout);
+    }
+
+    private static class OnlineInstanceItem {
+
+        public final String fileName;
+        public final String desc;
+        public final String displayName;
+
+        private OnlineInstanceItem(String fileName, String desc, String displayName) {
+            this.fileName = fileName;
+            this.desc = desc;
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
     }
 }

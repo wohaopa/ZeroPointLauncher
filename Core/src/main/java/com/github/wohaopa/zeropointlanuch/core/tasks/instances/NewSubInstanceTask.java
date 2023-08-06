@@ -43,12 +43,14 @@ public class NewSubInstanceTask extends Task<Instance> {
     public Instance call() throws Exception {
 
         if (Instance.containsKey(name)) return Instance.get(name);
+        accept("正在创建实例：" + name);
         Instance.Builder builder = new Instance.Builder(name);
         builder.setVersionFile(new File(instanceDir, "version.json"))
             .setDepVersion(instance.information.name)
             .setLauncher(instance.information.launcher)
             .setSharer(instance.information.sharer)
             .saveConfig();
+        accept("完成！");
         return builder.build();
     }
 }

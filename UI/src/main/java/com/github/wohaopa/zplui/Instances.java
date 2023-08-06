@@ -46,11 +46,15 @@ public class Instances {
 
     static {
         new DiscoverInstanceTask(null).call();
-        instances.setValue(FXCollections.observableArrayList(Instance.list()));
+        refresh();
     }
 
     public static ObjectProperty<ObservableList<Object>> instancesProperty() {
         return instances;
+    }
+
+    public static void refresh() {
+        instances.setValue(FXCollections.observableArrayList(Instance.list()));
     }
 
     public static StringProperty nameProperty() {
