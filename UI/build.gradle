@@ -82,3 +82,7 @@ jar {
     }
 }
 
+tasks.register("copyLib", Copy){
+    from configurations.runtimeClasspath
+    into "$buildDir/libs"
+}

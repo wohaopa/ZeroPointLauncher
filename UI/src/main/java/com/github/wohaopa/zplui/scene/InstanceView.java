@@ -34,6 +34,7 @@ import javafx.scene.paint.Color;
 import com.github.wohaopa.zeropointlanuch.core.Instance;
 import com.github.wohaopa.zeropointlanuch.core.ZplDirectory;
 import com.github.wohaopa.zeropointlanuch.core.tasks.Scheduler;
+import com.github.wohaopa.zeropointlanuch.core.tasks.Task;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.NewSubInstanceTask;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.RefreshInstanceTask;
 import com.github.wohaopa.zeropointlanuch.core.tasks.instances.ZplExtractTask;
@@ -125,6 +126,7 @@ public class InstanceView extends BaseMyScene {
 
                 var openModsManager = new JFXButton("Mods管理");
                 {
+                    openModsManager.setDisable(true);
                     var dialog = new ModsManagerDialog();
 
                     openModsManager.setOnAction(event -> {
@@ -135,6 +137,7 @@ public class InstanceView extends BaseMyScene {
 
                 var openMapManager = new JFXButton("映射管理");
                 {
+                    openMapManager.setDisable(true);
                     var dialog = new MapManagerDialog();
 
                     openMapManager.setOnAction(event -> {
@@ -195,6 +198,34 @@ public class InstanceView extends BaseMyScene {
                         DesktopUtils.openFileLocation(instance.insDir);
                     });
                 }
+                var transfer = new JFXButton("迁移旧实例");
+                {
+                    transfer.setDisable(true);
+                }
+
+                var clean = new JFXButton("清理运行目录");
+                {
+                    {
+                        clean.setOnAction(event -> {
+                            var msg = new SimpleStringProperty("正在等待...");
+                            var dialog = new DoneDialog("清理运行目录：" + Instances.getSelect().information.name, msg);
+
+                            dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
+                            dialog.show(ZplApplication.getRootPane());
+                            var instance = Instances.getSelect();
+
+                            Scheduler.submitTasks(new Task<>(s -> FXUtils.runFX(() -> msg.setValue(s))) {
+
+                                @Override
+                                public Object call() {
+                                    instance.clean();
+                                    accept("完成！");
+                                    return null;
+                                }
+                            });
+                        });
+                    }
+                }
 
                 controlView.getChildren()
                     .addAll(
@@ -203,6 +234,8 @@ public class InstanceView extends BaseMyScene {
                         openModsManager,
                         openMapManager,
                         refreshInstance,
+                        clean,
+                        transfer,
                         newSubInstance,
                         updateVersion,
                         extractInstance);

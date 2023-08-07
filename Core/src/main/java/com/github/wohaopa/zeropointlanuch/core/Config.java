@@ -42,7 +42,7 @@ public class Config {
     static {
         config = new Config();
         loadConfig();
-        // Runtime.getRuntime().addShutdownHook(new Thread(Config::saveConfig));
+        Runtime.getRuntime().addShutdownHook(new Thread(Config::saveConfig));
     }
 
     public static Config getConfig() {

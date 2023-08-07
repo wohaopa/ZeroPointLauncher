@@ -195,10 +195,23 @@ public class Instance {
         } else throw new RuntimeException("无法找到启动器：" + information.launcher);
     }
 
+    public void clean() {
+        clean0(runDir);
+    }
+
+    private void clean0(File dir) {
+        if (dir.exists()) {
+            for (File file : dir.listFiles()) {
+                if (FileUtil.isSymLink(file)) file.delete();
+                else if (file.isDirectory()) clean0(file);
+            }
+        }
+    }
+
     public Mapper getMapper() {
         Sharer sharer = Sharer.get(information.sharer); // 先拿到sharer
         if (sharer == null) Log.warn("未找到Sharer：{}", information.sharer);
-        if (mapper == null) mapper = new Mapper(null, this);
+        mapper = new Mapper(null, this);
         mapper.update(sharer); // 执行合并文件夹方法
         return mapper;
     }

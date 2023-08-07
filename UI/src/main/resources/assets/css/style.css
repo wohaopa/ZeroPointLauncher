@@ -27,6 +27,7 @@
 
 .zpl-text-field {
     -fx-text-fill: white;
+    -fx-font-size: 12px;
 }
 
 .tab-pane,
@@ -101,7 +102,7 @@
     -fx-text-fill: white;
 }
 
-.dialog-content .vbox{
+.vbox{
     -fx-alignment: center;
     -fx-spacing: 25;
 }

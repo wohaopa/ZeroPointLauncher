@@ -154,8 +154,7 @@ public class RootScene {
                 var btn = new JFXButton();
                 btn.setGraphic(baseMyScene.getIcon());
                 btn.setOnAction(event -> onAdd(baseMyScene.getPane()));
-                if (baseMyScene instanceof SettingView || baseMyScene instanceof LauncherView
-                    || baseMyScene instanceof ServerView
+                if (baseMyScene instanceof LauncherView || baseMyScene instanceof ServerView
                     || baseMyScene instanceof ConsoleView) btn.setDisable(true);
                 menuPane.getChildren().add(btn);
             });

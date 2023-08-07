@@ -22,15 +22,37 @@ package com.github.wohaopa.zplui.scene;
 
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+
+import com.github.wohaopa.zeropointlanuch.core.Config;
+import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.validation.RegexValidator;
 
 public class SettingView extends BaseMyScene {
 
     public SettingView() {
         super(() -> {
-            var img = new Label("设置");
-            img.setTextFill(Color.WHITE);
-            return img;
+            var root = new VBox();
+            root.getStyleClass().add("vbox");
+
+            var mirror = new JFXTextField();
+            mirror.getStyleClass().add("zpl-text-field");
+            mirror.setPromptText("镜像地址");
+            mirror.setLabelFloat(true);
+            var regex = new RegexValidator("请输入正确的URL");
+            regex.setRegexPattern(
+                "(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?");
+            mirror.setValidators(regex);
+            mirror.setText(Config.getConfig().getLibraries_url());
+            mirror.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null) {
+                    Config.getConfig().setLibraries_url(newValue);
+                }
+            });
+
+            root.getChildren().addAll(mirror);
+            return root;
         });
     }
 
