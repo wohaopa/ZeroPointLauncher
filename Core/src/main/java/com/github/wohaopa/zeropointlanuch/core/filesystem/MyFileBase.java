@@ -46,10 +46,10 @@ public abstract class MyFileBase {
         list1.add("crash-reports");
         list1.add("logs");
         list1.add("versions");
-        RUNTIME_FI.put("\\", list1);
+        RUNTIME_FI.put(separator, list1);
         ArrayList<String> list2 = new ArrayList<String>(list1);
         list2.add("saves");
-        DEFAULT_FI.put("\\", list2);
+        DEFAULT_FI.put(separator, list2);
     }
 
     public static MyFileBase getMyFileSystemByFile(File file, Map<String, List<String>> exclude) {

@@ -211,7 +211,8 @@ public class Instance {
     public Mapper getMapper() {
         Sharer sharer = Sharer.get(information.sharer); // 先拿到sharer
         if (sharer == null) Log.warn("未找到Sharer：{}", information.sharer);
-        mapper = new Mapper(null, this);
+        File configFile = new File(insDir, "map-config.json");
+        mapper = new Mapper(configFile.isFile() ? configFile : null, this);
         mapper.update(sharer); // 执行合并文件夹方法
         return mapper;
     }
@@ -223,13 +224,15 @@ public class Instance {
     public MyDirectory getMyDirectory() {
         if (myImage == null) {
             File file = new File(insDir, "image.json");
-//            if (file.isFile()) {
-//                myImage = (MyDirectory) MyFileBase.getMyFileSystemByJson(information.name, file, imageDir);
-//                if (file.lastModified() < imageDir.lastModified()) MyFileBase.update(myImage, imageDir, file);
-//            } else {
-                myImage = (MyDirectory) MyDirectory.getMyFileSystemByFile(imageDir, null);
-                myImage.saveChecksumAsJson(file);
-//            }
+            // if (file.isFile()) {
+            // myImage = (MyDirectory) MyFileBase.getMyFileSystemByJson(information.name,
+            // file, imageDir);
+            // if (file.lastModified() < imageDir.lastModified())
+            // MyFileBase.update(myImage, imageDir, file);
+            // } else {
+            myImage = (MyDirectory) MyDirectory.getMyFileSystemByFile(imageDir, null);
+            myImage.saveChecksumAsJson(file);
+            // }
         }
 
         return myImage;

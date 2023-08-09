@@ -175,8 +175,10 @@ public class MyDirectory extends MyFileBase {
                     fileBase.margeWith(otherFileBase, margeInfo);
                 } else {
                     MyFileBase fileBase = addSub(otherFileBase.name);
-                    fileBase.addTarget(otherFileBase);
-                    fileBase.shade = true;
+                    if (fileBase.isDirectory()) {
+                        fileBase.addTarget(otherFileBase);
+                        fileBase.shade = true;
+                    } else fileBase.margeWith(otherFileBase, margeInfo);
                 }
             }
         });

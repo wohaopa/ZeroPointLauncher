@@ -80,7 +80,10 @@ public class MyFile extends MyFileBase {
     @Override
     protected MyFileBase margeWith(MyFileBase other, MargeInfo margeInfo) {
         if (margeInfo.include(other.path)) this.target = other;
-        else if (!margeInfo.exclude(other.path)) addTarget(other);
+        else if (!margeInfo.exclude(other.path)) {
+            addTarget(other);
+            this.shade = true;
+        }
         return this;
     }
 
