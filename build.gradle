@@ -55,3 +55,22 @@ spotless {
     }
 
 }
+
+
+tasks.register('copyLib', Copy) {
+
+
+    into "$buildDir/zpl"
+
+    from rootProject.childProjects.get("MappingTools").tasks.jar.archiveFile.get().asFile
+    from rootProject.childProjects.get("Launcher").tasks.jar.archiveFile.get().asFile
+
+    into('lib') {
+        from rootProject.childProjects.get("UI").configurations.runtimeClasspath
+        from rootProject.childProjects.get("UI").tasks.jar.archiveFile.get().asFile
+
+    }
+
+}
+
+

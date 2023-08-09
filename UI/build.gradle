@@ -65,7 +65,6 @@ tasks.register('runZPL', JavaExec) {
     jvmArgs += ["--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED"]
 
     systemProperty("zpl.rootDir", "D:\\DevProject\\JavaProject\\ZeroPointLaunch\\TestResources\\.GTNH")
-    systemProperty("zpl.url", "http://127.0.0.1/ZeroPointLauncher")
 }
 def allJars = (configurations.runtimeClasspath)
         .findAll{it.isFile()}
@@ -82,7 +81,3 @@ jar {
     }
 }
 
-tasks.register("copyLib", Copy){
-    from configurations.runtimeClasspath
-    into "$buildDir/libs"
-}
