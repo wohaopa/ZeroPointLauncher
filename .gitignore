@@ -3,6 +3,7 @@
 /.idea/
 /.GTNH/
 /UI/.GTNH/
+/UI/logs/
 /build/
 /TestResources/
 /*/build/

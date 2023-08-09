@@ -64,7 +64,7 @@ public class MyDirectory extends MyFileBase {
             } else {
                 MyDirectory tmp = (MyDirectory) new MyDirectory(this, name + separator)
                     .makeMyFileSystemInstance(file1, exclude)
-                    .setFile(file);
+                    .setFile(file1);
                 fileCount += tmp.fileCount;
                 subs.put(name + separator, tmp);
             }

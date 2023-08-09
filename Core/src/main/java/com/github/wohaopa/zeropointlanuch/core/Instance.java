@@ -223,13 +223,13 @@ public class Instance {
     public MyDirectory getMyDirectory() {
         if (myImage == null) {
             File file = new File(insDir, "image.json");
-            if (file.isFile()) {
-                myImage = (MyDirectory) MyFileBase.getMyFileSystemByJson(information.name, file, imageDir);
-                if (file.lastModified() < imageDir.lastModified()) MyFileBase.update(myImage, imageDir, file);
-            } else {
+//            if (file.isFile()) {
+//                myImage = (MyDirectory) MyFileBase.getMyFileSystemByJson(information.name, file, imageDir);
+//                if (file.lastModified() < imageDir.lastModified()) MyFileBase.update(myImage, imageDir, file);
+//            } else {
                 myImage = (MyDirectory) MyDirectory.getMyFileSystemByFile(imageDir, null);
                 myImage.saveChecksumAsJson(file);
-            }
+//            }
         }
 
         return myImage;
