@@ -25,7 +25,6 @@ import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -72,44 +71,31 @@ public class RootScene {
         rootPane = new StackPane(); // 根Pane，用于显示其他的各种Pane
         {
             rootPane.getStylesheets().add("/assets/css/style.css");
-            rootPane.setMinWidth(580);
-            rootPane.setMinHeight(360);
+            rootPane.setMinWidth(ZplApplication.MIN_WIDTH);
+            rootPane.setMinHeight(ZplApplication.MIN_HEIGHT);
         }
         mainPane = new BorderPane(); // 主界面
         navigationBar = new HBox(); // 导航栏
         {
-            var back = new JFXButton();
             var title = new Label("ZeroPointLauncher - A GTNH Launcher by wohaopa!");
             var spacer1 = new Region();
             var spacer2 = new Region();
-            var close = new JFXButton();
-            close.setOnAction(event -> {
-                Platform.exit();
-                System.exit(0);
-            });
 
+            var back = new JFXButton();
             var backImg = new SVGGlyph(
                 0,
                 "angle-left",
                 "M358.286 640q0-7.429-5.714-13.143l-224.571-224.571 224.571-224.571q5.714-5.714 5.714-13.143t-5.714-13.143l-28.571-28.571q-5.714-5.714-13.143-5.714t-13.143 5.714l-266.286 266.286q-5.714 5.714-5.714 13.143t5.714 13.143l266.286 266.286q5.714 5.714 13.143 5.714t13.143-5.714l28.571-28.571q5.714-5.714 5.714-13.143z",
                 Color.WHITE);
             backImg.setSize(14, 14);
-            back.setButtonType(JFXButton.ButtonType.FLAT);
-            back.setPrefHeight(18);
-            back.setPrefWidth(18);
             back.setGraphic(backImg);
             back.setOnAction(event -> onBack());
             back.setRipplerFill(Color.BLACK);
 
             title.setMinHeight(20);
-            title.setAlignment(Pos.BOTTOM_CENTER);
-
             title.setFont(Font.font(14));
-            title.setTextFill(Color.WHITE);
 
-            close.setPrefHeight(18);
-            close.setPrefWidth(18);
-
+            var close = new JFXButton();
             var closeImg = new SVGGlyph(
                 0,
                 "CLOSE",
@@ -119,7 +105,10 @@ public class RootScene {
             close.setGraphic(closeImg);
             close.setCursor(Cursor.HAND);
             close.setRipplerFill(Color.BLACK);
-            close.setButtonType(JFXButton.ButtonType.FLAT);
+            close.setOnAction(event -> {
+                Platform.exit();
+                System.exit(0);
+            });
 
             HBox.setHgrow(spacer1, Priority.ALWAYS);
             HBox.setHgrow(spacer2, Priority.ALWAYS);
@@ -132,9 +121,8 @@ public class RootScene {
                 scene.getWindow().setX(event.getScreenX() - xOffset);
                 scene.getWindow().setY(event.getScreenY() - yOffset);
             });
-            navigationBar.setBackground(new Background(new BackgroundFill(Color.rgb(40, 40, 40, 0.9), null, null)));
-            navigationBar.setMinHeight(24);
-            navigationBar.setMaxHeight(24);
+
+            navigationBar.getStyleClass().add("navigation-bar");
             navigationBar.getChildren().addAll(back, spacer1, title, spacer2, close);
         }
 
@@ -158,6 +146,7 @@ public class RootScene {
                     || baseMyScene instanceof ConsoleView) btn.setDisable(true);
                 menuPane.getChildren().add(btn);
             });
+
             menuPane.widthProperty()
                 .addListener((observable, oldValue, newValue) -> menuPane.getChildren().forEach(node -> {
                     if (node instanceof JFXButton btn) {
@@ -165,7 +154,8 @@ public class RootScene {
                     }
                 }));
             if (menuItems.size() != 0) onAdd(menuItems.get(0).getPane());
-            menuPane.setBackground(new Background(new BackgroundFill(Color.rgb(60, 60, 60, 0.9), null, null)));
+
+            menuPane.getStyleClass().add("menu-pane");
         }
         launcherBar = new HBox();
         {
@@ -245,17 +235,14 @@ public class RootScene {
                     }
                 });
             });
-
-            launcherBar.setAlignment(Pos.CENTER);
             launcherBar.getChildren().addAll(accountCh, spacer1, instanceCh, spacer2, launch);
-            launcherBar.setBackground(new Background(new BackgroundFill(Color.rgb(50, 50, 50, 0.9), null, null)));
-            launcherBar.setPrefHeight(50);
+            launcherBar.getStyleClass().add("launcher-bar");
         }
 
-        mainPane.setBackground(new Background(new BackgroundFill(Color.rgb(80, 80, 80, 0.3), null, null)));
         mainPane.setTop(navigationBar);
         mainPane.setBottom(launcherBar);
         mainPane.setLeft(menuPane);
+        mainPane.getStyleClass().add("main-pane");
 
         rootPane.setBackground(
             new Background(

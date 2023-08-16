@@ -1,4 +1,97 @@
+/* ====================== 全局元素 ======================*/
+
+/* ====================== 菜单 ======================*/
+.context-menu {
+    -fx-background-color: black;
+}
+.context-menu .menu-item .label{
+    -fx-text-fill: white;
+}
+
+/*垂直布局*/
+.vbox{
+    -fx-alignment: center;
+    -fx-spacing: 25;
+}
+
+/*按钮*/
+.label,
+.jfx-button {
+    -fx-text-fill: white;
+}
+.jfx-button:hover {
+    -fx-background-color: rgba(30, 30, 30, 0.5);
+}
+
+
+/*滑动区域滑动条*/
+.scroll-pane .scroll-bar:horizontal,
+.scroll-pane .scroll-bar:vertical {
+    -fx-background-color: black;
+}
+.scroll-pane .viewport  {
+    -fx-background-color: black;
+}
+
+
+.jfx-tab-pane .headers-region .tab-container .tab-label {
+    -fx-font-size: 12;
+}
+.jfx-tab-pane .headers-region > .tab > .jfx-rippler {
+    -jfx-rippler-fill: white;
+}
+.jfx-tab-pane .headers-region .tab-selected-line {
+    -fx-background-color: white;
+}
+
+.jfx-text-field {
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+}
+
+.jfx-toggle-button {
+    -jfx-size: 8;
+    -jfx-toggle-color: white;
+}
+
+/* ====================== 导航栏 ======================*/
+.navigation-bar {
+    -fx-alignment: center;
+    -fx-background-color: rgba(40, 40, 40, 0.9);
+    -fx-min-height: 24;
+    -fx-max-height: 24;
+}
+.navigation-bar>.jfx-button:hover{
+    -jfx-button-type: FLAT;
+    -fx-pref-width: 18;
+    -fx-pref-height: 18;
+}
+.menu-pane {
+    -fx-background-color: rgba(60, 60, 60, 0.9);
+    -fx-spacing: 10;
+    -fx-pref-width: 70;
+}
+
+.main-pane{
+    -fx-background-color: rgba(80, 80, 80, 0.3);
+}
+.launcher-bar{
+    -fx-background-color: rgba(50, 50, 50, 0.9);
+    -fx-alignment: center;
+    -fx-pref-height: 70;
+    -fx-padding: 10,10,10,10;
+    -fx-border-width: 1;
+    -fx-border-color: black;
+    -fx-border-radius: 15;
+    /*-fx-background-radius: 15;*/
+}
+.launcher-bar:hover{
+
+    -fx-border-color: white;
+}
+
 /* ====================== launcherBar ======================*/
+
 
 .zpl-combo-box .list-view .jfx-list-cell {
     -fx-background-color: rgba(0.1, 0.1, 0.1, 0.5);
@@ -23,11 +116,6 @@
 .zpl-combo-box .list-view .jfx-list-cell:selected,
 .zpl-combo-box .list-view .jfx-list-cell:filled:hover {
     -fx-background-color: gray;
-}
-
-.zpl-text-field {
-    -fx-text-fill: white;
-    -fx-font-size: 12px;
 }
 
 .tab-pane,
@@ -59,7 +147,6 @@
 }
 
 .instance-info-grid .label,
-.instance-info-grid .jfx-text-field,
 .jfx-tree-view .tree-cell {
     -fx-text-fill: white;
     -fx-font-size: 12px;
@@ -84,13 +171,9 @@
 }
 
 .control-view .jfx-button {
-    -fx-text-fill: white;
     -fx-pref-width: 120;
 }
 
-.control-view .jfx-button:hover {
-    -fx-background-color: rgba(30, 30, 30, 0.5);
-}
 
 /* ====================== dialog ======================*/
 
@@ -102,50 +185,7 @@
     -fx-text-fill: white;
 }
 
-.vbox{
-    -fx-alignment: center;
-    -fx-spacing: 25;
-}
-
-.dialog-layout .jfx-button,
-.dialog-content .jfx-button {
-    -fx-text-fill: white;
-}
-
-.dialog-content .jfx-button:hover {
-    -fx-background-color: rgba(30, 30, 30, 0.5);
-}
-
-.dialog-content .scroll-pane .viewport  {
-    -fx-background-color: black;
-}
-.dialog-content .scroll-pane .scroll-bar:horizontal,
-.dialog-content .scroll-pane .scroll-bar:vertical {
-    -fx-background-color: black;
-}
 .dialog-content .tab-header-background{
     -fx-background-color: none;
-}
-.jfx-tab-pane .headers-region .tab-container .tab-label {
-    -fx-font-size: 12;
-}
-.jfx-tab-pane .headers-region > .tab > .jfx-rippler {
-    -jfx-rippler-fill: white;
-}
-.jfx-tab-pane .headers-region .tab-selected-line {
-    -fx-background-color: white;
-}
-.jfx-toggle-button {
-    -jfx-size: 8;
-    -jfx-toggle-color: white;
-}
-
-
-/* ====================== 菜单 ======================*/
-.context-menu {
-    -fx-background-color: black;
-}
-.context-menu .menu-item .label{
-    -fx-text-fill: white;
 }
 

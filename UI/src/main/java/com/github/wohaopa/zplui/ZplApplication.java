@@ -22,6 +22,9 @@ package com.github.wohaopa.zplui;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -39,18 +42,103 @@ public class ZplApplication extends Application {
     @Override
     public void start(Stage stage) {
         root = new RootScene();
+        var scene = root.getScene();
 
-        stage.setScene(root.getScene());
+        stage.setScene(scene);
         stage.setTitle("ZeroPointLauncher - A GTNH Launcher by wohaopa!");
         stage.initStyle(StageStyle.TRANSPARENT);
+        stage.getIcons().add(new Image("assets/img/logo.png"));
         stage.show();
         stage.setOnCloseRequest(event -> {
             Platform.exit();
             System.exit(0);
         });
+        bindResize(scene, stage);
+    }
+
+    public static final double MIN_WIDTH = 580; // 窗口最小宽度
+    public static final double MIN_HEIGHT = 360; // 窗口最小高度
+    private static final int RESIZE_WIDTH = 5; // 判定是否为调整窗口状态的范围与边界距离
+    private static Pos pos = Pos.None;
+
+    private enum Pos {
+
+        Right,
+        Left,
+        Top,
+        Bottom,
+        RightTop,
+        RightBottom,
+        LeftTop,
+        LeftBottom,
+        None;
+
+        public boolean bottom() {
+            return this == Pos.Bottom || this == Pos.LeftBottom || this == Pos.RightBottom;
+        }
+
+        public boolean right() {
+            return this == Pos.Right || this == Pos.RightBottom || this == Pos.RightTop;
+        }
+
+        public boolean left() {
+            return this == Pos.Left || this == Pos.LeftBottom || this == Pos.LeftTop;
+        }
+
+        public boolean top() {
+            return this == Pos.Top || this == Pos.LeftTop || this == Pos.RightTop;
+        }
     }
 
     public static StackPane getRootPane() {
         return root.getRootPane();
+    }
+
+    private static void bindResize(Scene scene, Stage stage) {
+
+        scene.setOnMouseMoved(event -> {
+            event.consume();
+            double x = event.getSceneX();
+            double y = event.getSceneY();
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            Cursor cursorType;
+
+            if (y >= height - RESIZE_WIDTH) {
+                if (x >= width - RESIZE_WIDTH) {
+                    pos = Pos.RightBottom;
+                    cursorType = Cursor.SE_RESIZE;
+                } else {
+                    pos = Pos.Bottom;
+                    cursorType = Cursor.S_RESIZE;
+                }
+            } else {
+                if (x >= width - RESIZE_WIDTH) {
+                    pos = Pos.Right;
+                    cursorType = Cursor.E_RESIZE;
+                } else {
+                    pos = Pos.None;
+                    cursorType = Cursor.DEFAULT;
+                }
+            }
+            scene.setCursor(cursorType);
+        });
+        scene.setOnMouseDragged(event -> {
+            // event.consume();
+            double x = event.getSceneX();
+            double y = event.getSceneY();
+
+            double nextWidth = stage.getWidth();
+            double nextHeight = stage.getHeight();
+
+            if (pos.right()) {
+                nextWidth = Math.max(x, MIN_WIDTH);
+            }
+            if (pos.bottom()) {
+                nextHeight = Math.max(y, MIN_HEIGHT);
+            }
+            stage.setWidth(nextWidth);
+            stage.setHeight(nextHeight);
+        });
     }
 }
